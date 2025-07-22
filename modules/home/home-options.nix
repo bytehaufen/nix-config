@@ -14,6 +14,7 @@ in {
   options.opts.home = {
     tui = mkEnableOption "Enable TUI applications in the home environment";
     gui = mkEnableOption "Enable GUI applications in the home environment";
+    agenix = mkEnableOption "Enable agenix, a tool for managing secrets";
     nixGL = mkEnableOption "Enable NixGL, the wrapper for OpenGL applications in non-NixOS";
     windowManager.hyprland = mkEnableOption "Enable Hyprland, a dynamic tiling Wayland compositor";
 

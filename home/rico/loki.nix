@@ -9,6 +9,7 @@
   opts.home = {
     tui.enable = true;
     gui.enable = true;
+    agenix.enable = true;
     windowManager.hyprland.enable = true;
 
     programs = {

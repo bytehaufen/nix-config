@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   config,
   pkgs,
   ...
@@ -11,11 +12,13 @@ in {
     ./secrets.nix
   ];
 
-  home.packages = [pkgs.ragenix];
+  config = lib.mkIf config.opts.home.agenix.enable {
+    home.packages = [pkgs.ragenix];
 
-  age = {
-    identityPaths = ["${home}/.ssh/id_ed25519_rico"];
-    secretsDir = "${home}/.agenix/agenix";
-    secretsMountPoint = "${home}/.agenix/agenix.d";
+    age = {
+      identityPaths = ["${home}/.ssh/id_ed25519_rico"];
+      secretsDir = "${home}/.agenix/agenix";
+      secretsMountPoint = "${home}/.agenix/agenix.d";
+    };
   };
 }
