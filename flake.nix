@@ -175,18 +175,6 @@
           isStandalone = true;
         };
       };
-
-      "rico@vm1" = lib.homeManagerConfiguration {
-        modules = [
-          ./modules/home
-          ./home/rico/vm1.nix
-        ];
-        pkgs = pkgsFor.x86_64-linux;
-        extraSpecialArgs = {
-          inherit self inputs outputs vars;
-          isStandalone = true;
-        };
-      };
     };
   };
 }
