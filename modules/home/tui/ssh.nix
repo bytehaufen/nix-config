@@ -21,7 +21,7 @@
         hostname = "ssh.github.com";
         user = "git";
         identityFile = config.age.secrets.id_ed25519_github.path;
-        identitiesOnly = true;
+        identitiesOnly = true; # FIXME: check
         addKeysToAgent = "yes";
       };
     };
