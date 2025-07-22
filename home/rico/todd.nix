@@ -5,6 +5,7 @@
   ];
 
   opts.home = {
+    tui.enable = true;
     gui.enable = true;
     nixGL.enable = true;
     windowManager.hyprland.enable = false;

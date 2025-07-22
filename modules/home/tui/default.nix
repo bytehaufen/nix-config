@@ -15,7 +15,7 @@
     ./skim.nix
     ./ssh.nix
     ./starship.nix
-    ./tmux
+    ./tmux # FIXME: Flatten
     ./xdg.nix
     ./yazi
     ./zellij

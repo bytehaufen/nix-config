@@ -7,6 +7,7 @@
   ];
 
   opts.home = {
+    tui.enable = true;
     gui.enable = true;
     windowManager.hyprland.enable = true;
 
