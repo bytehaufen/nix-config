@@ -11,7 +11,7 @@
 
     programs = {
       discord.enable = false;
-      nchat.enable = false;
+      nchat.enable = true;
       obs.enable = false;
       teams.enable = true;
     };
