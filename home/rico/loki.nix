@@ -83,5 +83,11 @@
       state.acc;
   in {
     monitor = calcMonitorStrings monitors;
+    workspace = [
+      "1, monitor:${philips1.name}, persistent:true"
+      "2, monitor:${philips2.name}, persistent:true"
+      "3, monitor:${asus.name}, persistent:true"
+      "4, monitor:${display.name}, persistent:true"
+    ];
   };
 }
