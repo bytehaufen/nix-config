@@ -55,6 +55,7 @@
     eza # `ls` replacement
     fd # `find` replacement
     file # File type detection
+    poppler-utils # PDF utilities
     hexyl # Hex viewer
     hyperfine # Benchmarking
     lazydocker # Docker manager
