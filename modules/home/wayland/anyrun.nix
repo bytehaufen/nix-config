@@ -25,7 +25,8 @@ in {
         ];
 
         closeOnClick = true;
-        width.fraction = 0.25;
+        width.fraction = 0.4;
+        x.fraction = 0.5;
         y.absolute = 15;
         hidePluginInfo = false;
       };
@@ -59,18 +60,7 @@ in {
           '';
       };
 
-      extraCss = let
-        inherit (inputs.nix-colors.lib.conversions) hexToRGBString;
-        inherit (config.colorScheme) palette;
-        toRGBA = color: opacity: "rgba(${hexToRGBString "," (lib.removePrefix "#" color)},${toString opacity})";
-
-        bg-col = toRGBA palette.base00 0.7;
-        border-col = toRGBA palette.base0A 0.7;
-        selected-col = toRGBA palette.base0A 0.7;
-        fg-col = "#ffffff";
-        fg-col2 = "#" + palette.base0F;
-        bg-main-box = toRGBA palette.base01 0.7;
-      in
+      extraCss =
         # css
         ''
           * {
@@ -78,44 +68,69 @@ in {
             font-size: 1.3rem;
           }
 
-          #window {
+          window {
             background: transparent;
           }
 
-          #plugin,
-          #main {
-            color: ${fg-col};
-            background-color: ${bg-col};
-          }
-          #entry {
-            color: ${fg-col};
-            background-color: ${bg-col};
-          }
-
-          #match {
-            color: ${fg-col};
-            background: ${bg-col};
-          }
-
-          #match:selected {
-            color: ${fg-col2};
-            background: ${selected-col};
-          }
-
-          #match {
-            padding: 3px;
-            border-radius: 15px;
-          }
-
-          #entry, #plugin:hover {
-            border-radius: 15px;
-          }
-
-          box#main {
-            background: ${bg-main-box};
-            border: 1px solid ${border-col};
-            border-radius: 15px;
+          box.main {
             padding: 5px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 2px solid @theme_selected_bg_color;
+            background-color: @theme_bg_color;
+            box-shadow: 0 0 5px black;
+          }
+
+
+          text {
+            min-height: 30px;
+            padding: 5px;
+            border-radius: 5px;
+          }
+
+          .matches {
+            background-color: rgba(0, 0, 0, 0);
+            border-radius: 10px;
+          }
+
+          box.plugin:first-child {
+            margin-top: 5px;
+          }
+
+          box.plugin.info {
+            min-width: 200px;
+          }
+
+          list.plugin {
+            background-color: rgba(0, 0, 0, 0);
+          }
+
+          label.match.description {
+            font-size: 10px;
+          }
+
+          label.plugin.info {
+            font-size: 14px;
+          }
+
+          .match {
+            background: transparent;
+          }
+
+          .match:selected {
+            border-left: 4px solid @theme_selected_bg_color;
+            background: transparent;
+            animation: fade 0.1s linear;
+          }
+
+          @keyframes fade {
+            0% {
+              opacity: 0;
+            }
+
+            100% {
+              opacity: 1;
+            }
           }
         '';
     };
