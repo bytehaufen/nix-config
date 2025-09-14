@@ -7,6 +7,7 @@ in {
     includes = [config.age.secrets.ssh-config-work.path];
     extraConfig = ''
       Host confluence-tunnel jira-tunnel gitlab-tunnel podman-registry-tunnel bender3 leela2 zoidberg leela kif elzar amy3 amy4 zapp zapp2 zappext svn-extern jenkins morbo nas smithers flanders svn
+        AddKeysToAgent yes
         IdentityFile ${identityFile}
     '';
   };

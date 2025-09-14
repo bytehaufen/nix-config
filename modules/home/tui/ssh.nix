@@ -1,7 +1,6 @@
 {config, ...}: {
   programs.ssh = {
     enable = true;
-    addKeysToAgent = "yes";
 
     matchBlocks = {
       "github.com" = {
@@ -9,6 +8,7 @@
         user = "git";
         identityFile = config.age.secrets.id_ed25519_github.path;
         identitiesOnly = true;
+        addKeysToAgent = "yes";
       };
     };
   };
