@@ -12,6 +12,7 @@
 
     programs = {
       discord.enable = true;
+      minetest.enable = true;
       nchat.enable = true;
       obs.enable = true;
       teams.enable = true;

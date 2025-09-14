@@ -20,6 +20,7 @@ in {
     programs = {
       hyprland = mkEnableOption "Enable Hyprland as the window manager";
       podman = mkEnableOption "Enable Podman for container management";
+      minetest = mkEnableOption "Enable minetest game";
       nix-ld = mkEnableOption "Enable Nix-LD for dynamic linking with Nix packages";
       zsh = mkEnableOption "Enable Zsh as the default shell";
     };

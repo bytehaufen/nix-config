@@ -3,6 +3,7 @@
     ./agenix
     ./core-packages.nix
     ./development.nix
+    ./games.nix
     ./greetd.nix
     ./home-manager.nix
     ./hyprland.nix

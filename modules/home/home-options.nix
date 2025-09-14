@@ -18,8 +18,9 @@ in {
 
     programs = {
       discord = mkEnableOption "Enable Discord Vesktop Client";
-      obs = mkEnableOption "Enable OBS Studio configuration.";
+      minetest = mkEnableOption "Enable Minetest, an open source voxel game engine";
       nchat = mkEnableOption "Enable nchat - Terminal-based chat client with support for Telegram and WhatsApp";
+      obs = mkEnableOption "Enable OBS Studio configuration.";
       teams = mkEnableOption "Enable Microsoft Teams Client for Linux";
     };
 
