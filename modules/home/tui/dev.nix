@@ -46,8 +46,7 @@
 
         # Dockerfile
         hadolint # Dockerfile linter
-        nodePackages.dockerfile-language-server-nodejs
-
+        dockerfile-language-server
         # Markdown
         glow # markdown previewer
         marksman # language server for markdown
