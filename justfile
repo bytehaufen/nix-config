@@ -14,13 +14,15 @@ nixos-gen HOSTNAME *ARGS:
 # Build and switch NixOS configuration
 [group('nix')]
 nixos-switch HOSTNAME *ARGS: clean
+  sudo -v
+  nom build ".#nixosConfigurations.{{HOSTNAME}}.config.system.build.toplevel" {{ARGS}} && \
   sudo nixos-rebuild switch --flake '.#{{HOSTNAME}}' {{ARGS}}
   @just notify
 
 # Build NixOS configuration
 [group('nix')]
 nixos-build HOSTNAME *ARGS:
-  sudo nixos-rebuild build --flake '.#{{HOSTNAME}}' {{ARGS}}
+  nom build ".#nixosConfigurations.{{HOSTNAME}}.config.system.build.toplevel" {{ARGS}}
   @just notify
 
 # Create home-manager configuration
