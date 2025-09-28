@@ -1,5 +1,4 @@
 {
-  pkgs,
   config,
   vars,
   ...
@@ -23,26 +22,84 @@ in {
       "wheel"
     ];
     openssh.authorizedKeys.keys = vars.sshAuthorizedKeys;
-
-    packages = [pkgs.home-manager];
   };
 
-  home-manager.users = {
-    "rico" = {
-      programs.home-manager.enable = true;
-
-      home = {
-        username = "rico";
-        homeDirectory = "/home/rico";
-        stateVersion = "25.05";
-        extraOutputsToInstall = ["doc" "devdoc"];
+  containers = {
+    syncthing-rico = {
+      autoStart = true;
+      privateNetwork = true;
+      hostAddress = "10.250.1.1";
+      localAddress = "10.250.1.2";
+      forwardPorts = [
+        {
+          containerPort = 8384;
+          hostPort = 8384;
+          protocol = "tcp";
+        }
+      ];
+      config = {lib, ...}: {
+        services.syncthing = {
+          enable = true;
+          openDefaultPorts = true;
+        };
+        networking = {
+          firewall.enable = true;
+          # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
+          useHostResolvConf = lib.mkForce false;
+        };
+        system.stateVersion = "25.05";
       };
-      news.display = "silent";
-      manual.manpages.enable = true;
+    };
 
-      services.syncthing = {
-        enable = true;
-        # TODO: Continue with the configuration
+    syncthing-steffen = {
+      autoStart = true;
+      privateNetwork = true;
+      hostAddress = "10.250.2.1";
+      localAddress = "10.250.2.2";
+      forwardPorts = [
+        {
+          containerPort = 8384;
+          hostPort = 8385;
+          protocol = "tcp";
+        }
+      ];
+      config = {lib, ...}: {
+        services.syncthing = {
+          enable = true;
+          openDefaultPorts = true;
+        };
+        networking = {
+          firewall.enable = true;
+          # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
+          useHostResolvConf = lib.mkForce false;
+        };
+        system.stateVersion = "25.05";
+      };
+    };
+
+    syncthing-maika = {
+      autoStart = true;
+      privateNetwork = true;
+      hostAddress = "10.250.3.1";
+      localAddress = "10.250.3.2";
+      forwardPorts = [
+        {
+          containerPort = 8384;
+          hostPort = 8386;
+          protocol = "tcp";
+        }
+      ];
+      config = {lib, ...}: {
+        services.syncthing = {
+          enable = true;
+          openDefaultPorts = true;
+        };
+        networking = {
+          firewall.enable = true;
+          # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
+          useHostResolvConf = lib.mkForce false;
+        };
+        system.stateVersion = "25.05";
       };
     };
   };

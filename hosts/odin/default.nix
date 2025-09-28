@@ -16,10 +16,6 @@
     networkmanager.enable = true;
   };
 
-  opts.nixos = {
-    home-manager.enable = true;
-  };
-
   hardware.graphics.enable = true;
 
   boot = {
