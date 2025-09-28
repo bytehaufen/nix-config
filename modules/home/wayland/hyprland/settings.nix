@@ -132,14 +132,7 @@ in {
   };
 
   # touchpad gestures
-  gestures = {
-    workspace_swipe = true;
-    workspace_swipe_forever = true;
-    workspace_swipe_fingers = 3;
-    workspace_swipe_cancel_ratio = 0.3;
-    workspace_swipe_distance = 1200;
-    workspace_swipe_create_new = true;
-  };
+  gesture = "3, horizontal, workspace";
 
   xwayland.force_zero_scaling = true;
 
