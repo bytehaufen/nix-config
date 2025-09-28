@@ -10,6 +10,7 @@
 in {
   users.mutableUsers = false;
   users.users.${username} = {
+    uid = 1000;
     hashedPassword = "$6$sPSd4O.QXpNQTOSi$TAkmMKvjCwUWJk0CJDEWWTaOHwQydEvYmIIWMQ3pttHuwQ6ErxrGnMc6kPFgox315g.Wmkojv3bj/R83zJhvp/";
     isNormalUser = true;
     extraGroups = ifTheyExist [

@@ -2,6 +2,7 @@
   pkgs,
   config,
   lib,
+  vars,
   ...
 }: {
   config = lib.mkIf config.opts.nixos.smb.enable {
@@ -11,10 +12,16 @@
     fileSystems."/mnt/NAS" = {
       device = "//192.168.178.100/NAS";
       fsType = "cifs";
-      options = let
-        # This line prevents hanging on network split
-        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      in ["${automount_opts},credentials=${config.age.secrets.smb-secrets.path}"];
+      options = [
+        "x-systemd.automount"
+        "noauto"
+        "x-systemd.idle-timeout=60"
+        "x-systemd.device-timeout=5s"
+        "x-systemd.mount-timeout=5s"
+        "credentials=${config.age.secrets.smb-secrets.path}"
+        "uid=${toString config.users.users.${vars.username}.uid}"
+        "gid=${toString config.users.groups.${config.users.users.${vars.username}.group}.gid}"
+      ];
     };
 
     services.gvfs = {
