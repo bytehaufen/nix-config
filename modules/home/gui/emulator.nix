@@ -11,15 +11,15 @@ in {
       WINEPREFIX = "${data}/wine";
     };
 
-    home.packages = with pkgs.stable; [
+    home.packages = with pkgs; [
       # Upstream mostly broken
-      pkgs.stable.quickemu # Emulator manager
-      pkgs.stable.quickgui # Quickemu frontend
-      spice-gtk # Spice client for quickemu
+      quickemu # Emulator manager
+      quickgui # Quickemu frontend
+      stable.spice-gtk # Spice client for quickemu
 
-      wineWowPackages.waylandFull # Windows compatibility layer
-      winetricks # Windows compatibility layer
-      distrobox
+      stable.wineWowPackages.waylandFull # Windows compatibility layer
+      stable.winetricks # Windows compatibility layer
+      stable.distrobox
     ];
 
     xdg.configFile."distrobox/distrobox.conf".text = ''
