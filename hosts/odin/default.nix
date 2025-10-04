@@ -18,6 +18,13 @@
 
   hardware.graphics.enable = true;
 
+  services = {
+    openssh = {
+      settings.PasswordAuthentication = false;
+      settings.KbdInteractiveAuthentication = false;
+    };
+  };
+
   boot = {
     loader = {
       systemd-boot = {
