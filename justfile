@@ -30,7 +30,7 @@ nixos-build HOSTNAME *ARGS:
 deploy-odin *ARGS:
   sudo -v
   nom build ".#nixosConfigurations.odin.config.system.build.toplevel" {{ARGS}} && \
-  NIX_SSHOPTS="-p 22220" nixos-rebuild switch --flake '.#odin' --target-host rico@localhost --ask-sudo-password {{ARGS}}
+  nixos-rebuild switch --flake '.#odin' --target-host rico@127.0.0.1 --ask-sudo-password -p 22220 {{ARGS}}
   @just notify
 
 # Create home-manager configuration
