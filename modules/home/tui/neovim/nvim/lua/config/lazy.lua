@@ -69,6 +69,7 @@ require("lazy").setup({
     { import = "plugins.extras.editor.telescope-extend" },
     { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.markdown-extend" },
+    { import = "plugins.extras.ai.codecompanion" },
     { import = "plugins" },
   },
   defaults = {
