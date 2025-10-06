@@ -1,27 +1,22 @@
 {
   pkgs,
-  inputs,
   lib,
   config,
   ...
-}: let
-  anyrunPackage = inputs.anyrun.packages.${pkgs.system};
-in {
+}: {
   config = lib.mkIf config.opts.home.windowManager.hyprland.enable {
     programs.anyrun = {
       enable = true;
 
-      package = anyrunPackage.anyrun;
-
       config = {
-        plugins = with anyrunPackage; [
-          applications
-          dictionary
-          randr
-          rink
-          shell
-          symbols
-          translate
+        plugins = with pkgs; [
+          "${anyrun}/lib/libapplications.so"
+          "${anyrun}/lib/dictionary.so"
+          "${anyrun}/lib/randr.so"
+          "${anyrun}/lib/rink.so"
+          "${anyrun}/lib/shell.so"
+          "${anyrun}/lib/symbols.so"
+          "${anyrun}/lib/translate.so"
         ];
 
         closeOnClick = true;
