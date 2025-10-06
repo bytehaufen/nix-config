@@ -26,26 +26,16 @@
   home.packages = [
     # COSIDE
     (pkgs.writeShellScriptBin "coside" ''
-      bash-no-nix
-      COSIDE_SHELL_OPTIONS='-f -c gnome-terminal' GTK_THEME=Adwaita COSIDE_LICENSE_FILE=27000@192.168.178.88 $HOME/Apps/coside/coside-latest/coside "$@"
+      exec bash-no-nix env COSIDE_SHELL_OPTIONS='-f -c gnome-terminal' GTK_THEME=Adwaita COSIDE_LICENSE_FILE=27000@192.168.178.88 "$HOME/Apps/coside/coside-latest/coside" "$@"
     '')
 
     # Eclipse COSIDE SDK
     (pkgs.writeShellScriptBin "coside-sdk" ''
-      bash-no-nix
-      # Force use light theme
-
-      export GTK_THEME=Adwaita
-
-      # Paths
-      export COSIDE_INSTALL_PATH="$HOME/Apps/coside/coside-latest"
+      COSIDE_INSTALL_PATH="$HOME/Apps/coside/coside-latest"
       COSIDE_SDK_DIR="$HOME/Apps/eclipse/coside-sdk-latest"
-
-      # Helper
       SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
-
-      # Launch
-      tcsh -c "cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && $COSIDE_SDK_DIR/coside-sdk/eclipse -data $COSIDE_SDK_DIR/ws"
+      EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && $COSIDE_SDK_DIR/coside-sdk/eclipse -data $COSIDE_SDK_DIR/ws"
+      exec bash-no-nix env GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
     '')
 
     # Tunnel for work network
