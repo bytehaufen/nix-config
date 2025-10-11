@@ -1,23 +1,13 @@
 return {
   {
-    "saghen/blink.cmp",
-    optional = true,
-    dependencies = { "fang2hou/blink-copilot" },
+    "folke/snacks.nvim",
     opts = function(_, opts)
-      return vim.tbl_deep_extend("force", opts, {
-        sources = {
-          default = { "copilot" },
-          providers = {
-            copilot = {
-              name = "copilot",
-              module = "blink-copilot",
-              score_offset = 0,
-              min_keyword_length = 2,
-              async = true,
-            },
-          },
-        },
-      })
+      opts.picker = {
+        enabled = true,
+        ui_select = true,
+        layout = { preset = "ivy", preview = "right" },
+        win = { preview = { enabled = true, wrap = true, width = 0.5 } },
+      }
     end,
   },
 }

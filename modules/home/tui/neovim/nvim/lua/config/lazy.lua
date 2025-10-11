@@ -65,13 +65,13 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.util.project" },
 
     -- custom module configs
+    { import = "plugins.extras.coding.blink-extend" },
     { import = "plugins.extras.ai.sidekick-extend" },
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
     { import = "plugins.extras.editor.overseer-extend" },
     { import = "plugins.extras.editor.telescope-extend" },
     { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.markdown-extend" },
-    { import = "plugins.extras.ai.codecompanion" },
     { import = "plugins" },
   },
   defaults = {
