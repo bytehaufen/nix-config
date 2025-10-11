@@ -12,6 +12,7 @@
     windowManager.hyprland.enable = false;
 
     programs = {
+      copilot.enable = true;
       discord.enable = false;
       nchat.enable = true;
       obs.enable = false;

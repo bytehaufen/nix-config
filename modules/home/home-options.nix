@@ -24,6 +24,7 @@ in {
       nchat = mkEnableOption "Enable nchat - Terminal-based chat client with support for Telegram and WhatsApp";
       obs = mkEnableOption "Enable OBS Studio configuration.";
       teams = mkEnableOption "Enable Microsoft Teams Client for Linux";
+      copilot = mkEnableOption "Enable GitHub Copilot CLI";
     };
 
     services = {

@@ -13,6 +13,7 @@
     windowManager.hyprland.enable = true;
 
     programs = {
+      copilot.enable = true;
       discord.enable = true;
       minetest.enable = true;
       nchat.enable = true;

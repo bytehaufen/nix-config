@@ -1,5 +1,6 @@
 {
   imports = [
+    ./ai.nix
     ./bat
     ./btop.nix
     ./core.nix
