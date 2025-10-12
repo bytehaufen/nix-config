@@ -6,7 +6,6 @@ return {
     opts = function(_, opts)
       return vim.tbl_deep_extend("force", opts, {
         sources = {
-          default = { "copilot" },
           providers = {
             copilot = {
               name = "copilot",
