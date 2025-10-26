@@ -2,11 +2,13 @@ return {
   -- Disable LazyVim's existing
   {
     "neovim/nvim-lspconfig",
-    init = function()
-      local keys = require("lazyvim.plugins.lsp.keymaps").get()
-      -- Disable the default <leader>ca keybind
-      keys[#keys + 1] = { "<leader>ca", false }
-    end,
+    opts = {
+      servers = {
+        ["*"] = {
+          { "<leader>ca", false },
+        },
+      },
+    },
   },
   {
     "aznhe21/actions-preview.nvim",
