@@ -3,7 +3,7 @@
   config,
   ...
 }: {
-  config = lib.mkIf config.opts.nixos.programs.minetest.enable {
+  config = lib.mkIf config.opts.nixos.programs.luanti.enable {
     networking.firewall = {
       allowedUDPPortRanges = [
         {

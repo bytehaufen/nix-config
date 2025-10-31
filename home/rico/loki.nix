@@ -15,7 +15,7 @@
     programs = {
       copilot.enable = true;
       discord.enable = true;
-      minetest.enable = true;
+      luanti.enable = true;
       nchat.enable = true;
       obs.enable = true;
       teams.enable = true;

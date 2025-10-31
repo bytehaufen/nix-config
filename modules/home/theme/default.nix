@@ -5,7 +5,7 @@
   inputs,
   ...
 }: let
-  tokyo-night-gtk = pkgs.tokyo-night-gtk.override {
+  tokyo-night-gtk = pkgs.tokyonight-gtk-theme.override {
     colorVariants = [
       "dark"
     ];
@@ -35,7 +35,7 @@ in {
       packages = with pkgs; [
         material-design-icons
         font-awesome
-        noto-fonts-emoji
+        noto-fonts-color-emoji
 
         dejavu_fonts
         julia-mono

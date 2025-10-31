@@ -7,7 +7,7 @@
   config = lib.mkIf config.opts.home.gui.enable {
     home.packages = with pkgs; [
       # MS Office alternatives
-      onlyoffice-bin
+      onlyoffice-desktopeditors
       libreoffice
 
       # Image editing

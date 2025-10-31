@@ -4,9 +4,9 @@
   pkgs,
   ...
 }: {
-  config = lib.mkIf config.opts.home.programs.minetest.enable {
+  config = lib.mkIf config.opts.home.programs.luanti.enable {
     home.packages = with pkgs; [
-      minetest
+      luanti
     ];
   };
 }
