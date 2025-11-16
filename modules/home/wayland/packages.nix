@@ -11,7 +11,6 @@
       dconf # Configuration system
       libsForQt5.qt5ct # Qt5 configuration tool
       libva # Video Acceleration API
-      mako # Notification daemon
       meson # Build system
       morewaita-icon-theme # Icon theme
       networkmanagerapplet # Provide GUI app: nm-connection-editor

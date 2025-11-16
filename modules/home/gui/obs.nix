@@ -13,7 +13,6 @@
         wlrobs
         obs-vaapi
         obs-teleport
-        droidcam-obs
         obs-vkcapture
         obs-gstreamer
         obs-3d-effect
