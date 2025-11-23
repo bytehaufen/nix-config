@@ -154,10 +154,12 @@
             };
           };
           git = {
-            paging = {
-              colorArg = "always";
-              pager = "delta --dark --paging=never -s";
-            };
+            pagers = [
+              {
+                colorArg = "always";
+                pager = "delta --dark --paging=never -s";
+              }
+            ];
             parseEmoji = true;
           };
         };
