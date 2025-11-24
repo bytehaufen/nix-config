@@ -17,7 +17,7 @@
       kdePackages.okular
 
       # Note-taking apps
-      obsidian
+      (config.lib.nixGL.wrap obsidian)
     ];
 
     programs.zathura = {
