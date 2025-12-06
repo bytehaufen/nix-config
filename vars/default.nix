@@ -1,6 +1,6 @@
 {
   username = "rico";
-  gitName = "bytehaufen";
+  gitName = "Rico Ukro";
   email = "rico.ukro@gmx.de";
 
   sshAuthorizedKeys = [
