@@ -36,7 +36,6 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.editor.harpoon2" },
     { import = "lazyvim.plugins.extras.editor.overseer" },
     { import = "lazyvim.plugins.extras.editor.refactoring" },
-    { import = "lazyvim.plugins.extras.editor.telescope" },
     { import = "lazyvim.plugins.extras.formatting.prettier" },
     { import = "lazyvim.plugins.extras.lang.clangd" },
     { import = "lazyvim.plugins.extras.lang.cmake" },
@@ -69,7 +68,6 @@ require("lazy").setup({
     { import = "plugins.extras.ai.sidekick-extend" },
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
     { import = "plugins.extras.editor.overseer-extend" },
-    { import = "plugins.extras.editor.telescope-extend" },
     { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.markdown-extend" },
     { import = "plugins" },
