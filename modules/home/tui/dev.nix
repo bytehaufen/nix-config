@@ -103,7 +103,7 @@
         # Java
         gradle
         maven
-        jdk
+        jdk25
         jdt-language-server
 
         # Lua
