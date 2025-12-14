@@ -8,7 +8,7 @@
     home.packages = with pkgs; [
       # MS Office alternatives
       onlyoffice-desktopeditors
-      libreoffice
+      pkgs.stable.libreoffice
 
       # Image editing
       gimp
