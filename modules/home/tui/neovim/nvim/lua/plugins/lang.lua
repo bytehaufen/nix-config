@@ -11,6 +11,7 @@ return {
           "html",
           "arduino_language_server",
           "docker_compose_language_service",
+          "just-lsp",
         })
       end
       opts.automatic_installation = true
