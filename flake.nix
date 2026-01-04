@@ -57,6 +57,12 @@
       url = "git+ssh://git@github.com/bytehaufen/nix-secrets.git";
       flake = false;
     };
+
+    workaholick = {
+      # FIXME: Use non SSH after release
+      url = "git+ssh://git@github.com/bytehaufen/workaholick.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
