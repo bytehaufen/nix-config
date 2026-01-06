@@ -114,6 +114,7 @@ in {
         vim = "nvim";
         wlc = "wl-copy";
         wlp = "wl-paste";
+        wh = lib.getExe pkgs.workaholick;
         batt = "${lib.getExe pkgs.acpi} -b";
 
         us = "systemctl --user";
