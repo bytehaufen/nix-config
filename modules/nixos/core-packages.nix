@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   environment.systemPackages = with pkgs; [
+    android-tools
     git # used by nix flakes
     git-lfs # used by huggingface models
 
