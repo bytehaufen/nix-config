@@ -23,80 +23,72 @@
       highopacity
     ];
   in [
-    "blur, ${toRegex blurred}"
-    "xray 1, ${toRegex ["bar"]}"
-    "ignorealpha 0.5, ${toRegex (highopacity ++ ["music"])}"
-    "ignorealpha 0.2, ${toRegex lowopacity}"
+    "blur true, match:namespace ${toRegex blurred}"
+    "xray true 1, match:namespace ${toRegex ["bar"]}"
   ];
 
   # Window rules
   windowrule = [
     # Gnome calculator
-    "float, class:^(org.gnome.Calculator)$"
+    "match:class ^(org.gnome.Calculator)$, float true"
 
     # Quickgui (Quickemu)
-    "float, class:^(quickgui)$"
-    "move 100%-w-20, class:^(quickgui)$"
-    "float, class:^(spicy)$"
-    "size 800 600, class:^(spicy)$"
+    "match:class ^(quickgui)$, float true"
+    "match:class ^(quickgui)$, move 100%-w-20"
+    "match:class ^(spicy)$, float true"
+    "match:class ^(spicy)$, size 800 600"
 
     # Allow tearing in games
-    "immediate, class:^(osu\!|cs2)$"
+    "match:class ^(osu\!|cs2)$, immediate true"
 
     # Make Firefox PiP window floating and sticky
-    "float, title:^(Picture-in-Picture)$"
-    "pin, title:^(Picture-in-Picture)$"
+    "match:title ^(Picture-in-Picture)$, float true"
+    "match:title ^(Picture-in-Picture)$, pin true"
 
     # Throw sharing indicators away
-    "workspace special silent, title:^(Firefox — Sharing Indicator)$"
-    "workspace special silent, title:^(.*is sharing (your screen|a window)\.)$"
+    "match:title ^(Firefox — Sharing Indicator)$, workspace special silent"
+    "match:title ^(.*is sharing (your screen|a window)\.)$, workspace special silent"
 
     # Idle inhibit while watching videos
-    "idleinhibit focus, class:^(mpv|.+exe|celluloid)$"
-    "idleinhibit focus, class:^(brave-browser)$, title:^(.*YouTube.*)$"
-    "idleinhibit fullscreen, class:^(brave-browser)$"
-    "idleinhibit focus, class:^(firefox)$, title:^(.*YouTube.*)$"
-    "idleinhibit fullscreen, class:^(firefox)$"
+    "match:class ^(mpv|.+exe|celluloid)$, idle_inhibit focus"
+    "match:class ^(brave-browser)$ match:title:^(.*YouTube.*)$, idle_inhibit focus"
+    "match:class ^(brave-browser)$, idle_inhibit fullscreen"
+    "match:class ^(firefox)$ match:title:^(.*YouTube.*)$, idle_inhibit focus"
+    "match:class ^(firefox)$, idle_inhibit fullscreen"
 
     # Do not go idle while anything is fullscreen
-    "idleinhibit fullscreen, class:^(kitty.*)$"
-
-    # Spotube
-    "float, class:^(spotube)$"
-    "size 300 700, class:^(spotube)$"
-    "monitor 0, class:^(spotube)$"
-    "move 100%-w-20, class:^(spotube)$"
+    "match:class ^(kitty.*)$, idle_inhibit fullscreen"
 
     # Musicpod
-    "float, class:^(musicpod)$"
-    "size 500 700, class:^(musicpod)$"
-    "monitor 0, class:^(musicpod)$"
-    "move 100%-w-20, class:^(musicpod)$"
+    "match:class ^(musicpod)$, float true"
+    "match:class ^(musicpod)$, size 500 700"
+    "match:class ^(musicpod)$, monitor 0"
+    "match:class ^(musicpod)$, move 100%-w-20"
 
     # Gpt4all
-    "float, class:^(io.gpt4all.)$"
-    "size 1280 720, class:^(io.gpt4all.)$"
-    "move 100%-w-20, class:^(io.gpt4all.)$"
+    "match:class ^(io.gpt4all.)$, float true"
+    "match:class ^(io.gpt4all.)$, size 1280 720"
+    "match:class ^(io.gpt4all.)$, move 100%-w-20"
 
-    "dimaround, class:^(gcr-prompter)$"
-    "dimaround, class:^(xdg-desktop-portal-gtk)$"
-    "dimaround, class:^(polkit-gnome-authentication-agent-1)$"
+    "match:class ^(gcr-prompter)$, dim_around true"
+    "match:class ^(xdg-desktop-portal-gtk)$, dim_around true"
+    "match:class ^(polkit-gnome-authentication-agent-1)$, dim_around true"
 
     # Fix xwayland apps
-    "rounding 0, xwayland:1"
-    "center, class:^(.*jetbrains.*)$, title:^(Confirm Exit|Open Project|win424|win201|splash)$"
-    "size 640 400, class:^(.*jetbrains.*)$, title:^(splash)$"
+    "match:xwayland 1, rounding 0"
+    "match:class ^(.*jetbrains.*)$ match:title:^(Confirm Exit|Open Project|win424|win201|splash)$, center true"
+    "match:class ^(.*jetbrains.*)$ match:title:^(splash)$, size 640 400"
 
     # File / directory chooser
-    "float,title:^(Open File)(.*)$"
-    "size 640 480,title:^(Open File)(.*)$"
-    "float,title:^(Open Folder)(.*)$"
-    "size 640 480,title:^(Open Folder)(.*)$"
-    "float,title:^(Save As)(.*)$"
-    "size 640 480,title:^(Save As)(.*)$"
-    "float,title:^(Library)(.*)$ "
-    "size 640 480,title:^(Library)(.*)$ "
-    "float,title:^(Please choose a directory)(.*)$"
-    "size 640 480,title:^(Please choose a directory)(.*)$"
+    "match:title ^(Open File)(.*)$, float true"
+    "match:title ^(Open File)(.*)$, size 640 480"
+    "match:title ^(Open Folder)(.*)$, float true"
+    "match:title ^(Open Folder)(.*)$, size 640 480"
+    "match:title ^(Save As)(.*)$, float true"
+    "match:title ^(Save As)(.*)$, size 640 480"
+    "match:title ^(Library)(.*)$, float true"
+    "match:title ^(Library)(.*)$ , size 640 480"
+    "match:title ^(Please choose a directory)(.*)$, float true"
+    "match:title ^(Please choose a directory)(.*)$, size 640 480"
   ];
 }
