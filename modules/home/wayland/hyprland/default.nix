@@ -20,7 +20,7 @@ in {
     home = {
       packages = [pkgs.swaybg] ++ builtins.attrValues scripts;
       file.".wayland-session" = {
-        source = "${lib.getExe pkgs.hyprland}";
+        source = "${lib.getExe' pkgs.hyprland "start-hyprland"}";
         executable = true;
       };
 
