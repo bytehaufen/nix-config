@@ -29,7 +29,7 @@ in
     .modules-left, .modules-right, .modules-center {
       background-color: ${surface};
       border-radius: ${border-radius};
-      padding: 0.25em 0.25em;
+      padding: 0.1em 0.1em;
     }
 
     /* modules-left */
