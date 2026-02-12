@@ -21,6 +21,13 @@
       type = "Application";
       categories = ["Development"];
     };
+    coside-sdk-no-nix = {
+      name = "COSIDE SDK";
+      exec = "coside-sdk-no-nix";
+      terminal = false;
+      type = "Application";
+      categories = ["Development"];
+    };
   };
 
   home.packages = [
@@ -34,7 +41,16 @@
       COSIDE_INSTALL_PATH="$HOME/Apps/coside/coside-latest"
       COSIDE_SDK_DIR="$HOME/Apps/eclipse/coside-sdk-latest"
       SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
-      EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && $COSIDE_SDK_DIR/coside-sdk/eclipse -data $COSIDE_SDK_DIR/ws"
+      EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && $COSIDE_SDK_DIR/coside-sdk/eclipse -data $COSIDE_SDK_DIR/ws"
+      GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
+    '')
+
+    # Eclipse COSIDE SDK with out nix in ENV
+    (pkgs.writeShellScriptBin "coside-sdk-no-nix" ''
+      COSIDE_INSTALL_PATH="$HOME/Apps/coside/coside-latest"
+      COSIDE_SDK_DIR="$HOME/Apps/eclipse/coside-sdk-latest"
+      SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
+      EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && $COSIDE_SDK_DIR/coside-sdk/eclipse -data $COSIDE_SDK_DIR/ws"
       exec bash-no-nix env GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
     '')
 
