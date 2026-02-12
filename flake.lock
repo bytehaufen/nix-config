@@ -1181,11 +1181,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1768421174,
-        "narHash": "sha256-Oqu23iLJ3OofIPHf+gSHpJ10rHK6+r2w4YztrDw+Llc=",
+        "lastModified": 1768717133,
+        "narHash": "sha256-me9vjb2pFFqkv+1xzbVrdluYSY6/8d+TpXJS7wQEJzw=",
         "ref": "refs/heads/main",
-        "rev": "fc98093ce9e3c6a793c4314a155a4f0e3a5d3b9b",
-        "revCount": 75,
+        "rev": "1f8728c6f41c6ad7ece3d4e2779de63ce272655f",
+        "revCount": 78,
         "type": "git",
         "url": "ssh://git@github.com/bytehaufen/workaholick.git"
       },
