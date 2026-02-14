@@ -13,7 +13,6 @@
     ];
 
     highopacity = [
-      "anyrun"
       "osd"
       "logout_dialog"
     ];
