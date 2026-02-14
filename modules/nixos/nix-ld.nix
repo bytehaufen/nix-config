@@ -27,9 +27,9 @@
     stdenv.cc.cc
     subversion
     tcsh
-    xorg.libX11
-    xorg.libXrender
-    xorg.libXtst
+    libx11
+    libxrender
+    libxtst
     zlib
   ];
 in {
