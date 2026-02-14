@@ -288,7 +288,7 @@ in {
             format-icons = {
               activated = " ";
               deactivated = " ";
-              start-activated = false;
+              start-activated = true;
             };
           };
           power-profiles-daemon = {
