@@ -63,5 +63,9 @@
     ];
   };
 
+  swapDevices = [
+    {device = "/swap/swapfile";}
+  ];
+
   system.stateVersion = "25.05";
 }

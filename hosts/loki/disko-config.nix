@@ -42,8 +42,8 @@
                       mountOptions = ["compress=zstd" "noatime"];
                     };
                     "/swap" = {
-                      mountpoint = "/swap/swapfile";
-                      swap.swapfile.size = "16G";
+                      mountpoint = "/swap";
+                      swap.swapfile.size = "48G"; # Rust-analyzer can be hungry
                     };
                   };
                 };
