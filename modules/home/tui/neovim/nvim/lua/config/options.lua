@@ -8,6 +8,8 @@ vim.g.autoformat = false
 vim.g.lazyvim_python_lsp = "basedpyright"
 vim.g.lazyvim_python_ruff = "ruff"
 
+vim.g.lazyvim_rust_diagnostics = "bacon-ls"
+
 -- Remove the default `~` char for end of buffer
 vim.opt.fillchars = "eob: "
 
