@@ -13,6 +13,8 @@
 
     programs = {
       copilot.enable = true;
+      ollama.enable = true;
+      mcphost.enable = true;
       discord.enable = false;
       nchat.enable = true;
       obs.enable = false;

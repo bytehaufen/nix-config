@@ -25,6 +25,9 @@ in {
       obs = mkEnableOption "Enable OBS Studio configuration.";
       teams = mkEnableOption "Enable Microsoft Teams Client for Linux";
       copilot = mkEnableOption "Enable GitHub Copilot CLI";
+      ollama = mkEnableOption "Enable Ollama - Get up and running large language models";
+      mcphost = mkEnableOption "Enable Mcphost - Cli host application that enables LLMs to interact
+        external tools through MCP";
     };
 
     services = {

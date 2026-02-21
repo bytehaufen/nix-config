@@ -4,9 +4,19 @@
   pkgs,
   ...
 }: {
-  config = lib.mkIf config.opts.home.programs.copilot.enable {
-    home.packages = with pkgs; [
-      github-copilot-cli
-    ];
+  config = with pkgs; {
+    home.packages =
+      lib.optionals config.opts.home.programs.copilot.enable [
+        github-copilot-cli
+      ]
+      ++ lib.optionals config.opts.home.programs.ollama.enable [
+        ollama-vulkan
+      ]
+      ++ lib.optionals config.opts.home.programs.ollama.enable [
+        ollama
+      ]
+      ++ lib.optionals config.opts.home.programs.mcphost.enable [
+        mcphost
+      ];
   };
 }
