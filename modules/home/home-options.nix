@@ -26,8 +26,11 @@ in {
       teams = mkEnableOption "Enable Microsoft Teams Client for Linux";
       copilot = mkEnableOption "Enable GitHub Copilot CLI";
       ollama = mkEnableOption "Enable Ollama - Get up and running large language models";
+      ollama-vulkan = mkEnableOption "Enable Ollama - Get up and running large language models with
+        vulkan backend";
       mcphost = mkEnableOption "Enable Mcphost - Cli host application that enables LLMs to interact
         external tools through MCP";
+      openai-codex = mkEnableOption "Enable Codex CLI - Lightweight coding agent that runs in your terminal";
     };
 
     services = {

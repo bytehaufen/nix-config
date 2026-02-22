@@ -13,8 +13,10 @@
 
     programs = {
       copilot.enable = true;
-      ollama.enable = true;
+      ollama-vulkan.enable = true;
       mcphost.enable = true;
+      openai-codex.enable = true;
+
       discord.enable = false;
       nchat.enable = true;
       obs.enable = false;

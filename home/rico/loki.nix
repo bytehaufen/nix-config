@@ -16,6 +16,8 @@
       copilot.enable = true;
       ollama.enable = true;
       mcphost.enable = true;
+      openai-codex.enable = true;
+
       discord.enable = true;
       luanti.enable = true;
       nchat.enable = true;
