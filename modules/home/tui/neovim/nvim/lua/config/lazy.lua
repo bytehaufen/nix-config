@@ -67,7 +67,6 @@ require("lazy").setup({
     -- { import = "plugins.extras.coding.blink-extend" },  -- See copilot comment
     { import = "plugins.extras.ai.sidekick-extend" },
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
-    { import = "plugins.extras.editor.overseer-extend" },
     { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.markdown-extend" },
     { import = "plugins" },
