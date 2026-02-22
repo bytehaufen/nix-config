@@ -6,20 +6,23 @@
 }: {
   config = with pkgs; {
     home.packages =
-      lib.optionals config.opts.home.programs.copilot.enable [
-        github-copilot-cli
+      [
+        (config.lib.nixGL.wrap vulkan-tools)
+      ]
+      ++ lib.optionals config.opts.home.programs.copilot.enable [
+        (config.lib.nixGL.wrap github-copilot-cli)
       ]
       ++ lib.optionals config.opts.home.programs.ollama-vulkan.enable [
-        ollama-vulkan
+        (config.lib.nixGL.wrap ollama-vulkan)
       ]
       ++ lib.optionals config.opts.home.programs.ollama.enable [
-        ollama
+        (config.lib.nixGL.wrap ollama)
       ]
       ++ lib.optionals config.opts.home.programs.mcphost.enable [
-        mcphost
+        (config.lib.nixGL.wrap mcphost)
       ]
       ++ lib.optionals config.opts.home.programs.openai-codex.enable [
-        codex
+        (config.lib.nixGL.wrap codex)
       ];
   };
 }

@@ -7,9 +7,12 @@
   ...
 }: {
   config = lib.mkIf isStandalone {
-    # Better home-manager integration on non-NixOS
-    # Sets environment variables lie XDG_DATA_DIRS and fixing locale issues
-    targets.genericLinux.enable = true;
+    targets.genericLinux = {
+      # Better home-manager integration on non-NixOS
+      # Sets environment variables lie XDG_DATA_DIRS and fixing locale issues
+      enable = true;
+      gpu.enable = true;
+    };
 
     # Create `.profile` to source home-manager session vars on non-nixos
     home.file.".profile".text = ''
