@@ -65,9 +65,8 @@ in {
     in {
       inherit settings;
 
-      # package = config.lib.nixGL.wrap (pkgs.hyprland.override {wrapRuntimeDeps = false;});
       enable = true;
-      package = config.lib.nixGL.wrap (hPackage.hyprland.override {wrapRuntimeDeps = false;});
+      package = hPackage.hyprland.override {wrapRuntimeDeps = false;};
       portalPackage = hPackage.xdg-desktop-portal-hyprland;
       systemd = {
         enable = true;

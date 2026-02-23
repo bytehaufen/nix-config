@@ -17,12 +17,12 @@
       kdePackages.okular
 
       # Note-taking apps
-      (config.lib.nixGL.wrap obsidian)
+      obsidian
     ];
 
     programs.zathura = {
       enable = true;
-      package = config.lib.nixGL.wrap pkgs.zathura;
+      package = pkgs.zathura;
       options = {
         selection-notification = true;
 

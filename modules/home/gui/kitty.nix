@@ -7,7 +7,7 @@
   config = lib.mkIf config.opts.home.gui.enable {
     programs.kitty = {
       enable = true;
-      package = config.lib.nixGL.wrap pkgs.kitty;
+      package = pkgs.kitty;
       keybindings = {
         "ctrl+shift+v" = "paste_from_clipboard";
         "ctrl+v" = "paste_from_clipboard";

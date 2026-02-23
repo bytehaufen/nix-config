@@ -8,8 +8,8 @@
     home.packages = with pkgs; [
       pulsemixer # PulseAudio mixer
       pavucontrol # PulseAudio volume control
-      (config.lib.nixGL.wrap spotube) # Spotify client
-      (config.lib.nixGL.wrap musicpod) # YT Music client
+      spotube # Spotify client
+      musicpod # YT Music client
     ];
 
     programs = {

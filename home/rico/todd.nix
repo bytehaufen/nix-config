@@ -8,7 +8,6 @@
     tui.enable = true;
     gui.enable = true;
     agenix.enable = true;
-    nixGL.enable = true;
     windowManager.hyprland.enable = false;
 
     programs = {

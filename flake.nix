@@ -36,11 +36,6 @@
 
     nix-colors.url = "github:misterio77/nix-colors";
 
-    nixGL = {
-      url = "github:guibou/nixGL";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-25.05";
 
