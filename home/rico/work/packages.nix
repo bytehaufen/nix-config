@@ -22,7 +22,7 @@
       categories = ["Development"];
     };
     coside-sdk-no-nix = {
-      name = "COSIDE SDK";
+      name = "COSIDE SDK NO NIX";
       exec = "coside-sdk-no-nix";
       terminal = false;
       type = "Application";
