@@ -40,5 +40,16 @@
     gnutar
     rsync
     vim
+
+    # Hardware configuration / explore tools
+    lshw
+    pciutils
+    usbutils
+    lm_sensors
+    powertop
+    acpi
+    brightnessctl
+    vulkan-tools
+    bolt
   ];
 }
