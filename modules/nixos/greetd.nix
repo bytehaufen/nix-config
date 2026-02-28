@@ -4,7 +4,7 @@
   vars,
   ...
 }: {
-  config = lib.mkIf config.opts.nixos.gui.enable {
+  config = lib.mkIf config.opts.nixos.programs.hyprland.enable {
     services.greetd = {
       enable = true;
 
