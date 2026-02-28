@@ -1014,11 +1014,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1759465018,
+        "lastModified": 1772476980,
         "narHash": "sha256-drf0LKkiYODXlAloklEf9Fm5WKRu8H27mM4re57ATzw=",
         "ref": "refs/heads/main",
-        "rev": "56c8a2c4819694c66ee4095ee31eac71bd0370db",
-        "revCount": 67,
+        "rev": "3a1ff9174f729eeb97390fe62bf42f0bb4a4404d",
+        "revCount": 81,
         "type": "git",
         "url": "ssh://git@github.com/bytehaufen/nix-secrets.git"
       },
