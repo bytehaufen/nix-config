@@ -12,7 +12,7 @@
 
     programs = {
       copilot.enable = true;
-      ollama-vulkan.enable = true;
+      ollama-cuda.enable = true;
       mcphost.enable = true;
       openai-codex.enable = true;
 

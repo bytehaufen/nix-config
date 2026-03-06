@@ -15,6 +15,9 @@
       ++ lib.optionals config.opts.home.programs.ollama-vulkan.enable [
         ollama-vulkan
       ]
+      ++ lib.optionals config.opts.home.programs.ollama-cuda.enable [
+        stable.ollama-cuda
+      ]
       ++ lib.optionals config.opts.home.programs.ollama.enable [
         ollama
       ]

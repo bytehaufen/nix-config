@@ -1,7 +1,10 @@
 {inputs, ...}: {
   # Adds pkgs.stable == inputs.nixpkgsStable.legacyPackages.${pkgs.system}
   stable = final: _: {
-    stable = inputs.nixpkgsStable.legacyPackages.${final.stdenv.hostPlatform.system};
+    stable = import inputs.nixpkgsStable {
+      inherit (final.stdenv.hostPlatform) system;
+      config.allowUnfree = true;
+    };
   };
 
   # Enable JavaFX for jdk
