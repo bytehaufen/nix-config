@@ -7,8 +7,8 @@
   config = lib.mkIf (config.opts.home.gui.enable && config.opts.home.programs.obs.enable) {
     programs.obs-studio = {
       enable = true;
-      package = pkgs.obs-studio;
-      plugins = with pkgs.obs-studio-plugins; [
+      package = pkgs.stable.obs-studio;
+      plugins = with pkgs.stable.obs-studio-plugins; [
         # Screen capture
         wlrobs
         obs-vaapi

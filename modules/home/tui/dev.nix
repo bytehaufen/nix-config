@@ -68,7 +68,7 @@
 
         # Python
         pyright # Python language server
-        (python312.withPackages (
+        (stable.python3.withPackages (
           ps:
             with ps; [
               cairosvg
