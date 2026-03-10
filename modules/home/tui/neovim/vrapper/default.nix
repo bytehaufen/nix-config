@@ -7,35 +7,43 @@
   configPath = "${config.home.homeDirectory}/nix-config/modules/home/tui/neovim";
   vrapperPath = "${config.xdg.configHome}/vrapper";
   # Hacky to run under non-NixOS
-  cheatsheet = pkgs.writeShellScript "vrapper-cheatsheet" ''
-    zsh -c "source /home/rico/.config/zsh/.zshrc && kitty zsh -c \"cd /home/rico/.config/vrapper && python3 gen-cheatsheet.py && ${lib.getExe pkgs.glow} -p /tmp/cheatsheet.md\""
+
+  cheatsheetBase = pkgs.writeShellScriptBin "vrapper-cheatsheet" ''
+    cd /home/rico/.config/vrapper && python3 gen-cheatsheet.py && ${lib.getExe config.programs.neovim.package} /tmp/cheatsheet.md
+  '';
+  cheatsheet = pkgs.writeShellScript "vrapper-cheatsheet-desktop" ''
+    exec ${lib.getExe pkgs.kitty} -e ${lib.getExe pkgs.zsh} -lc "source /home/rico/.config/zsh/.zshrc && ${lib.getExe cheatsheetBase}"
   '';
 in {
   config = lib.mkIf config.opts.home.tui.enable {
     # For eclipses vim plugin
-    home.file.".vrapperrc".text =
-      # vim
-      ''
-        source ${vrapperPath}/files.vim
-        source ${vrapperPath}/buffers.vim
-        source ${vrapperPath}/code.vim
-        source ${vrapperPath}/debug.vim
-        source ${vrapperPath}/editor.vim
-        source ${vrapperPath}/git.vim
-        source ${vrapperPath}/goto.vim
-        source ${vrapperPath}/help.vim
-        source ${vrapperPath}/insertion.vim
-        source ${vrapperPath}/java.vim
-        source ${vrapperPath}/quit.vim
-        source ${vrapperPath}/refactoring.vim
-        source ${vrapperPath}/search.vim
-        source ${vrapperPath}/settings.vim
-        source ${vrapperPath}/sneak.vim
-        source ${vrapperPath}/tests.vim
-        source ${vrapperPath}/ui.vim
-        source ${vrapperPath}/windows.vim
-        source ${vrapperPath}/zoom.vim
-      '';
+    home = {
+      file.".vrapperrc".text =
+        # vim
+        ''
+          source ${vrapperPath}/files.vim
+          source ${vrapperPath}/buffers.vim
+          source ${vrapperPath}/code.vim
+          source ${vrapperPath}/debug.vim
+          source ${vrapperPath}/editor.vim
+          source ${vrapperPath}/git.vim
+          source ${vrapperPath}/goto.vim
+          source ${vrapperPath}/help.vim
+          source ${vrapperPath}/insertion.vim
+          source ${vrapperPath}/java.vim
+          source ${vrapperPath}/quit.vim
+          source ${vrapperPath}/refactoring.vim
+          source ${vrapperPath}/search.vim
+          source ${vrapperPath}/settings.vim
+          source ${vrapperPath}/sneak.vim
+          source ${vrapperPath}/tests.vim
+          source ${vrapperPath}/ui.vim
+          source ${vrapperPath}/windows.vim
+          source ${vrapperPath}/zoom.vim
+        '';
+
+      packages = [cheatsheetBase];
+    };
 
     xdg.configFile.vrapper.source = config.lib.file.mkOutOfStoreSymlink "${configPath}/vrapper";
 

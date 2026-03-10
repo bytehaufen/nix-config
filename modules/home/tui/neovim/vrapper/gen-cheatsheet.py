@@ -7,7 +7,7 @@ output_file = "/tmp/cheatsheet.md"
 vim_files = sorted(glob.glob("*.vim"))
 
 with open(output_file, "w") as out:
-    _ = out.write("# Vrapper Cheatsheet\n")
+    _ = out.write("# Vrapper Cheatsheet\n\n")
 
     for vim_file in vim_files:
         with open(vim_file) as f:
