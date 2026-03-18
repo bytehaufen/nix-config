@@ -1,4 +1,7 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  sdkHome = "$HOME/Apps/eclipse/coside-sdk-latest";
+  eclipseHome = "${sdkHome}/coside-sdk";
+in {
   xdg.desktopEntries = {
     coseda-tunnel = {
       name = "COSEDA Tunnel";
@@ -30,6 +33,11 @@
     };
   };
 
+  home.sessionVariables = {
+    ECLIPSE_HOME = eclipseHome;
+    JAVAFX_HOME = "$HOME/Apps/javafx/javafx-sdk-latest/lib";
+  };
+
   home.packages = [
     # COSIDE
     (pkgs.writeShellScriptBin "coside" ''
@@ -39,18 +47,16 @@
     # Eclipse COSIDE SDK
     (pkgs.writeShellScriptBin "coside-sdk" ''
       COSIDE_INSTALL_PATH="$HOME/Apps/coside/coside-latest"
-      COSIDE_SDK_DIR="$HOME/Apps/eclipse/coside-sdk-latest"
       SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
-      EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && $COSIDE_SDK_DIR/coside-sdk/eclipse -data $COSIDE_SDK_DIR/ws"
+      EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${sdkHome}/coside-sdk/eclipse -data ${sdkHome}/ws"
       GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
     '')
 
     # Eclipse COSIDE SDK with out nix in ENV
     (pkgs.writeShellScriptBin "coside-sdk-no-nix" ''
       COSIDE_INSTALL_PATH="$HOME/Apps/coside/coside-latest"
-      COSIDE_SDK_DIR="$HOME/Apps/eclipse/coside-sdk-latest"
       SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
-      EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && $COSIDE_SDK_DIR/coside-sdk/eclipse -data $COSIDE_SDK_DIR/ws"
+      EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${sdkHome}/coside-sdk/eclipse -data ${sdkHome}/ws"
       exec bash-no-nix env GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
     '')
 
