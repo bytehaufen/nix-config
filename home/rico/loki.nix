@@ -50,22 +50,15 @@
       height = 1440;
       scale = 1;
     };
-    asus = {
-      name = "HDMI-A-1";
-      pos = 3;
-      width = 2560;
-      height = 1080;
-      scale = 1;
-    };
     display = {
       name = "eDP-1";
-      pos = 4;
+      pos = 3;
       width = 1920;
       height = 1080;
       scale = 1.2;
     };
 
-    monitors = [philips1 philips2 asus display];
+    monitors = [philips1 philips2 display];
 
     mkRes = m: "${toString m.width}x${toString m.height}";
     mkPos = x: "${toString x}x0";
@@ -94,8 +87,7 @@
     workspace = [
       "1, monitor:${philips1.name}, persistent:true"
       "2, monitor:${philips2.name}, persistent:true"
-      "3, monitor:${asus.name}, persistent:true"
-      "4, monitor:${display.name}, persistent:true"
+      "3, monitor:${display.name}, persistent:true"
     ];
   };
 }
