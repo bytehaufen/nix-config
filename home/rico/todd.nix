@@ -1,4 +1,4 @@
-{...}: {
+{
   imports = [
     ./core.nix
     ./work
@@ -11,7 +11,7 @@
     windowManager.hyprland.enable = false;
 
     programs = {
-      copilot.enable = true;
+      copilot.enable = false;
       ollama-cuda.enable = true;
       mcphost.enable = true;
       openai-codex.enable = true;
