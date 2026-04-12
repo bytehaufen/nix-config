@@ -41,7 +41,7 @@
         statix # Lints and suggestions for the nix programming language
 
         taplo # TOML language server / formatter / validator
-        nodePackages.yaml-language-server
+        yaml-language-server
         actionlint # GitHub Actions linter
 
         # Dockerfile
@@ -115,24 +115,24 @@
         stylua
 
         # Bash
-        nodePackages.bash-language-server
+        bash-language-server
         shellcheck
         shfmt
 
         # Web dev
         emmet-ls
-        nodePackages.nodejs
-        nodePackages.typescript
-        nodePackages.typescript-language-server
-        nodePackages.vscode-langservers-extracted
-        nodePackages."@tailwindcss/language-server"
+        nodejs
+        typescript
+        typescript-language-server
+        vscode-langservers-extracted
+        tailwindcss-language-server
 
         # English prose linter
         proselint
 
         # Optional
         ast-grep
-        nodePackages.prettier # Common code formatter
+        prettier # Common code formatter
         (ripgrep.override {withPCRE2 = true;}) # Recursively searches directories for a regex pattern
         tectonic
         tokei # Code line counter

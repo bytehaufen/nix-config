@@ -10,7 +10,10 @@
         vulkan-tools
       ]
       ++ lib.optionals config.opts.home.programs.copilot.enable [
-        github-copilot-cli
+        # FIXME: Workaround for `#505644` remove when fixed upstream
+        (pkgs.github-copilot-cli.overrideAttrs (_: {
+          doInstallCheck = false;
+        }))
       ]
       ++ lib.optionals config.opts.home.programs.ollama-vulkan.enable [
         ollama-vulkan

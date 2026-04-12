@@ -8,7 +8,6 @@
     ./fastfetch.nix
     ./git.nix
     ./gpg.nix
-    ./helix
     ./mail.nix
     ./nchat.nix
     ./neovim
