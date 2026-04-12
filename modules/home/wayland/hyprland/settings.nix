@@ -124,8 +124,7 @@ in {
     animate_mouse_windowdragging = false;
 
     # enable variable refresh rate (effective depending on hardware)
-    vfr = true;
-    vrr = false;
+    vrr = 0;
 
     # Do not show ANR Dialog when a window is unresponsive
     enable_anr_dialog = false;
