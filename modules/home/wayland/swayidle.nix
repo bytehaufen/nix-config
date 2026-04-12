@@ -15,7 +15,7 @@ in {
   config = lib.mkIf config.opts.home.windowManager.hyprland.enable {
     services.swayidle = {
       enable = true;
-      systemdTarget = "graphical-session.target";
+      systemdTargets = ["graphical-session.target"];
       timeouts = [
         # Lock screen
         {
