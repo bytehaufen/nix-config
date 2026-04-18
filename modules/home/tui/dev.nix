@@ -136,6 +136,9 @@
         (ripgrep.override {withPCRE2 = true;}) # Recursively searches directories for a regex pattern
         tectonic
         tokei # Code line counter
+
+        # Learning
+        exercism # CLI tool for <exercism.io>
       ];
     };
   };
