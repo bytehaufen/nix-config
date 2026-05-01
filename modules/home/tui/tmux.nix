@@ -73,13 +73,13 @@
         ######################
 
         # Copy mode
-        bind-key v copy-mode
+        bind v copy-mode
         unbind -T copy-mode-vi MouseDragEnd1Pane              # don't exit copy mode after dragging with mouse
 
         # Better copy / paste
         unbind p
-        bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'wl-copy && wl-paste -n | wl-copy -p'
-        bind-key p run 'wl-paste -n | tmux load-buffer - ; tmux paste-buffer'
+        bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'wl-copy && wl-paste -n | wl-copy -p'
+        bind p run 'wl-paste -n | tmux load-buffer - ; tmux paste-buffer'
 
         # Pane navigation
         bind k selectp -U
@@ -93,15 +93,15 @@
         bind K resize-pane -U 5
         bind L resize-pane -R 5
 
-        bind-key R run-shell " \
+        bind R run-shell " \
           tmux source-file ~/.config/tmux/tmux.conf > /dev/null; \
           tmux display-message 'Sourced ~/.config/tmux/tmux.conf'"
 
         # Splitting
-        bind-key '-' split-window -v -l 20% -c '#{pane_current_path}'
-        bind-key '_' split-window -v -c '#{pane_current_path}'
-        bind-key "\\" split-window -h -l 20% -c '#{pane_current_path}'
-        bind-key '|' split-window -h -c '#{pane_current_path}'
+        bind '-' split-window -v -l 20% -c '#{pane_current_path}'
+        bind '_' split-window -v -c '#{pane_current_path}'
+        bind "\\" split-window -h -l 20% -c '#{pane_current_path}'
+        bind '|' split-window -h -c '#{pane_current_path}'
 
         # Swap panes
         bind '>' swap-pane -D       # swap current pane with the next one
@@ -114,7 +114,7 @@
         # window navigation
         bind -r C-h previous-window # select previous window
         bind -r C-l next-window     # select next window
-        bind Tab last-window        # move to last active window
+        bind C-a last-window        # move to last active window
 
         # Maximize / restore pane
         bind -r m resize-pane -Z
