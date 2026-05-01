@@ -108,12 +108,6 @@ in {
     };
   };
 
-  # Unused -> set to master layout
-  dwindle = {
-    pseudotile = true;
-    preserve_split = true;
-  };
-
   misc = {
     # disable auto polling for config file changes
     disable_autoreload = true;

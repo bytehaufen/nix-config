@@ -41,7 +41,7 @@ return {
       if type(opts.ensure_installed) == "table" then
         vim.list_extend(
           opts.ensure_installed,
-          { "css-lsp", "html-lsp", "stylelint-lsp", "typescript-language-server", "svelte-language-server" }
+          { "css-lsp", "html-lsp", "stylelint-language-server", "typescript-language-server", "svelte-language-server" }
         )
       end
     end,

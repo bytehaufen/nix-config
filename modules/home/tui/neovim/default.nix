@@ -10,7 +10,7 @@ in {
   imports = [./vrapper];
 
   config = lib.mkIf config.opts.home.tui.enable {
-    # Make a (writeable) symlink to ~/.config
+    # Make a (writable) symlink to ~/.config
     xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";
     # home.file.".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";
 
@@ -24,6 +24,7 @@ in {
       neovim = {
         enable = true;
         package = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        sideloadInitLua = true;
         withNodeJs = true;
         withRuby = true;
         withPython3 = true;
@@ -35,7 +36,7 @@ in {
         plugins = with pkgs.vimPlugins; [
           telescope-fzf-native-nvim
 
-          nvim-treesitter.withAllGrammars
+          # nvim-treesitter.withAllGrammars
         ];
 
         # These environment variables are needed to build and run binaries

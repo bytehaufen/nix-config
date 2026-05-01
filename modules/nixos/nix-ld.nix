@@ -34,10 +34,6 @@
   ];
 in {
   config = lib.mkIf config.opts.nixos.programs.nix-ld.enable {
-    nixpkgs.config.permittedInsecurePackages = [
-      "openssl-1.1.1w"
-    ];
-
     environment.systemPackages = [
       #
       pkgs.tcsh
@@ -52,8 +48,6 @@ in {
             (pkgs.runCommand "ld-lsb-compat" {} ''
               mkdir -p "$out/lib"
               ln -sr "${pkgs.glibc}/lib/ld-linux-x86-64.so.2" "$out/lib/ld-lsb-x86-64.so.3"
-              ln -sr "${pkgs.openssl_1_1.out}/lib/libssl.so" "$out/lib/libssl.so.10"
-              ln -sr "${pkgs.openssl_1_1.out}/lib/libcrypto.so" "$out/lib/libcrypto.so.10"
               ln -sr "${pkgs.ncurses}/lib/libtinfo.so" "$out/lib/libtinfo.so.5"
             '')
           ];
