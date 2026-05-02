@@ -69,6 +69,7 @@ require("lazy").setup({
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
     { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.markdown-extend" },
+    { import = "plugins.extras.lang.rust-extend" }, -- Let use bacon-ls clippy and give diagnostics in tests
     { import = "plugins" },
   },
   defaults = {
