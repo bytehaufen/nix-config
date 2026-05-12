@@ -35,23 +35,25 @@
   };
 
   wayland.windowManager.hyprland.settings = let
+    # Use stable monitor descriptions instead of connector names, which can
+    # change across kernel/Hyprland updates and different dock states.
     philips1 = {
-      name = "DP-5";
+      desc = "desc:Philips Consumer Electronics Company PHL 278B1 UK02507010538";
       pos = 1;
-      width = 2560;
-      height = 1440;
-      scale = 1;
+      width = 3840;
+      height = 2160;
+      scale = 1.2;
     };
 
     philips2 = {
-      name = "DP-6";
+      desc = "desc:Philips Consumer Electronics Company PHL 278B1 UK02507010541";
       pos = 2;
-      width = 2560;
-      height = 1440;
-      scale = 1;
+      width = 3840;
+      height = 2160;
+      scale = 1.2;
     };
     display = {
-      name = "eDP-1";
+      desc = "desc:LG Display 0x072C";
       pos = 3;
       width = 1920;
       height = 1080;
@@ -62,7 +64,8 @@
 
     mkRes = m: "${toString m.width}x${toString m.height}";
     mkPos = x: "${toString x}x0";
-    mkString = m: x: "${m.name}, ${mkRes m}, ${mkPos x}, ${toString m.scale}";
+    mkString = m: x: "${m.desc}, ${mkRes m}, ${mkPos x}, ${toString m.scale}";
+    logicalWidth = m: builtins.floor (m.width / m.scale);
 
     calcMonitorStrings = ms: let
       sorted = builtins.sort (a: b: a.pos < b.pos) ms;
@@ -70,7 +73,7 @@
         builtins.foldl' (
           st: m: let
             s = mkString m st.x;
-            x' = st.x + m.width;
+            x' = st.x + logicalWidth m;
           in {
             x = x';
             acc = st.acc ++ [s];
@@ -85,9 +88,9 @@
   in {
     monitor = calcMonitorStrings monitors;
     workspace = [
-      "1, monitor:${philips1.name}, persistent:true"
-      "2, monitor:${philips2.name}, persistent:true"
-      "3, monitor:${display.name}, persistent:true"
+      "1, monitor:${philips1.desc}, persistent:true"
+      "2, monitor:${philips2.desc}, persistent:true"
+      "3, monitor:${display.desc}, persistent:true"
     ];
   };
 }
