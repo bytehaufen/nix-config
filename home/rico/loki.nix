@@ -42,7 +42,7 @@
       pos = 1;
       width = 3840;
       height = 2160;
-      scale = 1.2;
+      scale = 1.5;
     };
 
     philips2 = {
@@ -50,7 +50,7 @@
       pos = 2;
       width = 3840;
       height = 2160;
-      scale = 1.2;
+      scale = 1.5;
     };
     display = {
       desc = "desc:LG Display 0x072C";
