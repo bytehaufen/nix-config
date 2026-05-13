@@ -2,7 +2,6 @@
   pkgs,
   config,
   lib,
-  inputs,
   ...
 } @ args: let
   # Custom scripts, used in keybindings and in user environment
@@ -60,14 +59,12 @@ in {
       };
     };
 
-    wayland.windowManager.hyprland = let
-      hPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system};
-    in {
+    wayland.windowManager.hyprland = {
       inherit settings;
 
       enable = true;
-      package = hPackage.hyprland.override {wrapRuntimeDeps = false;};
-      portalPackage = hPackage.xdg-desktop-portal-hyprland;
+      package = pkgs.hyprland.override {wrapRuntimeDeps = false;};
+      portalPackage = pkgs.xdg-desktop-portal-hyprland;
       systemd = {
         enable = true;
         variables = ["--all"];
