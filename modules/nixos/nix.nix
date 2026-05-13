@@ -43,8 +43,7 @@ in {
     gc = {
       automatic = true;
       dates = "weekly";
-      # Keep the last 3 generations
-      options = "--delete-older-than +3";
+      options = "--delete-older-than 7d";
     };
     registry = lib.mapAttrs (_: flake: {inherit flake;}) flakeInputs;
     nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
