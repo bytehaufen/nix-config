@@ -1,7 +1,24 @@
 {pkgs, ...}: let
   sdkHome = "$HOME/Apps/eclipse/coside-sdk-latest";
+  licensePath = "$HOME/Apps/coside/license/coside.lic";
   eclipseHome = "${sdkHome}/coside-sdk";
+  javafxHome = "$HOME/Apps/javafx/javafx-sdk-latest";
+  cosideInstallPath = "$HOME/Apps/coside/coside-latest";
+  workspace = "${sdkHome}/ws";
+  reviewWorkspace = "${sdkHome}/host-review-ws";
+  cosideRepoRoot = "$HOME/Projects/coside-eclipse";
 in {
+  xdg.configFile."coside/copilot-local.conf".text = ''
+    ECLIPSE_HOME=${eclipseHome}
+    JAVAFX_HOME=${javafxHome}
+    COSIDE_INSTALL_PATH=${cosideInstallPath}
+    WORKSPACE=${workspace}
+    COSIDE_REPO_ROOT=${cosideRepoRoot}
+    HOST_REVIEW_WORKSPACE=${reviewWorkspace}
+
+    # HOST_ECLIPSE_AGENT_PORT=4740
+  '';
+
   xdg.desktopEntries = {
     coseda-tunnel = {
       name = "COSEDA Tunnel";
@@ -35,8 +52,7 @@ in {
 
   home = {
     sessionVariables = {
-      ECLIPSE_HOME = eclipseHome;
-      JAVAFX_HOME = "$HOME/Apps/javafx/javafx-sdk-latest/lib";
+      COSIDE_LICENSE_FILE = licensePath;
       COSIDE_AGENT_SERVER = "yes";
     };
 
@@ -56,17 +72,17 @@ in {
 
       # Eclipse COSIDE SDK
       (pkgs.writeShellScriptBin "coside-sdk" ''
-        COSIDE_INSTALL_PATH="$HOME/Apps/coside/coside-latest"
+        COSIDE_INSTALL_PATH="${cosideInstallPath}"
         SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
-        EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${sdkHome}/coside-sdk/eclipse -data ${sdkHome}/ws"
+        EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${eclipseHome}/eclipse -data ${workspace}"
         GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
       '')
 
       # Eclipse COSIDE SDK with out nix in ENV
       (pkgs.writeShellScriptBin "coside-sdk-no-nix" ''
-        COSIDE_INSTALL_PATH="$HOME/Apps/coside/coside-latest"
+        COSIDE_INSTALL_PATH="${cosideInstallPath}"
         SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
-        EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${sdkHome}/coside-sdk/eclipse -data ${sdkHome}/ws"
+        EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${eclipseHome}/eclipse -data ${workspace}"
         exec bash-no-nix env GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
       '')
 
