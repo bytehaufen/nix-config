@@ -43,13 +43,10 @@ in {
       # Compositor commands
       "$mod SHIFT, Q, exit,"
       "$mod, Q, killactive,"
-      "$mod, F, fullscreen,"
       "$mod, G, togglegroup,"
       "$mod SHIFT, N, changegroupactive, f"
       "$mod SHIFT, P, changegroupactive, b"
       "$mod, V, togglefloating, active"
-      "$mod, B, exec, hyprctl dispatch togglefloating; hyprctl dispatch layoutmsg swapwithmaster"
-      "$mod, P, pseudo,"
       "$mod ALT, ,resizeactive,"
       "$mod,      A, layoutmsg, togglesplit"
       "$mod SHIFT, A, layoutmsg, swapsplit"
@@ -84,20 +81,26 @@ in {
       ", XF86Calculator, exec, ${toggle "gnome-calculator" true}"
 
       # Movement
-      "$mod, h, movefocus, l"
-      "$mod, l, movefocus, r"
-      "$mod, k, movefocus, u"
-      "$mod, j, movefocus, d"
+      "$mod, h, layoutmsg, focus l"
+      "$mod, l, layoutmsg, focus r"
+      "$mod, k, layoutmsg, focus u"
+      "$mod, j, layoutmsg, focus d"
+
+      # Move columns (wheel)
+      "$mod, mouse_up, layoutmsg, move -col"
+      "$mod, mouse_down, layoutmsg, move +col"
+
       # Move focused window
-      "$mod SHIFT, h, movewindow, l"
+      "$mod SHIFT, h, layoutmsg, swapcol l"
       "$mod SHIFT, j, movewindow, d"
       "$mod SHIFT, k, movewindow, u"
-      "$mod SHIFT, l, movewindow, r"
+      "$mod SHIFT, l, layoutmsg, swapcol r"
       # Resize
-      "$mod CTRL, h, resizeactive, -40 0"
-      "$mod CTRL, l, resizeactive, 40 0"
-      "$mod CTRL, k, resizeactive, 0 -40"
-      "$mod CTRL, j, resizeactive, 0 40"
+      "$mod CTRL, h, layoutmsg, colresize -conf"
+      "$mod CTRL, l, layoutmsg, colresize +conf"
+
+      "$mod, F, layoutmsg, colresize 0.667"
+      "$mod, B, layoutmsg, fit visible"
 
       # Go to next window, for example to reach a floating one
       "$mod, space, cyclenext"
@@ -115,8 +118,8 @@ in {
       "$mod SHIFT, bracketright, movetoworkspace, r+1" # Let create new workspace, when @ the end
 
       # Cycle monitors
-      "$mod CTRL, bracketleft, focusmonitor, l"
-      "$mod CTRL, bracketright, focusmonitor, r"
+      "$mod, comma, focusmonitor, l"
+      "$mod, period, focusmonitor, r"
 
       # Send focused workspace to left/right monitors
       "$mod CTRL SHIFT, bracketleft, movecurrentworkspacetomonitor, l"

@@ -26,7 +26,7 @@ in {
   ];
 
   general = {
-    layout = "master";
+    layout = "scrolling";
     resize_on_border = true;
 
     gaps_in = 10;
@@ -34,6 +34,15 @@ in {
     border_size = 2;
     "col.active_border" = "${rgba config.colorScheme.palette.base0A "aa"} ${rgba config.colorScheme.palette.base05 "aa"}";
     "col.inactive_border" = "${rgba config.colorScheme.palette.base0A "77"} ${rgba config.colorScheme.palette.base05 "77"}";
+  };
+
+  scrolling = {
+    fullscreen_on_one_column = true;
+    column_width = 0.667;
+    focus_fit_method = 0;
+    follow_focus = true;
+    explicit_column_widths = "0.333, 0.5, 0.667, 1.0";
+    direction = "right";
   };
 
   decoration = {
