@@ -74,6 +74,7 @@
 
         # Copy mode
         bind v copy-mode
+        bind -T copy-mode-vi v send -X begin-selection
         unbind -T copy-mode-vi MouseDragEnd1Pane              # don't exit copy mode after dragging with mouse
 
         # Better copy / paste
