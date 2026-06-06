@@ -120,6 +120,9 @@ in {
       # Cycle monitors
       "$mod, comma, focusmonitor, l"
       "$mod, period, focusmonitor, r"
+      # Move active to next/prev monitor
+      "$mod SHIFT, comma, movewindow, mon:l"
+      "$mod SHIFT, period, movewindow, mon:r"
 
       # Send focused workspace to left/right monitors
       "$mod CTRL SHIFT, bracketleft, movecurrentworkspacetomonitor, l"
