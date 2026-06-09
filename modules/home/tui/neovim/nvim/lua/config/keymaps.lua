@@ -49,3 +49,9 @@ vim.keymap.set("v", "gl", function()
   vim.cmd("normal! `[V`]")
   vim.cmd("normal gc")
 end, { desc = "Yank, paste, and comment pasted selection" })
+
+vim.keymap.set("x", "p", '"_dP', {
+  noremap = true,
+  silent = true,
+  desc = "Paste over selection without yanking replaced text",
+})
