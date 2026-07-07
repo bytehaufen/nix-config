@@ -3,8 +3,11 @@
   config,
   vars,
   ...
-}: {
-  config = lib.mkIf config.opts.nixos.programs.hyprland.enable {
+}: let
+  wmEnabled =
+    config.opts.nixos.programs.niri.enable;
+in {
+  config = lib.mkIf wmEnabled {
     services.greetd = {
       enable = true;
 

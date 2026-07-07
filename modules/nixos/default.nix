@@ -6,10 +6,10 @@
     ./games.nix
     ./greetd.nix
     ./home-manager.nix
-    ./hyprland.nix
     ./kdeconnect.nix
     ./locale.nix
     ./networking.nix
+    ./niri.nix
     ./nix-ld.nix
     ./nix.nix
     ./nixos-options.nix

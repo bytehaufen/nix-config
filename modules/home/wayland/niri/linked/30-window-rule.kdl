@@ -1,0 +1,53 @@
+window-rule {
+    geometry-corner-radius 5
+    clip-to-geometry true
+}
+window-rule {
+    match app-id="firefox$" title="^Picture-in-Picture$"
+    open-floating true
+}
+window-rule {
+    match app-id="^org\\.gnome\\.Calculator$"
+    open-floating true
+    default-column-width {
+        fixed 500
+    }
+    default-window-height {
+        fixed 700
+    }
+}
+// Quickgui
+window-rule {
+    match app-id="^quickgui$"
+    open-floating true
+}
+window-rule {
+    match app-id="^spicy$"
+    open-floating true
+    default-column-width {
+        fixed 800
+    }
+    default-window-height {
+        fixed 600
+    }
+}
+window-rule {
+    match app-id="^musicpod$"
+    open-floating true
+    default-column-width {
+        fixed 500
+    }
+    default-window-height {
+        fixed 700
+    }
+}
+window-rule {
+    match title="^(Open File|Open Folder|Save As|Library|Please choose a directory).*$"
+    open-floating true
+    default-column-width {
+        fixed 640
+    }
+    default-window-height {
+        fixed 480
+    }
+}

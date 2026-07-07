@@ -26,7 +26,7 @@ TBD
 
 |                      | Tool                                                                |
 | -------------------- | ------------------------------------------------------------------- |
-| Window Manager       | [Hyprland](https://hyprland.org/)                                   |
+| Window Manager       | [Niri](https://niri-wm.github.io/niri/index.html)                   |
 | Terminal Emulator    | [Kitty](https://sw.kovidgoyal.net/kitty/)                           |
 | Shell                | [Zsh](https://www.zsh.org/)                                         |
 | PDF Viewer           | [Zathura](https://pwmt.org/projects/zathura/)                       |

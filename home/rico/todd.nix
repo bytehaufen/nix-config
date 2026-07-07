@@ -8,7 +8,7 @@
     tui.enable = true;
     gui.enable = true;
     agenix.enable = true;
-    windowManager.hyprland.enable = false;
+    windowManager.niri.enable = false;
 
     programs = {
       copilot.enable = false;

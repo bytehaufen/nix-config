@@ -2,8 +2,10 @@
   lib,
   config,
   ...
-}: {
-  config = lib.mkIf config.opts.home.windowManager.hyprland.enable {
+}: let
+  wmEnabled = config.opts.home.windowManager.niri.enable;
+in {
+  config = lib.mkIf wmEnabled {
     # My personal keyboard settings
     # Contain an English and a German layout
     # With <ESC> as <CAPS> and ` as <ESC> and ~ as <SHIFT>+<ESC>

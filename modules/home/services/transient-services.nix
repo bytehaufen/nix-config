@@ -1,4 +1,4 @@
-# Package to run processes as transient systemd services -> used in hyprland binds
+# Package to run processes as transient systemd services -> used in window manager binds
 {
   pkgs,
   config,

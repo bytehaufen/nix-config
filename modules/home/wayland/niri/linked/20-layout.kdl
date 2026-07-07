@@ -1,0 +1,7 @@
+layout {
+    gaps 10
+    focus-ring {
+        width 2
+    }
+    background-color "transparent"
+}

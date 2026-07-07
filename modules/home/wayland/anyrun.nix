@@ -4,7 +4,7 @@
   config,
   ...
 }: {
-  config = lib.mkIf config.opts.home.windowManager.hyprland.enable {
+  config = lib.mkIf config.opts.home.windowManager.niri.enable {
     programs.anyrun = {
       enable = true;
 

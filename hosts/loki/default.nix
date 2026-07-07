@@ -22,7 +22,7 @@
     wireless.enable = true;
 
     programs = {
-      hyprland.enable = true;
+      niri.enable = true;
       podman.enable = true;
       luanti.enable = true;
       nix-ld.enable = true;

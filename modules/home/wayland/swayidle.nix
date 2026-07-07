@@ -3,17 +3,17 @@
   lib,
   config,
   ...
-}: let
-  hyprctl = lib.getExe' config.wayland.windowManager.hyprland.package "hyprctl";
-  swaylock = lib.getExe config.programs.swaylock.package;
-  systemctl = lib.getExe' pkgs.systemd "systemctl";
+}: {
+  config = lib.mkIf config.opts.home.windowManager.niri.enable {
+    services.swayidle = let
+      niri = lib.getExe pkgs.niri;
+      swaylock = lib.getExe config.programs.swaylock.package;
+      systemctl = lib.getExe' pkgs.systemd "systemctl";
 
-  lockTime = 5 * 60; # 5 minutes
-  monitorOffTime = lockTime + 60; # 6 minutes
-  suspendTime = 2 * lockTime; # 10 minutes
-in {
-  config = lib.mkIf config.opts.home.windowManager.hyprland.enable {
-    services.swayidle = {
+      lockTime = 5 * 60; # 5 minutes
+      monitorOffTime = lockTime + 60; # 6 minutes
+      suspendTime = 2 * lockTime; # 10 minutes
+    in {
       enable = true;
       systemdTargets = ["graphical-session.target"];
       timeouts = [
@@ -23,11 +23,10 @@ in {
           command = "${swaylock} --daemonize";
         }
 
-        # Turn off displays (hyprland)
+        # Turn off displays
         {
           timeout = monitorOffTime;
-          command = "${hyprctl} dispatch dpms off";
-          resumeCommand = "${hyprctl} dispatch dpms on;";
+          command = "${niri} msg action power-off-monitors";
         }
 
         # Let system sleep

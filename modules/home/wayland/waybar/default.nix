@@ -46,7 +46,7 @@
       '';
     };
 in {
-  config = lib.mkIf config.opts.home.windowManager.hyprland.enable {
+  config = lib.mkIf config.opts.home.windowManager.niri.enable {
     programs.waybar = {
       inherit style;
       enable = true;
@@ -60,8 +60,8 @@ in {
           position = "top";
           modules-left = [
             "custom/menu"
-            "hyprland/workspaces"
-            "hyprland/submap"
+            "niri/workspaces"
+            "niri/window"
             "custom/currentplayer"
             "custom/player"
           ];
@@ -82,7 +82,7 @@ in {
             "idle_inhibitor"
             "power-profiles-daemon"
             "battery"
-            "custom/keymap"
+            "niri/language"
             "custom/hostname"
           ];
 
@@ -95,15 +95,27 @@ in {
             exec = mkScriptJson {
               text = "";
               tooltip = ''$(grep PRETTY_NAME /etc/os-release | cut -d '"' -f2)'';
-              class = let
-                isFullScreen = "hyprctl activewindow -j | jq -e '.fullscreen' &>/dev/null";
-              in "$(if ${isFullScreen}; then echo fullscreen; fi)";
             };
             on-click = mkScript {
               script = ''
                 "${lib.getExe config.programs.anyrun.package}"
               '';
             };
+          };
+
+          "niri/workspaces" = {
+            format = "{icon}";
+            format-icons = {
+              active = "";
+              focused = "";
+              default = "";
+            };
+          };
+
+          "niri/window" = {
+            format = "{}";
+            separate-outputs = true;
+            max-length = 50;
           };
 
           "custom/currentplayer" = {
@@ -155,9 +167,9 @@ in {
             max-length = 30;
             format = "{icon} {}";
             format-icons = {
-              "Playing" = "󰐊";
-              "Paused" = "󰏤 ";
-              "Stopped" = "󰓛";
+              Playing = "󰐊";
+              Paused = "󰏤 ";
+              Stopped = "󰓛";
             };
             on-click = mkScript {
               deps = [pkgs.playerctl];
@@ -229,9 +241,9 @@ in {
             };
             format = "{icon}  ({})";
             format-icons = {
-              "read" = "󰇯";
-              "unread" = "󰇮";
-              "syncing" = "󰁪";
+              read = "󰇯";
+              unread = "󰇮";
+              syncing = "󰁪";
             };
           };
 
@@ -316,15 +328,8 @@ in {
             };
           };
 
-          "custom/keymap" = {
-            keyboard-name = "at-translated-set-2-keyboard";
-            format = "󰥻  {}";
-            exec = mkScript {
-              script = ''
-                hyprctl devices | awk '/at-translated-set-2-keyboard/{flag=1;next}/keymap/{if(flag){print $3;flag=0}}'
-              '';
-            };
-            interval = 1;
+          "niri/language" = {
+            format = "󰥻  {short}";
           };
 
           "custom/hostname" = {
@@ -334,15 +339,12 @@ in {
               '';
             };
             on-click = mkScript {
+              deps = [pkgs.waybar];
               script = ''
-                if command -v hyprctl &> /dev/null; then
-                  # Hyprland kills and starts waybar on reload
-                  hyprctl reload
-                else
-                  pkill waybar
-                  ${lib.getExe pkgs.waybar}
-                fi
-
+                systemctl --user restart waybar.service 2>/dev/null || {
+                  pkill waybar || true
+                  ${lib.getExe pkgs.waybar} &
+                }
               '';
             };
           };

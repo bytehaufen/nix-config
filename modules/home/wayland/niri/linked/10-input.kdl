@@ -1,0 +1,19 @@
+input {
+    keyboard {
+        xkb {
+            layout "en-65,de-65"
+            options "caps:escape"
+        }
+        repeat-delay 300
+        repeat-rate 60
+        numlock
+    }
+    touchpad {
+        tap
+        natural-scroll
+    }
+    mouse {
+        accel-profile "flat"
+    }
+    mod-key "Super"
+}

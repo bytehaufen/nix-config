@@ -15,7 +15,18 @@ in {
     tui = mkEnableOption "Enable TUI applications in the home environment";
     gui = mkEnableOption "Enable GUI applications in the home environment";
     agenix = mkEnableOption "Enable agenix, a tool for managing secrets";
-    windowManager.hyprland = mkEnableOption "Enable Hyprland, a dynamic tiling Wayland compositor";
+
+    windowManager = {
+      niri =
+        mkEnableOption "Enable Niri, a scrollable-tiling Wayland compositor"
+        // {
+          extraConfig = lib.mkOption {
+            type = lib.types.lines;
+            default = "";
+            description = "Extra KDL appended to ~/.config/niri/config.kdl";
+          };
+        };
+    };
 
     programs = {
       discord = mkEnableOption "Enable Discord Vesktop Client";
@@ -46,7 +57,7 @@ in {
       description = "Location of the wallpaper to use throughout the system";
       type = lib.types.path;
       example = lib.literalExample "/home/foobar/.config/wallpaper/wallpaper.png";
-      default = config.xdg.configHome + "/images/hyprland.png";
+      default = config.xdg.configHome + "/images/dark-music.png";
     };
   };
 }

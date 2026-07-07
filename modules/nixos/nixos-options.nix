@@ -18,7 +18,7 @@ in {
     wireless = mkEnableOption "Enable wireless networking support";
 
     programs = {
-      hyprland = mkEnableOption "Enable Hyprland as the window manager";
+      niri = mkEnableOption "Enable Niri as the window manager";
       podman = mkEnableOption "Enable Podman for container management";
       luanti = mkEnableOption "Enable luanti game";
       nix-ld = mkEnableOption "Enable Nix-LD for dynamic linking with Nix packages";
