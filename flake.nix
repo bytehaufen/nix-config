@@ -78,13 +78,26 @@
 
     overlays = import ./overlays {inherit inputs outputs;};
 
-    checks = forAllSystems (system: {
+    checks = forAllSystems (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
       pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
         src = ./.;
         excludes = [".lock" ".json" "hardware-configuration.nix"];
         hooks = {
           alejandra.enable = true;
           deadnix.enable = true;
+          kdlfmt = {
+            enable = true;
+            package = pkgs.kdlfmt;
+            entry = "${lib.getExe pkgs.kdlfmt} format";
+            # Niri config files are false detected as v2
+            args = [
+              "--kdl-version"
+              "v1"
+            ];
+            files = "^modules/home/wayland/niri/linked/.*\\.kdl$";
+          };
           prettier = {
             enable = true;
             settings = {
