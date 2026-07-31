@@ -24,9 +24,6 @@
       ++ lib.optionals config.opts.home.programs.ollama.enable [
         ollama
       ]
-      ++ lib.optionals config.opts.home.programs.mcphost.enable [
-        mcphost
-      ]
       ++ lib.optionals config.opts.home.programs.openai-codex.enable [
         codex
       ];

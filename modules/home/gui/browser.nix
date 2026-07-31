@@ -3,7 +3,28 @@
   config,
   lib,
   ...
-}: {
+}: let
+  braveArgs = [
+    "--ozone-platform-hint=auto"
+    "--password-store=gnome-libsecret"
+    "--gtk-version=4"
+    "--enable-wayland-ime"
+    "--enable-features=UseOzonePlatform,WebRTCPipeWireCapturer"
+    "--remote-debugging-port=9222"
+  ];
+
+  braveWithArgs = pkgs.brave.overrideAttrs (old: {
+    preFixup =
+      (old.preFixup or "")
+      + ''
+        gappsWrapperArgs+=(
+          --add-flags ${
+          lib.escapeShellArg (lib.concatStringsSep " " braveArgs)
+        }
+        )
+      '';
+  });
+in {
   config = lib.mkIf config.opts.home.gui.enable {
     programs = {
       firefox = {
@@ -11,21 +32,9 @@
         configPath = "${config.xdg.configHome}/mozilla/firefox";
       };
 
-      # Brave
-      chromium = {
+      brave = {
         enable = true;
-        package = pkgs.brave;
-        commandLineArgs = [
-          "--enable-features=UseOzonePlatform"
-          "--ozone-platform=wayland"
-          "--password-store=gnome-libsecret"
-          "--ozone-platform-hint=auto"
-          "--ozone-platform=wayland"
-          "--gtk-version=4"
-          "--enable-wayland-ime"
-          "--enable-features=WebRTCPipeWireCapturer"
-          "--remote-debugging-port=9222"
-        ];
+        package = braveWithArgs;
       };
     };
   };

@@ -40,8 +40,6 @@ in {
         vulkan backend";
       ollama-cuda = mkEnableOption "Enable Ollama - Get up and running large language models with
         nvidia backend";
-      mcphost = mkEnableOption "Enable Mcphost - Cli host application that enables LLMs to interact
-        external tools through MCP";
       openai-codex = mkEnableOption "Enable Codex CLI - Lightweight coding agent that runs in your terminal";
     };
 

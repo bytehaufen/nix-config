@@ -13,7 +13,6 @@
     programs = {
       copilot.enable = false;
       ollama-cuda.enable = true;
-      mcphost.enable = true;
       openai-codex.enable = true;
 
       discord.enable = false;

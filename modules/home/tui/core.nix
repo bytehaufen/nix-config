@@ -19,6 +19,7 @@
       # A command-line fuzzy finder
       fzf = {
         enable = true;
+        historyWidget.command = "";
         colors = {
           "bg+" = "#283457";
           "bg" = "#16161e";

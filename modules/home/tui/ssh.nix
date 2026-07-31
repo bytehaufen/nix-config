@@ -8,26 +8,26 @@
       enable = true;
       enableDefaultConfig = false;
 
-      matchBlocks = {
+      settings = {
         "*" = {
-          forwardAgent = false;
-          addKeysToAgent = "no";
-          compression = false;
-          serverAliveInterval = 0;
-          serverAliveCountMax = 3;
-          hashKnownHosts = false;
-          userKnownHostsFile = "~/.ssh/known_hosts";
-          controlMaster = "no";
-          controlPath = "~/.ssh/master-%r@%n:%p";
-          controlPersist = "no";
+          ForwardAgent = false;
+          AddKeysToAgent = "no";
+          Compression = false;
+          ServerAliveInterval = 0;
+          ServerAliveCountMax = 3;
+          HashKnownHosts = false;
+          UserKnownHostsFile = "~/.ssh/known_hosts";
+          ControlMaster = "no";
+          ControlPath = "~/.ssh/master-%r@%n:%p";
+          ControlPersist = "no";
         };
 
         "github.com" = {
-          hostname = "ssh.github.com";
-          user = "git";
-          identityFile = config.age.secrets.id_ed25519_github.path;
-          identitiesOnly = true;
-          addKeysToAgent = "yes";
+          HostName = "ssh.github.com";
+          User = "git";
+          IdentityFile = config.age.secrets.id_ed25519_github.path;
+          IdentitiesOnly = true;
+          AddKeysToAgent = "yes";
         };
       };
     };
