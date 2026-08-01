@@ -5,7 +5,6 @@
   onSurface = "#ffffff";
   onSurfaceVariant = "#${palette.base02}"; # #343a52
   primary = "#${palette.base0A}"; # #0db9d7
-  onPrimary = "#${palette.base03}"; # #444b6a
   warning = "#${palette.base0F}"; # #f7768e
   good = "#${palette.base0B}"; # #9ece6a
 
@@ -49,8 +48,8 @@ in
     }
     #workspaces button.focused,
     #workspaces button.active {
-      background-color: ${primary};
-      color: ${onPrimary};
+      background-color: ${surface};
+      color: ${primary};
     }
 
     /* modules-center */

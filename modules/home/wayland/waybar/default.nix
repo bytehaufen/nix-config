@@ -106,8 +106,8 @@ in {
           "niri/workspaces" = {
             format = "{icon}";
             format-icons = {
-              active = "";
-              focused = "";
+              active = "";
+              focused = "";
               default = "";
             };
           };
