@@ -53,6 +53,8 @@ in {
       systemd.enable = true;
       settings = {
         primary = {
+          layer = "top";
+
           exclusive = true;
           passthrough = false;
           reload_style_on_change = true;
