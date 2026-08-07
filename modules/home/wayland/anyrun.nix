@@ -2,21 +2,39 @@
   pkgs,
   lib,
   config,
+  isStandalone,
   ...
-}: {
+}: let
+  anyrunPackage =
+    if isStandalone
+    then
+      pkgs.symlinkJoin {
+        name = "anyrun-wrapped";
+
+        paths = [pkgs.anyrun];
+
+        nativeBuildInputs = [pkgs.makeWrapper];
+
+        postBuild = ''
+          wrapProgram $out/bin/anyrun \
+            --set GSK_RENDERER ngl
+        '';
+      }
+    else pkgs.anyrun;
+in {
   config = lib.mkIf config.opts.home.windowManager.niri.enable {
     programs.anyrun = {
       enable = true;
+      package = anyrunPackage;
 
       config = {
         plugins = with pkgs; [
           "${anyrun}/lib/libapplications.so"
-          "${anyrun}/lib/dictionary.so"
-          "${anyrun}/lib/randr.so"
-          "${anyrun}/lib/rink.so"
-          "${anyrun}/lib/shell.so"
-          "${anyrun}/lib/symbols.so"
-          "${anyrun}/lib/translate.so"
+          "${anyrun}/lib/libdictionary.so"
+          "${anyrun}/lib/librink.so"
+          "${anyrun}/lib/libshell.so"
+          "${anyrun}/lib/libsymbols.so"
+          "${anyrun}/lib/libtranslate.so"
         ];
 
         closeOnClick = true;
@@ -33,7 +51,10 @@
             Config(
               desktop_actions: false,
               max_entries: 5,
-              terminal: Some("kitty"),
+              terminal: Some(Terminal(
+                command: "kitty",
+                args: "-e \"{}\"",
+              )),
             )
           '';
 

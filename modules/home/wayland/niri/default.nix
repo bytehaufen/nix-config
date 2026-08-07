@@ -75,7 +75,7 @@ in {
           Mod+W { spawn "${lib.getExe config.programs.chromium.package}"; }
           Mod+E { spawn "${lib.getExe pkgs.nautilus}"; }
 
-          Mod+Space { spawn "sh" "-c" "pkill anyrun || run-as-service ${lib.getExe config.programs.anyrun.package}"; }
+          Mod+Space { spawn "sh" "-c" "pkill anyrun || ${lib.getExe' config.programs.anyrun.package "anyrun"}"; }
 
           Mod+D { spawn "${makoctl}" "dismiss"; }
           Mod+Shift+D { spawn "${makoctl}" "restore"; }

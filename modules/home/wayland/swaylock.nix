@@ -2,6 +2,7 @@
   lib,
   config,
   pkgs,
+  isStandalone,
   ...
 }: {
   config =
@@ -19,7 +20,7 @@
         onError = palette.base01;
         onTertiary = palette.base01;
       in {
-        enable = true;
+        enable = !isStandalone;
         package = pkgs.swaylock-effects;
         settings = {
           clock = true;

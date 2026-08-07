@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  isStandalone,
   ...
 }: {
   config = lib.mkIf config.opts.home.windowManager.niri.enable {
@@ -24,6 +25,22 @@
         layer = "overlay";
         max-history = 50;
       };
+    };
+    systemd.user.services.mako = lib.mkIf isStandalone {
+      Unit = {
+        Description = "Lightweight Wayland notification daemon";
+        PartOf = ["graphical-session.target"];
+        After = ["graphical-session.target"];
+      };
+
+      Service = {
+        Type = "dbus";
+        BusName = "org.freedesktop.Notifications";
+        ExecStart = lib.getExe config.services.mako.package;
+        ExecReload = "${lib.getExe' config.services.mako.package "makoctl"} reload";
+      };
+
+      Install.WantedBy = ["graphical-session.target"];
     };
   };
 }
