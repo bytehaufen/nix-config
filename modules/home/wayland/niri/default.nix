@@ -72,7 +72,7 @@ in {
 
       binds {
           Mod+Return { spawn "sh" "-c" "run-as-service ${lib.getExe pkgs.kitty}"; }
-          Mod+W { spawn "${lib.getExe config.programs.chromium.package}"; }
+          Mod+W { spawn "${lib.getExe config.programs.brave.package}"; }
           Mod+E { spawn "${lib.getExe pkgs.nautilus}"; }
 
           Mod+Space { spawn "sh" "-c" "pkill anyrun || ${lib.getExe' config.programs.anyrun.package "anyrun"}"; }
