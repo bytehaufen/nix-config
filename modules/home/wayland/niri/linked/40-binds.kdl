@@ -15,10 +15,10 @@ binds {
         close-window
     }
     Mod+H {
-        focus-column-left
+        focus-column-or-monitor-left
     }
     Mod+L {
-        focus-column-right
+        focus-column-or-monitor-right
     }
     Mod+K {
         focus-window-or-workspace-up
@@ -27,10 +27,10 @@ binds {
         focus-window-or-workspace-down
     }
     Mod+Shift+H {
-        move-column-left
+        move-column-left-or-to-monitor-left
     }
     Mod+Shift+L {
-        move-column-right
+        move-column-right-or-to-monitor-right
     }
     Mod+Shift+K {
         move-window-up-or-to-workspace-up
