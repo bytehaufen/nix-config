@@ -1,7 +1,6 @@
 {
   lib,
   config,
-  isStandalone,
   ...
 }: {
   config = lib.mkIf config.opts.home.windowManager.niri.enable {
@@ -26,7 +25,8 @@
         max-history = 50;
       };
     };
-    systemd.user.services.mako = lib.mkIf isStandalone {
+
+    systemd.user.services.mako = {
       Unit = {
         Description = "Lightweight Wayland notification daemon";
         PartOf = ["graphical-session.target"];
