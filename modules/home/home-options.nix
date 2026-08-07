@@ -55,7 +55,7 @@ in {
       description = "Location of the wallpaper to use throughout the system";
       type = lib.types.path;
       example = lib.literalExample "/home/foobar/.config/wallpaper/wallpaper.png";
-      default = config.xdg.configHome + "/images/dark-music.png";
+      default = config.xdg.configHome + "/images/dark-music.jpg";
     };
   };
 }

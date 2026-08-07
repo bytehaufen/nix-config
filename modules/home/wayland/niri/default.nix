@@ -28,6 +28,8 @@
   wpctl = lib.getExe' pkgs.wireplumber "wpctl";
   brightnessctl = lib.getExe pkgs.brightnessctl;
 in {
+  imports = [./standalone.nix];
+
   config = lib.mkIf cfg.enable {
     home = {
       file.".wayland-session" = {
@@ -45,7 +47,7 @@ in {
         SDL_VIDEODRIVER = "wayland";
         XDG_SESSION_TYPE = "wayland";
 
-        LIBVA_DRIVER_NAME = "iHD";
+        # LIBVA_DRIVER_NAME = "iHD";
         MOZ_ENABLE_WAYLAND = "1";
 
         # NOTE: Check obsolete?
