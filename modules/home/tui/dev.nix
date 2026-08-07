@@ -104,6 +104,7 @@
               pyyaml
               requests
               tabulate
+              websockets
 
               pip
             ]
