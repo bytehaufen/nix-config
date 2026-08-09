@@ -30,11 +30,14 @@ in {
       config = {
         plugins = with pkgs; [
           "${anyrun}/lib/libapplications.so"
-          "${anyrun}/lib/libdictionary.so"
-          "${anyrun}/lib/librink.so"
+          "${anyrun}/lib/libniri_focus.so"
+          "${anyrun}/lib/libnix_run.so" # Prefix `:nr`
+          "${anyrun}/lib/librandr.so" # Change monitor settings on the fly
+          "${anyrun}/lib/librink.so" # Calculator
           "${anyrun}/lib/libshell.so"
           "${anyrun}/lib/libsymbols.so"
-          "${anyrun}/lib/libtranslate.so"
+          "${anyrun}/lib/libtranslate.so" # Example: `:de>en Baum` -> results in `tree`
+          "${anyrun}/lib/libwebsearch.so" # Prefix `?`
         ];
 
         closeOnClick = true;
@@ -58,6 +61,17 @@ in {
             )
           '';
 
+        "nix-run.ron".text =
+          #ron
+          ''
+            Config(
+              prefix: ":nr ",
+                allow_unfree = true,
+                channel: "nixpkgs-unstable",
+                max_entries: 5,
+            )
+          '';
+
         "randr.ron".text =
           # ron
           ''
@@ -72,6 +86,16 @@ in {
           ''
             Config(
               prefix: ":!",
+            )
+          '';
+
+        "translate.ron".text =
+          # ron
+          ''
+            Config(
+              prefix: ":",
+              language_delimiter: ">",
+              max_entries: 10,
             )
           '';
       };
