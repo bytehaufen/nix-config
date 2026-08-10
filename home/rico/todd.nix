@@ -85,33 +85,40 @@
         };
       }
 
-      # TODO: Set this shit up
-      # {
-      #   profile = {
-      #     name = "office";
-      #
-      #     outputs = [
-      #       {
-      #         criteria = "<office monitor 1>";
-      #         status = "enable";
-      #         scale = 1.0;
-      #         position = "0,0";
-      #       }
-      #       {
-      #         criteria = "<office monitor 2>";
-      #         status = "enable";
-      #         scale = 1.0;
-      #         position = "1920,0";
-      #       }
-      #       {
-      #         criteria = "BOE NE160QDM-NZC Unknown";
-      #         status = "enable";
-      #         scale = 1.5;
-      #         position = "3840,0";
-      #       }
-      #     ];
-      #   };
-      # }
+      {
+        profile = {
+          name = "office";
+
+          outputs = [
+            {
+              criteria = "Lenovo Group Limited LEN LT2452pwC 0x4B355A33";
+              status = "enable";
+              mode = "1920x1200@59.950Hz";
+              position = "0,0";
+              scale = 1.0;
+              transform = "normal";
+            }
+
+            {
+              criteria = "Lenovo Group Limited LEN LT2452pwC 0x4E395A33";
+              status = "enable";
+              mode = "1920x1200@59.950Hz";
+              position = "1920,0";
+              scale = 1.0;
+              transform = "normal";
+            }
+
+            {
+              criteria = "BOE NE160QDM-NZC Unknown";
+              status = "enable";
+              mode = "2560x1600@240.000Hz";
+              position = "3840,0";
+              scale = 1.5;
+              transform = "normal";
+            }
+          ];
+        };
+      }
     ];
   };
 }
