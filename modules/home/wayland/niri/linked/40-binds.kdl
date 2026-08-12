@@ -3,7 +3,7 @@ binds {
         show-hotkey-overlay
     }
     Mod+Shift+I repeat=false {
-        spawn-sh "info=\"$(niri msg pick-window)\" && notify-send 'Niri Window Info' \"$info\""
+        spawn-sh "info=\"$(niri msg pick-window)\" && tmp=$(mktemp /tmp/niri-info.XXXXXX) && printf '%s\n' \"$info\" > \"$tmp\" && kitty --detach nvim \"$tmp\""
     }
     Mod+Shift+Q {
         quit skip-confirmation=true
