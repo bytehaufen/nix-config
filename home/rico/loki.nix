@@ -11,30 +11,38 @@
     gui.enable = true;
     agenix.enable = true;
 
-    windowManager = {
-      niri = {
-        enable = true;
+    windowManager.niri = {
+      enable = true;
 
-        extraConfig = ''
-          output "Philips Consumer Electronics Company PHL 278B1 UK02507010538" {
-              mode "3840x2160"
-              scale 1.5
-              position x=0 y=0
-          }
+      monitorProfiles = {
+        home = {
+          m1 = {
+            criteria = "Philips Consumer Electronics Company PHL 278B1 UK02507010538";
+            mode = "3840x2160";
+            scale = 1.5;
+            position = "0,0";
+          };
+          m2 = {
+            criteria = "Philips Consumer Electronics Company PHL 278B1 UK02507010541";
+            mode = "3840x2160";
+            scale = 1.5;
+            position = "2560,0";
+            focus = true;
+          };
+          m3 = {
+            criteria = "eDP-1";
+            mode = "1920x1080";
+            scale = 1.2;
+            position = "5120,0";
+          };
+        };
 
-          output "Philips Consumer Electronics Company PHL 278B1 UK02507010541" {
-              mode "3840x2160"
-              scale 1.5
-              position x=2560 y=0
-              focus-at-startup
-          }
-
-          output "eDP-1" {
-              mode "1920x1080"
-              scale 1.2
-              position x=5120 y=0
-          }
-        '';
+        undocked.m3 = {
+          criteria = "eDP-1";
+          mode = "1920x1080";
+          scale = 1.2;
+          position = "0,0";
+        };
       };
     };
 

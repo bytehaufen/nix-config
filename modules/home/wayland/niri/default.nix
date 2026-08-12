@@ -28,7 +28,11 @@
   wpctl = lib.getExe' pkgs.wireplumber "wpctl";
   brightnessctl = lib.getExe pkgs.brightnessctl;
 in {
-  imports = [./standalone.nix];
+  imports = [
+    ./monitors.nix
+    ./standalone.nix
+    ./workspaces.nix
+  ];
 
   config = lib.mkIf cfg.enable {
     home = {
