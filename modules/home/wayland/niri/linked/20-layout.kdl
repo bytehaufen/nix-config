@@ -4,4 +4,13 @@ layout {
         width 2
     }
     background-color "transparent"
+    center-focused-column "on-overflow"
+    always-center-single-column
+    preset-column-widths {
+        proportion 0.45
+        proportion 0.95
+    }
+    default-column-width {
+        proportion 0.95
+    }
 }
