@@ -18,28 +18,24 @@
         home = {
           m1 = {
             criteria = "Philips Consumer Electronics Company PHL 278B1 UK02507010538";
-            mode = "3840x2160";
             scale = 1.5;
             position = "0,0";
           };
           m2 = {
             criteria = "Philips Consumer Electronics Company PHL 278B1 UK02507010541";
-            mode = "3840x2160";
             scale = 1.5;
             position = "2560,0";
             focus = true;
           };
           m3 = {
-            criteria = "eDP-1";
-            mode = "1920x1080";
+            criteria = "LG Display 0x072C Unknown";
             scale = 1.2;
             position = "5120,0";
           };
         };
 
         undocked.m3 = {
-          criteria = "eDP-1";
-          mode = "1920x1080";
+          criteria = "LG Display 0x072C Unknown";
           scale = 1.2;
           position = "0,0";
         };
