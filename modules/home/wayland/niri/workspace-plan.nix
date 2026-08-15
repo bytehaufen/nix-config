@@ -57,7 +57,7 @@
       ];
     }
 
-    # m1w3: COSIDE || Eclipse git staging
+    # m1w3: COSIDE
     {
       workspace = "m1w3";
       matches = [
@@ -72,13 +72,6 @@
         {
           title = "^coside_workspace";
           appId = "^COSIDE®$";
-          openFocused = false;
-        }
-
-        # Eclipse Git Staging window
-        {
-          title = "^$";
-          appId = "^Eclipse$";
           openFocused = false;
         }
       ];
