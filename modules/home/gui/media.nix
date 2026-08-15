@@ -8,7 +8,6 @@
     home.packages = with pkgs; [
       pulsemixer # PulseAudio mixer
       pavucontrol # PulseAudio volume control
-      spotube # Spotify client
       musicpod # YT Music client
     ];
 
