@@ -48,10 +48,17 @@ window-rule {
 window-rule {
     match title="^(Open File|Open Folder|Save As|Library|Please choose a directory).*$"
     open-floating true
+    open-focused true
     default-column-width {
         fixed 640
     }
     default-window-height {
         fixed 480
     }
+}
+window-rule {
+    match title="^Unlock Login Keyring.*$"
+    open-floating true
+    open-focused true
+    block-out-from "screencast"
 }
