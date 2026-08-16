@@ -38,6 +38,9 @@
         close_on_child_death = true;
 
         background_opacity = 1.0;
+        # Kitty detects and uses the semibold version, so we need to override
+        bold_font = "postscript_name=JetBrainsMonoNFM-ExtraBold";
+        bold_italic_font = "postscript_name=JetBrainsMonoNFM-ExtraBoldItalic";
       };
     };
 
