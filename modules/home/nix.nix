@@ -24,7 +24,6 @@
       config = {
         allowUnfree = true;
         allowUnfreePredicate = _: true;
-        allowUnsupportedSystem = true;
         experimental-features = "nix-command flakes ca-derivations";
       };
     };
