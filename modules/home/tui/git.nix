@@ -154,10 +154,10 @@
             };
           };
           git = {
-            pagers = [
+            diffRenderers = [
               {
                 colorArg = "always";
-                pager = "delta --dark --paging=never -s";
+                command = "delta --dark --paging=never -s";
               }
             ];
             parseEmoji = true;
