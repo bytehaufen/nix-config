@@ -76,6 +76,7 @@
     programs = {
       copilot.enable = false;
       ollama-cuda.enable = true;
+      llama-cpp-cuda.enable = true;
       openai-codex.enable = true;
 
       discord.enable = false;
@@ -101,11 +102,11 @@
     enable = true;
     # Query the version:
     # nvidia-smi --query-gpu=driver_version --format=csv,noheader
-    version = "595.71.05";
+    version = "610.57.04";
     # From home-manager options:
     # nix store prefetch-file https://download.nvidia.com/XFree86/Linux-x86_64/@VERSION@/NVIDIA-Linux-x86_64-@VERSION@.run
     # where @VERSION@ is replaced with the exact driver version.
     # If you are on ARM, replace Linux-x86_64 with Linux-aarch64.
-    sha256 = "sha256-NiA7iWC35JyKQva6H1hjzeNKBek9KyS3mK8G3YRva4I=";
+    sha256 = "sha256-suk1xmuDuwDAyFe8jg7g/VLekoa0DJzB7sKafOfrEW0=";
   };
 }
