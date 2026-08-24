@@ -20,6 +20,11 @@ in {
           doInstallCheck = false;
         }))
       ]
+      ++ lib.optionals config.opts.home.programs.llama-cpp-cuda.enable [
+        (llama-cpp.override {
+          cudaSupport = true;
+        })
+      ]
       ++ lib.optionals config.opts.home.programs.ollama-vulkan.enable [
         ollama-vulkan
       ]

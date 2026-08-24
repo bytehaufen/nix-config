@@ -89,6 +89,7 @@
             with ps; [
               cairosvg
               grip
+              huggingface-hub
               ipykernel
               ipython
               jupyter

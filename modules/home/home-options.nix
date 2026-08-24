@@ -35,6 +35,7 @@ in {
       obs = mkEnableOption "Enable OBS Studio configuration.";
       teams = mkEnableOption "Enable Microsoft Teams Client for Linux";
       copilot = mkEnableOption "Enable GitHub Copilot CLI";
+      llama-cpp-cuda = mkEnableOption "Enable llama.cpp with NVIDIA CUDA backend";
       ollama = mkEnableOption "Enable Ollama - Get up and running large language models";
       ollama-vulkan = mkEnableOption "Enable Ollama - Get up and running large language models with
         vulkan backend";
