@@ -11,7 +11,7 @@
       mission-center # System monitor
       nautilus # File manager
       overskride # Bluetooth / Obex client
-      vimiv-qt # Image viewer
+      imv # Image viewer
       gparted # Partition editor
 
       # Screenshot
