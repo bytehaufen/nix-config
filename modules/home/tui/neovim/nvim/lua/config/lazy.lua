@@ -33,6 +33,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.dap.nlua" },
     { import = "lazyvim.plugins.extras.editor.aerial" },
     { import = "lazyvim.plugins.extras.editor.harpoon2" },
+    { import = "lazyvim.plugins.extras.editor.neo-tree" },
     { import = "lazyvim.plugins.extras.editor.overseer" },
     { import = "lazyvim.plugins.extras.editor.refactoring" },
     { import = "lazyvim.plugins.extras.formatting.prettier" },
@@ -65,6 +66,7 @@ require("lazy").setup({
     -- custom module configs
     -- { import = "plugins.extras.coding.blink-extend" },  -- See copilot comment
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
+    { import = "plugins.extras.editor.neo-tree-extend" },
     { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.markdown-extend" },
     { import = "plugins.extras.lang.rust-extend" }, -- Let use bacon-ls clippy and give diagnostics in tests
