@@ -23,7 +23,6 @@ require("lazy").setup({
 
     { import = "lazyvim.plugins.extras.ai.copilot-chat" },
     -- { import = "lazyvim.plugins.extras.ai.copilot" }, -- Disabled because of noisiness
-    { import = "lazyvim.plugins.extras.ai.sidekick" },
     { import = "lazyvim.plugins.extras.coding.blink" },
     { import = "lazyvim.plugins.extras.coding.luasnip" },
     { import = "lazyvim.plugins.extras.coding.mini-comment" },
@@ -65,7 +64,6 @@ require("lazy").setup({
 
     -- custom module configs
     -- { import = "plugins.extras.coding.blink-extend" },  -- See copilot comment
-    { import = "plugins.extras.ai.sidekick-extend" },
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
     { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.markdown-extend" },
