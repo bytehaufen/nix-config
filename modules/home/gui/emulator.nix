@@ -17,8 +17,8 @@ in {
       quickgui # Quickemu frontend
       stable.spice-gtk # Spice client for quickemu
 
-      stable.wineWowPackages.waylandFull # Windows compatibility layer
-      stable.winetricks # Windows compatibility layer
+      wineWow64Packages.waylandFull # Windows compatibility layer
+      winetricks # Windows compatibility layer
       stable.distrobox
     ];
 
