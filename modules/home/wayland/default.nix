@@ -7,6 +7,7 @@
     ./packages.nix
 
     ./waybar
+    ./noctalia
     ./niri
   ];
 }
