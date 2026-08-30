@@ -255,7 +255,7 @@
         "manualSunrise": "06:30",
         "manualSunset": "18:30",
         "monitorForColors": "",
-        "predefinedScheme": "Noctalia (default)",
+        "predefinedScheme": "Tokyo Night",
         "schedulingMode": "off",
         "syncGsettings": true,
         "useWallpaperColors": false
@@ -381,7 +381,8 @@
         "iRadiusRatio": 1,
         "keybinds": {
             "keyDown": [
-                "Down"
+                "Down",
+                "Ctrl+N"
             ],
             "keyEnter": [
                 "Return",
@@ -400,7 +401,8 @@
                 "Right"
             ],
             "keyUp": [
-                "Up"
+                "Up",
+                "Ctrl+P"
             ]
         },
         "language": "",
@@ -469,7 +471,7 @@
         "weatherTaliaMascotAlways": false
     },
     "network": {
-        "bluetoothAutoConnect": true,
+        "bluetoothAutoConnect": false,
         "bluetoothDetailsViewMode": "grid",
         "bluetoothHideUnnamedDevices": false,
         "bluetoothRssiPollIntervalMs": 60000,
