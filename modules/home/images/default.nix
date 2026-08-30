@@ -9,6 +9,7 @@
     xdg.configFile = {
       "images/avatar.jpg".source = ./avatar.jpg;
       "images/dark-music.jpg".source = ./dark-music.jpg;
+      "images/bytehaufen.png".source = ./bytehaufen.png;
     };
   };
 }
