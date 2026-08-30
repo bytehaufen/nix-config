@@ -6,6 +6,7 @@
   config = lib.mkIf config.opts.nixos.wireless.enable {
     hardware.bluetooth = {
       enable = true;
+      powerOnBoot = true;
     };
 
     services.blueman.enable = true;
