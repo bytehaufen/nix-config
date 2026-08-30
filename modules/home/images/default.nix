@@ -3,13 +3,13 @@
   config,
   ...
 }: {
-  # Make my images available under $XDG_CONFIG_HOME/images, so that they can be
-  # set manually in applications
   config = lib.mkIf config.opts.home.gui.enable {
-    xdg.configFile = {
-      "images/avatar.jpg".source = ./avatar.jpg;
-      "images/dark-music.jpg".source = ./dark-music.jpg;
-      "images/bytehaufen.png".source = ./bytehaufen.png;
+    home.file = let
+      link = config.lib.file.mkOutOfStoreSymlink;
+    in {
+      "Pictures/Avatars/mihouse.jpg".source = link ./Avatars/milhouse.jpg;
+      "Pictures/Avatars/bytehaufen.png".source = link ./Avatars/bytehaufen.png;
+      "Pictures/Wallpapers/dark-music.jpg".source = link ./Wallpapers/dark-music.jpg;
     };
   };
 }

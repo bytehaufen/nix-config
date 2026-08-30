@@ -20,7 +20,7 @@ in {
 
     if ! pkill -x wf-recorder -SIGINT; then
       mkdir -p "$RECORD_PATH"
-      path="$RECORD_PATH/record-$(date +%Y%m%d%H%M%S)"
+      path="$RECORD_PATH/record_$(date +%Y-%m-%d_%H-%M-%S)"
 
       ${notify-send} -t ${notification-time} "Screen recording" "Select an area to start the recording..."
       geometry="$(${slurp} -c '#${config.colorScheme.palette.base0F}' -w 2 -d -o || true)"
@@ -43,8 +43,8 @@ in {
 
   # Make a screenshot of the screen (including all monitors) and a selected area
   screenshot-area = pkgs.writeShellScriptBin "screenshot-area" ''
-    mkdir -p "$HOME/Pictures/screenshots"
-    cd "$HOME/Pictures/screenshots" || exit
+    mkdir -p "$HOME/Pictures/Screenshots"
+    cd "$HOME/Pictures/Screenshots" || exit
 
     geometry="$(${slurp} -c '#ff3f3faf' -w 2 -d -o || true)"
 
@@ -55,7 +55,7 @@ in {
     fi
 
     if [ -f area.png ]; then
-      AREA_FILENAME=area-"$(date +%Y%m%d-%H%M%S)".png
+      AREA_FILENAME=area_"$(date +%Y-%m-%d_%H-%M-%S)".png
       mv area.png "$AREA_FILENAME"
       ${swappy} -f "$AREA_FILENAME" -o "''${AREA_FILENAME%.png}-annotated.png"
     fi
