@@ -188,13 +188,13 @@ binds {
         spawn "nautilus"
     }
     Mod+Space {
-        spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"
+        spawn-sh "noctalia-shell ipc call launcher toggle"
     }
     XF86Search {
-        spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"
+        spawn "noctalia-shell ipc call launcher toggle"
     }
     Mod+Alt+L {
-        spawn "noctalia-shell" "ipc" "call" "lockScreen" "lock"
+        spawn "noctalia-shell ipc call lockScreen lock"
     }
     Mod+BackSpace {
         switch-layout "next"
@@ -205,18 +205,21 @@ binds {
     Mod+Alt+S {
         spawn "screenshot-area"
     }
+    Mod+Shift+N {
+        spawn-sh "noctalia-shell ipc call desktopWidgets edit"
+    }
     // Keyboard hotkeys
     XF86AudioRaiseVolume allow-when-locked=true {
-        spawn "noctalia-shell" "ipc" "call" "volume" "increase"
+        spawn-sh "noctalia-shell ipc call volume increase"
     }
     XF86AudioLowerVolume allow-when-locked=true {
-        spawn "noctalia-shell" "ipc" "call" "volume" "decrease"
+        spawn-sh "noctalia-shell ipc call volume decrease"
     }
     XF86AudioMute allow-when-locked=true {
-        spawn "noctalia-shell" "ipc" "call" "volume" "muteOutput"
+        spawn-sh "noctalia-shell ipc call volume muteOutput"
     }
     XF86AudioMicMute allow-when-locked=true {
-        spawn "noctalia-shell" "ipc" "call" "volume" "muteInput"
+        spawn-sh "noctalia-shell ipc call volume muteInput"
     }
     XF86AudioPlay allow-when-locked=true {
         spawn-sh "noctalia-shell ipc call media playPause"
@@ -231,18 +234,18 @@ binds {
         spawn-sh "noctalia-shell ipc call media next"
     }
     XF86MonBrightnessUp allow-when-locked=true {
-        spawn "noctalia-shell" "ipc" "call" "brightness" "increase"
+        spawn-sh "noctalia-shell ipc call brightness increase"
     }
     XF86MonBrightnessDown allow-when-locked=true {
-        spawn "noctalia-shell" "ipc" "call" "brightness" "decrease"
+        spawn-sh "noctalia-shell ipc call brightness decrease"
     }
     XF86KbdBrightnessUp allow-when-locked=true {
-        spawn "brightnessctl" "--device=kbd_backlight" "set" "10%+"
+        spawn-sh "brightnessctl --device=kbd_backlight set 10%+"
     }
     XF86KbdBrightnessDown allow-when-locked=true {
-        spawn "brightnessctl" "--device=kbd_backlight" "set" "10%-"
+        spawn-sh "brightnessctl --device=kbd_backlight set 10%-"
     }
     XF86Calculator {
-        spawn "sh" "-c" "pkill gnome-calculator || run-as-service gnome-calculator"
+        spawn-sh "pkill gnome-calculator || gnome-calculator"
     }
 }
