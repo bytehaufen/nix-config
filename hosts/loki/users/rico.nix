@@ -35,8 +35,4 @@ in {
     "${self}/modules/home"
     "${self}/home/${username}/${config.networking.hostName}.nix"
   ];
-
-  security.pam.services = {
-    swaylock = {};
-  };
 }

@@ -6,8 +6,6 @@
 }: let
   notification-time = "3000";
 
-  swaylock = lib.getExe config.programs.swaylock.package;
-  niri = lib.getExe pkgs.niri;
   wf-recorder = lib.getExe pkgs.wf-recorder;
   notify-send = "${pkgs.libnotify}/bin/notify-send";
   ffmpeg = lib.getExe pkgs.ffmpeg;
@@ -16,12 +14,6 @@
   grim = lib.getExe pkgs.grim;
   swappy = lib.getExe pkgs.swappy;
 in {
-  # Let system suspend with lock screen
-  pause-system = pkgs.writeShellScriptBin "pause-system" ''
-    ${swaylock} --daemonize
-    systemctl suspend
-  '';
-
   # Make screen record and save it as mkv and gif
   record-area = pkgs.writeShellScriptBin "record-area" ''
     RECORD_PATH="$HOME/Videos/screenrecords"
@@ -67,10 +59,5 @@ in {
       mv area.png "$AREA_FILENAME"
       ${swappy} -f "$AREA_FILENAME" -o "''${AREA_FILENAME%.png}-annotated.png"
     fi
-  '';
-
-  next-xkb-layout = pkgs.writeShellScriptBin "next-xkb-layout" ''
-    ${niri} msg action switch-layout next
-    ${notify-send} -t ${notification-time} "Keyboard layout" "Switched layout"
   '';
 }

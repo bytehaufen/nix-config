@@ -87,7 +87,6 @@
 
     services = {
       kdeconnect.enable = false;
-      playerctl.enable = false;
       power-monitor.enable = false;
       syncthing.enable = true;
       udiskie.enable = false;

@@ -3,9 +3,10 @@ input {
     warp-mouse-to-focus
     keyboard {
         xkb {
-            layout "en-65,de-65"
+            layout "us,de"
             options "caps:escape"
         }
+        track-layout "global"
         repeat-delay 300
         repeat-rate 60
         numlock

@@ -20,7 +20,6 @@ in {
         networkmanagerapplet # Provide GUI app: nm-connection-editor
         pipewire # Multimedia framework
         qogir-icon-theme # Icon theme
-        swaybg # Wallpaper
         wayland-utils # Utilities for Wayland
         wayland-protocols # Wayland protocols
         wev # Wayland window debugging

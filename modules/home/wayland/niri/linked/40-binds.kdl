@@ -2,8 +2,12 @@ binds {
     Mod+Shift+Slash {
         show-hotkey-overlay
     }
+    // Show app information, like app-id, title, etc.
     Mod+Shift+I repeat=false {
         spawn-sh "info=\"$(niri msg pick-window)\" && tmp=$(mktemp /tmp/niri-info.XXXXXX) && printf '%s\n' \"$info\" > \"$tmp\" && kitty --detach nvim \"$tmp\""
+    }
+    Mod+Escape allow-inhibiting=false {
+        toggle-keyboard-shortcuts-inhibit
     }
     Mod+Shift+Q {
         quit skip-confirmation=true
@@ -173,10 +177,72 @@ binds {
     Alt+Print {
         screenshot-window
     }
+    // App launching
+    Mod+Return {
+        spawn "kitty"
+    }
+    Mod+W {
+        spawn "brave"
+    }
+    Mod+E {
+        spawn "nautilus"
+    }
+    Mod+Space {
+        spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"
+    }
+    XF86Search {
+        spawn "noctalia-shell" "ipc" "call" "launcher" "toggle"
+    }
+    Mod+Alt+L {
+        spawn "noctalia-shell" "ipc" "call" "lockScreen" "lock"
+    }
+    Mod+BackSpace {
+        switch-layout "next"
+    }
+    Mod+Alt+R {
+        spawn "record-area"
+    }
+    Mod+Alt+S {
+        spawn "screenshot-area"
+    }
+    // Keyboard hotkeys
+    XF86AudioRaiseVolume allow-when-locked=true {
+        spawn "noctalia-shell" "ipc" "call" "volume" "increase"
+    }
+    XF86AudioLowerVolume allow-when-locked=true {
+        spawn "noctalia-shell" "ipc" "call" "volume" "decrease"
+    }
+    XF86AudioMute allow-when-locked=true {
+        spawn "noctalia-shell" "ipc" "call" "volume" "muteOutput"
+    }
+    XF86AudioMicMute allow-when-locked=true {
+        spawn "noctalia-shell" "ipc" "call" "volume" "muteInput"
+    }
+    XF86AudioPlay allow-when-locked=true {
+        spawn-sh "noctalia-shell ipc call media playPause"
+    }
+    XF86AudioStop allow-when-locked=true {
+        spawn-sh "noctalia-shell ipc call media pause"
+    }
+    XF86AudioPrev allow-when-locked=true {
+        spawn-sh "noctalia-shell ipc call media previous"
+    }
+    XF86AudioNext allow-when-locked=true {
+        spawn-sh "noctalia-shell ipc call media next"
+    }
+    XF86MonBrightnessUp allow-when-locked=true {
+        spawn "noctalia-shell" "ipc" "call" "brightness" "increase"
+    }
+    XF86MonBrightnessDown allow-when-locked=true {
+        spawn "noctalia-shell" "ipc" "call" "brightness" "decrease"
+    }
+    XF86KbdBrightnessUp allow-when-locked=true {
+        spawn "brightnessctl" "--device=kbd_backlight" "set" "10%+"
+    }
+    XF86KbdBrightnessDown allow-when-locked=true {
+        spawn "brightnessctl" "--device=kbd_backlight" "set" "10%-"
+    }
     XF86Calculator {
         spawn "sh" "-c" "pkill gnome-calculator || run-as-service gnome-calculator"
-    }
-    Mod+Escape allow-inhibiting=false {
-        toggle-keyboard-shortcuts-inhibit
     }
 }

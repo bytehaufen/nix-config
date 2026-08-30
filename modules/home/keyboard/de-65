@@ -1,7 +1,0 @@
-default partial alphanumeric_keys
-xkb_symbols "basic" {
-	include "de(basic)"
-
-	name[Group1] = "de";
-    key <ESC>  {[ grave,    asciitilde      ]       };
-};

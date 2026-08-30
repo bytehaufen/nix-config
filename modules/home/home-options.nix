@@ -46,7 +46,6 @@ in {
 
     services = {
       kdeconnect = mkEnableOption "Enable KDE Connect, a tool to integrate your phone with your desktop";
-      playerctl = mkEnableOption "Enable playerctl, a command-line utility to control media players";
       power-monitor = mkEnableOption "Enable power-monitor, a tool to monitor power usage and battery status";
       syncthing = mkEnableOption "Enable Syncthing, a continuous file synchronization program";
       udiskie = mkEnableOption "Enable udiskie, a tool to manage removable drives in Wayland";
