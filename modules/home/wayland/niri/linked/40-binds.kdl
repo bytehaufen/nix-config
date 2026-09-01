@@ -191,10 +191,10 @@ binds {
         spawn-sh "noctalia-shell ipc call launcher toggle"
     }
     XF86Search {
-        spawn "noctalia-shell ipc call launcher toggle"
+        spawn-sh "noctalia-shell ipc call launcher toggle"
     }
     Mod+Alt+L {
-        spawn "noctalia-shell ipc call lockScreen lock"
+        spawn-sh "noctalia-shell ipc call lockScreen lock"
     }
     Mod+BackSpace {
         switch-layout "next"
