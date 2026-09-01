@@ -66,6 +66,10 @@
       };
 
       extraConfig = ''
+        environment {
+            NOCTALIA_PAM_SERVICE "noctalia"
+        }
+
         debug {
             // render-drm-device "/dev/dri/renderD129"
             wait-for-frame-completion-before-queueing
