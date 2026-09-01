@@ -16,7 +16,7 @@ in {
     COSIDE_REPO_ROOT=${cosideRepoRoot}
     HOST_REVIEW_WORKSPACE=${reviewWorkspace}
 
-    # HOST_ECLIPSE_AGENT_PORT=4740
+    HOST_ECLIPSE_AGENT_PORT=4711
   '';
 
   xdg.desktopEntries = {
