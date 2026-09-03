@@ -80,7 +80,7 @@
     programs = {
       copilot.enable = false;
       ollama-cuda.enable = true;
-      llama-cpp-cuda.enable = true;
+      llama-cpp-cuda.enable = false;
       openai-codex.enable = true;
 
       discord.enable = false;
