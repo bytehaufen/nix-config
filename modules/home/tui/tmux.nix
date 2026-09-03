@@ -109,8 +109,8 @@
         bind '<' swap-pane -U       # swap current pane with the previous one
 
         # Session navigation
-        bind -n M-[ switch-client -p  # previous session
-        bind -n M-] switch-client -n  # next session
+        bind -n M-, switch-client -p # previous session
+        bind -n M-. switch-client -n # next session
 
         # window navigation
         bind -r C-h previous-window # select previous window
