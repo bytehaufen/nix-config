@@ -24,6 +24,7 @@ in {
       enableNushellIntegration = true;
       settings = {
         keymap_mode = "auto";
+        ai.enable = false;
       };
     };
 
