@@ -68,11 +68,11 @@
       extraConfig = ''
         environment {
             NOCTALIA_PAM_SERVICE "noctalia"
+            VK_DRIVER_FILES "/run/opengl-driver/share/vulkan/icd.d"
         }
 
         debug {
-            // render-drm-device "/dev/dri/renderD129"
-            wait-for-frame-completion-before-queueing
+             render-drm-device "/dev/dri/by-path/pci-0000:01:00.0-render"
         }
       '';
     };
