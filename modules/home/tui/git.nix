@@ -99,7 +99,6 @@
         enable = true;
         options = {
           dark = true;
-          show-syntax-themes = true;
           minus-style = "syntax '#37222c'";
           minus-non-emph-style = "syntax '#37222c'";
           minus-emph-style = "syntax '#713137'";
