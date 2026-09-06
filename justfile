@@ -101,6 +101,7 @@ penvof pid:
 [group('misc')]
 notify:
   notify-send "Nixfiles process finished"
+  printf '\a'
 
 # Remove all reflog entries and prune unreachable objects
 [group('git')]
