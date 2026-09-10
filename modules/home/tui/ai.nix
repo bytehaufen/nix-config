@@ -2,6 +2,7 @@
   lib,
   config,
   pkgs,
+  inputs,
   ...
 }: let
   ollamaEnabled =
@@ -35,7 +36,8 @@ in {
         ollama
       ]
       ++ lib.optionals config.opts.home.programs.openai-codex.enable [
-        codex
+        inputs.llm-agents.packages.${pkgs.system}.codex-acp
+        inputs.llm-agents.packages.${pkgs.system}.codex
       ];
 
     programs.zsh.shellAliases = lib.mkIf ollamaEnabled {
