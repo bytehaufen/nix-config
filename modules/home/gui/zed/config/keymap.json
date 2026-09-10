@@ -1,0 +1,79 @@
+[
+  {
+    "context": "Editor && (vim_mode == normal || vim_mode == visual) && !menu",
+    "bindings": {
+      "s": "vim::HelixJumpToWord",
+      "g s": "vim::PushSneak",
+      "g shift-s": "vim::PushSneakBackward"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == normal && !menu",
+    "bindings": {
+      "space space": "file_finder::Toggle",
+      "space f f": "file_finder::Toggle",
+      "space f r": "projects::OpenRecent",
+      "space f n": "workspace::NewFile",
+      "space /": "pane::DeploySearch",
+      "space s g": "pane::DeploySearch",
+      "space s s": "outline::Toggle",
+      "space s shift-s": "project_symbols::Toggle",
+      "space e": "project_panel::ToggleFocus",
+      "space b b": "tab_switcher::Toggle",
+      "space b d": "pane::CloseActiveItem",
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
+      "space c a": "editor::ToggleCodeActions",
+      "space c r": "editor::Rename",
+      "space c f": "editor::Format",
+      "space x x": "diagnostics::Deploy",
+      "space g g": "git_panel::ToggleFocus",
+      "space g d": "git::Diff",
+      "space u h": "editor::ToggleInlayHints",
+      "space u w": "editor::ToggleSoftWrap",
+      "space w w": "workspace::Save",
+      "space w v": "pane::SplitRight",
+      "space w s": "pane::SplitDown",
+      "space t t": "task::Spawn",
+      "space t r": "task::Rerun",
+      "space d d": "debugger::Start",
+      "space d b": "editor::ToggleBreakpoint",
+      "space a a": "agent::ToggleFocus",
+      "space a c": [
+        "task::Spawn",
+        {
+          "task_name": "Codex CLI",
+          "reveal_target": "center"
+        }
+      ],
+      "space a p": [
+        "task::Spawn",
+        {
+          "task_name": "Copilot CLI",
+          "reveal_target": "center"
+        }
+      ],
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-/": "terminal_panel::Toggle"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == visual && !menu",
+    "bindings": {
+      "space c f": "editor::Format",
+      "space c a": "editor::ToggleCodeActions"
+    }
+  },
+  {
+    "context": "EmptyPane",
+    "bindings": {
+      "space space": "file_finder::Toggle",
+      "space f f": "file_finder::Toggle",
+      "space e": "project_panel::ToggleFocus",
+      "space a a": "agent::ToggleFocus"
+    }
+  }
+]

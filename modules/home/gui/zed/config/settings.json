@@ -1,0 +1,272 @@
+{
+  "cli_default_open_behavior": "existing_window",
+  "agent_servers": {
+    "codex-acp": {
+      "favorite_config_option_values": {
+        "model": [
+          "gpt-5.6-terra"
+        ]
+      },
+      "type": "registry"
+    }
+  },
+  "$schema": "zed://schemas/settings",
+  "theme": "Nix Colors (Dark)",
+  "base_keymap": "Zed",
+  "vim_mode": true,
+  "vim": {
+    "use_system_clipboard": "always",
+    "use_smartcase_find": true,
+    "toggle_relative_line_numbers": true
+  },
+  "buffer_font_family": "FiraCode Nerd Font",
+  "ui_font_family": "DejaVu Sans",
+  "buffer_font_size": 14,
+  "ui_font_size": 14,
+  "relative_line_numbers": "enabled",
+  "vertical_scroll_margin": 10,
+  "tab_size": 2,
+  "hard_tabs": false,
+  "preferred_line_length": 100,
+  "soft_wrap": "none",
+  "show_whitespaces": "selection",
+  "format_on_save": "off",
+  "use_on_type_format": false,
+  "load_direnv": "direct",
+  "auto_update": false,
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "inlay_hints": {
+    "enabled": true
+  },
+  "show_edit_predictions": false,
+  "terminal": {
+    "working_directory": "current_project_directory",
+    "font_family": "FiraCode Nerd Font",
+    "font_size": 14
+  },
+  "auto_install_extensions": {
+    "arduino": true,
+    "dockerfile": true,
+    "graphviz": true,
+    "groovy": true,
+    "html": true,
+    "java": true,
+    "just": true,
+    "lua": true,
+    "make": true,
+    "markdownlint": true,
+    "neocmake": true,
+    "nix": true,
+    "scss": true,
+    "stylelint": true,
+    "svelte": true,
+    "toml": true,
+    "vue": true
+  },
+  "languages": {
+    "C": {
+      "format_on_save": "off"
+    },
+    "C++": {
+      "format_on_save": "off"
+    },
+    "CMake": {
+      "format_on_save": "off"
+    },
+    "Go": {
+      "format_on_save": "off",
+      "hard_tabs": true,
+      "language_servers": ["gopls"],
+      "formatter": "language_server",
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      }
+    },
+    "Rust": {
+      "format_on_save": "off",
+      "tab_size": 4,
+      "language_servers": ["rust-analyzer"],
+      "formatter": "language_server"
+    },
+    "Python": {
+      "format_on_save": "off",
+      "language_servers": ["basedpyright", "ruff"],
+      "tab_size": 4,
+      "formatter": {
+        "language_server": {
+          "name": "ruff"
+        }
+      },
+      "code_actions_on_format": {
+        "source.organizeImports.ruff": true
+      }
+    },
+    "Nix": {
+      "format_on_save": "off",
+      "language_servers": ["nixd", "!nil"],
+      "formatter": {
+        "external": {
+          "command": "alejandra",
+          "arguments": ["--quiet", "--"]
+        }
+      }
+    },
+    "Java": {
+      "format_on_save": "off"
+    },
+    "JavaScript": {
+      "format_on_save": "off",
+      "language_servers": ["vtsls", "eslint", "tailwindcss-language-server"],
+      "formatter": "prettier"
+    },
+    "TypeScript": {
+      "format_on_save": "off",
+      "language_servers": ["vtsls", "eslint", "tailwindcss-language-server"],
+      "formatter": "prettier"
+    },
+    "TSX": {
+      "format_on_save": "off",
+      "language_servers": ["vtsls", "eslint", "tailwindcss-language-server"],
+      "formatter": "prettier"
+    },
+    "Svelte": {
+      "format_on_save": "off",
+      "language_servers": ["svelte-language-server", "tailwindcss-language-server", "eslint"],
+      "formatter": "prettier"
+    },
+    "Vue.js": {
+      "format_on_save": "off",
+      "language_servers": ["vue-language-server", "vtsls", "tailwindcss-language-server", "eslint"],
+      "formatter": "prettier"
+    },
+    "HTML": {
+      "format_on_save": "off",
+      "formatter": "prettier"
+    },
+    "CSS": {
+      "format_on_save": "off",
+      "formatter": "prettier",
+      "language_servers": [
+        "vscode-css-language-server",
+        "tailwindcss-language-server",
+        "stylelint-lsp"
+      ]
+    },
+    "SCSS": {
+      "format_on_save": "off",
+      "formatter": "prettier",
+      "language_servers": [
+        "vscode-css-language-server",
+        "tailwindcss-language-server",
+        "stylelint-lsp"
+      ]
+    },
+    "JSON": {
+      "format_on_save": "off",
+      "formatter": "prettier"
+    },
+    "JSONC": {
+      "format_on_save": "off",
+      "formatter": "prettier"
+    },
+    "YAML": {
+      "format_on_save": "off",
+      "formatter": "prettier"
+    },
+    "TOML": {
+      "format_on_save": "off"
+    },
+    "Markdown": {
+      "format_on_save": "off",
+      "formatter": "prettier",
+      "soft_wrap": "editor_width",
+      "remove_trailing_whitespace_on_save": false,
+      "language_servers": ["marksman", "markdownlint"]
+    },
+    "Shell Script": {
+      "format_on_save": "off",
+      "formatter": {
+        "external": {
+          "command": "shfmt",
+          "arguments": ["-i", "2", "-filename", "{buffer_path}"]
+        }
+      }
+    },
+    "Dockerfile": {
+      "format_on_save": "off"
+    },
+    "Docker Compose": {
+      "format_on_save": "off",
+      "formatter": "prettier"
+    },
+    "Groovy": {
+      "format_on_save": "off"
+    },
+    "Arduino": {
+      "format_on_save": "off"
+    },
+    "Just": {
+      "format_on_save": "off"
+    },
+    "Lua": {
+      "format_on_save": "off",
+      "formatter": {
+        "external": {
+          "command": "stylua",
+          "arguments": ["--stdin-filepath", "{buffer_path}", "-"]
+        }
+      }
+    },
+    "Graphviz": {
+      "format_on_save": "off"
+    },
+    "Make": {
+      "format_on_save": "off"
+    }
+  },
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        "cargo": {
+          "allFeatures": true
+        },
+        "check": {
+          "overrideCommand": [
+            "cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--all-features",
+            "--profile",
+            "test",
+            "--message-format=json"
+          ]
+        }
+      }
+    },
+    "tailwindcss-language-server": {
+      "settings": {
+        "includeLanguages": {
+          "svelte": "html",
+          "vue": "html"
+        }
+      }
+    },
+    "arduino-language-server": {
+      "settings": {
+        "autoDownloadCli": false,
+        "autoCreateConfig": true
+      }
+    },
+    "yaml-language-server": {
+      "settings": {
+        "yaml": {
+          "keyOrdering": false
+        }
+      }
+    }
+  }
+}

@@ -10,5 +10,6 @@
     ./obs.nix
     ./office.nix
     ./packages.nix
+    ./zed
   ];
 }
