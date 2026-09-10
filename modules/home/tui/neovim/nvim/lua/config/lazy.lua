@@ -21,8 +21,9 @@ require("lazy").setup({
     -- lazyvim extension modules
     -- { import = "lazyvim.plugins.extras.ui.edgy" }, -- Must be imported before aerial and similar plugins
 
-    { import = "lazyvim.plugins.extras.ai.copilot-chat" },
+    -- { import = "lazyvim.plugins.extras.ai.copilot-chat" },
     -- { import = "lazyvim.plugins.extras.ai.copilot" }, -- Disabled because of noisiness
+    { import = "lazyvim.plugins.extras.ai.avante" },
     { import = "lazyvim.plugins.extras.coding.blink" },
     { import = "lazyvim.plugins.extras.coding.luasnip" },
     { import = "lazyvim.plugins.extras.coding.mini-comment" },
@@ -65,6 +66,7 @@ require("lazy").setup({
 
     -- custom module configs
     -- { import = "plugins.extras.coding.blink-extend" },  -- See copilot comment
+    { import = "plugins.extras.ai.avante-extend" },
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
     { import = "plugins.extras.editor.neo-tree-extend" },
     { import = "plugins.extras.lang.nix-extend" },
