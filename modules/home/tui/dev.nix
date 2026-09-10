@@ -119,7 +119,7 @@
         rustfmt
 
         # Java
-        gradle
+        stable.gradle
         maven
         jdk25
         jdt-language-server
