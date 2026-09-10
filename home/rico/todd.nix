@@ -70,10 +70,6 @@
             NOCTALIA_PAM_SERVICE "noctalia"
             VK_DRIVER_FILES "/run/opengl-driver/share/vulkan/icd.d"
         }
-
-        debug {
-             render-drm-device "/dev/dri/by-path/pci-0000:01:00.0-render"
-        }
       '';
     };
 
@@ -104,10 +100,12 @@
   targets.genericLinux.gpu.nvidia = {
     enable = true;
     # Query the version:
-    # nvidia-smi --query-gpu=driver_version --format=csv,noheader
+    #
+    # export NVIDIA_DRIVER_VERSION=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader)
+    # echo $NVIDIA_DRIVER_VERSION
     version = "610.57.04";
     # From home-manager options:
-    # nix store prefetch-file https://download.nvidia.com/XFree86/Linux-x86_64/@VERSION@/NVIDIA-Linux-x86_64-@VERSION@.run
+    # nix store prefetch-file https://download.nvidia.com/XFree86/Linux-x86_64/"$NVIDIA_DRIVER_VERSION"/NVIDIA-Linux-x86_64-"$NVIDIA_DRIVER_VERSION".run
     # where @VERSION@ is replaced with the exact driver version.
     # If you are on ARM, replace Linux-x86_64 with Linux-aarch64.
     sha256 = "sha256-suk1xmuDuwDAyFe8jg7g/VLekoa0DJzB7sKafOfrEW0=";
