@@ -7,14 +7,18 @@
   configPath = "${config.home.homeDirectory}/nix-config/modules/home/gui/zed/config";
 in {
   config = lib.mkIf config.opts.home.gui.enable {
+    home.packages = with pkgs; [
+      bubblewrap
+    ];
+
     programs.zed-editor = {
       enable = true;
 
       extraPackages = with pkgs; [
-        nodejs
         git
         ripgrep
         direnv
+
         alejandra
         nixd
         clang-tools
