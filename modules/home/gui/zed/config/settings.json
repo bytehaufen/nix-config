@@ -7,11 +7,15 @@
   // - "light": Use the theme indicated by the "light" field
   // - "dark": Use the theme indicated by the "dark" field
   "theme": {
-    "mode": "system",
+    "mode": "dark",
     "light": "Catppuccin Latte",
     "dark": "Catppuccin Mocha",
   },
-  "icon_theme": "Catppuccin Mocha",
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Catppuccin Latte",
+    "dark": "Catppuccin Mocha"
+  },
   // The name of a base set of key bindings to use.
   // This setting can take the following values:
   //
@@ -640,7 +644,7 @@
     //    "always"
     // 3. Never show the minimap:
     //    "never" (default)
-    "show": "always",
+    "show": "auto",
     // Where to show the minimap in the editor.
     // This setting can take two values:
     // 1. Show the minimap on the focused editor only:
@@ -747,7 +751,7 @@
   "fast_scroll_sensitivity": 4.0,
   "sticky_scroll": {
     // Whether to stick scopes to the top of the editor.
-    "enabled": false,
+    "enabled": true,
   },
   "relative_line_numbers": "enabled",
   // If 'search_wrap' is disabled, search result do not wrap around the end of the file.
@@ -1322,7 +1326,7 @@
   // - "full": Use LSP semantic tokens exclusively to highlight the text, tree-sitter syntax highlighting is off.
   //
   // May require language server restart to properly apply.
-  "semantic_tokens": "off",
+  "semantic_tokens": "combined",
 
   // Controls whether folding ranges from language servers are used instead of
   // tree-sitter and indent-based folding.
@@ -2175,6 +2179,7 @@
   "auto_install_extensions": {
     "catppuccin": true,
     "catppuccin-icons": true,
+    "todo-highlight-language-server": true,
 
     "dockerfile": true,
     "git-firefly": true,
@@ -2700,7 +2705,18 @@
     // ]
     //
     // Default rules are viewable via the "zed: show default semantic token rules" action.
-    "semantic_token_rules": [],
+    "semantic_token_rules": [
+         { "token_type": "keyword", "token_modifiers": ["todo"],       "foreground_color": "#FF8C00", "background_color": "#2B1700", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["fixme"],      "foreground_color": "#FF2D55", "background_color": "#2B0011", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["hack"],       "foreground_color": "#FFD60A", "background_color": "#272100", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["note"],       "foreground_color": "#0A84FF", "background_color": "#001B2B", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["info"],       "foreground_color": "#0A84FF", "background_color": "#001B2B", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["warn"],       "foreground_color": "#FF9F0A", "background_color": "#271B00", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["warning"],    "foreground_color": "#FF9F0A", "background_color": "#271B00", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["bug"],        "foreground_color": "#FF453A", "background_color": "#2B0A00", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["xxx"],        "foreground_color": "#BF5AF2", "background_color": "#1B0029", "font_weight": "bold" },
+         { "token_type": "keyword", "token_modifiers": ["deprecated"], "foreground_color": "#98989D", "background_color": "#1A1A1A", "font_weight": "bold" }
+       ]
   },
   // Jupyter settings
   "jupyter": {
