@@ -9,7 +9,6 @@ in {
   config = lib.mkIf config.opts.home.gui.enable {
     programs.zed-editor = {
       enable = true;
-      package = pkgs.zed-editor.fhs;
 
       extraPackages = with pkgs; [
         nodejs
@@ -46,6 +45,7 @@ in {
         just-lsp
         jdk25
         stable.gradle
+        vscode-langservers-extracted
       ];
     };
 

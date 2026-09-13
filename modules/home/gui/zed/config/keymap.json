@@ -1,5 +1,11 @@
 [
   {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "space": null
+    }
+  },
+  {
     "context": "Editor && (vim_mode == normal || vim_mode == visual) && !menu",
     "bindings": {
       "s": "vim::HelixJumpToWord",
