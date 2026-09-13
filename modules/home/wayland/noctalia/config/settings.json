@@ -443,7 +443,8 @@
         "screenUnlock": "",
         "session": "",
         "startup": "",
-        "wallpaperChange": ""
+        "wallpaperChange": "",
+        "session_unlocked": "systemctl --user restart kanshi.service"
     },
     "idle": {
         "customCommands": "[]",
