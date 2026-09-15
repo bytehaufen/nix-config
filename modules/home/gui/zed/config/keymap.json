@@ -1,49 +1,396 @@
+// Pending decisions: ../keybinding-decisions/TODO.md
+// Grouped by workflow; Zed accepts JSON with comments.
+// Native completion and unchanged Vim motions intentionally remain in the defaults.
 [
+  // Leader prefix
   {
     "context": "VimControl && !menu",
     "bindings": {
       "space": null
     }
   },
+  // Files, buffers and projects
   {
-    "context": "Editor && (vim_mode == normal || vim_mode == visual) && !menu",
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
     "bindings": {
-      "s": "vim::HelixJumpToWord",
-      "g s": "vim::PushSneak",
-      "g shift-s": "vim::PushSneakBackward"
+      "space f b": "tab_switcher::ToggleAll",
+      "space q q": "zed::Quit",
+      "space b o": "pane::CloseOtherItems",
+      "space b d": "pane::CloseActiveItem",
+      "space b b": "pane::AlternateFile",
+      "space b l": "pane::CloseItemsToTheLeft",
+      "space b r": "pane::CloseItemsToTheRight",
+      "space b p": "pane::TogglePinTab",
+      "space b e": "tab_switcher::ToggleAll",
+      "space e": "project_panel::ToggleFocus",
+      "space f p": "projects::OpenRecent",
+      "space f r": "file_finder::Toggle",
+      "space f c": "zed::OpenSettingsFile",
+      "space tab [": "multi_workspace::PreviousProject",
+      "space tab ]": "multi_workspace::NextProject",
+      "space tab tab": "workspace::NewWindow",
+      "space f n": "workspace::NewFile",
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
+      "space space": "file_finder::Toggle"
+    }
+  },
+  // Code and language tools
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space c h": "editor::SwitchSourceHeader",
+      "space c l": "dev::OpenLanguageServerLogs",
+      "space c shift-a": "editor::ToggleCodeActions",
+      "[ [": "vim::GoToPreviousReference",
+      "] ]": "vim::GoToNextReference",
+      "g r": "editor::FindAllReferences",
+      "alt-p": "vim::GoToPreviousReference",
+      "alt-n": "vim::GoToNextReference",
+      "space c a": "editor::ToggleCodeActions",
+      "space c r": "editor::Rename",
+      "space c f": "editor::Format"
     }
   },
   {
-    "context": "Editor && vim_mode == normal && !menu",
+    "context": "Editor && mode == full && vim_mode == visual && !menu",
     "bindings": {
-      "space space": "file_finder::Toggle",
-      "space f f": "file_finder::Toggle",
-      "space f r": "projects::OpenRecent",
-      "space f n": "workspace::NewFile",
+      "space c f": "editor::FormatSelections",
+      "space c a": "editor::ToggleCodeActions"
+    }
+  },
+  // Search, diagnostics and registers
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space s b": "buffer_search::Deploy",
+      "space s shift-d": "diagnostics::DeployCurrentFile",
+      "space x shift-x": "diagnostics::DeployCurrentFile",
+      "space s \"": "vim::ToggleRegistersView",
+      "space s m": "vim::ToggleMarksView",
+      "space s shift-h": "dev::OpenHighlightsTreeView",
+      "space s d": "diagnostics::Deploy",
+      "space c s": "outline_panel::ToggleFocus",
+      "space c d": "editor::Hover",
+      "[ shift-d": "editor::GoToPreviousDiagnostic",
+      "] shift-d": "editor::GoToDiagnostic",
+      "space s r": [
+        "pane::DeploySearch",
+        {
+          "replace_enabled": true
+        }
+      ],
       "space /": "pane::DeploySearch",
       "space s g": "pane::DeploySearch",
       "space s s": "outline::Toggle",
       "space s shift-s": "project_symbols::Toggle",
-      "space e": "project_panel::ToggleFocus",
-      "space b b": "tab_switcher::Toggle",
-      "space b d": "pane::CloseActiveItem",
-      "shift-h": "pane::ActivatePreviousItem",
-      "shift-l": "pane::ActivateNextItem",
-      "space c a": "editor::ToggleCodeActions",
-      "space c r": "editor::Rename",
-      "space c f": "editor::Format",
-      "space x x": "diagnostics::Deploy",
-      "space g g": "git_panel::ToggleFocus",
+      "space x x": "diagnostics::Deploy"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == visual && !menu",
+    "bindings": {
+      "space s r": [
+        "pane::DeploySearch",
+        {
+          "replace_enabled": true
+        }
+      ]
+    }
+  },
+  // Git (hunk operations use editor selections)
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space g h d": "git::OpenFileDiff",
+      "space g h p": "editor::ToggleSelectedDiffHunks",
+      "space g h u": "git::UnstageAndNext",
+      "space g h r": "git::Restore",
+      "space g h s": "git::StageAndNext",
+      "[ h": "editor::GoToPreviousHunk",
+      "] h": "editor::GoToHunk",
+      "space g s": "git_panel::ToggleFocus",
       "space g d": "git::Diff",
+      "space g shift-y": "editor::CopyPermalinkToLine",
+      "space g shift-b": "editor::OpenPermalinkToLine",
+      "space g f": "git::FileHistory",
+      "space g b": "editor::BlameHover",
+      "space g g": "git_panel::ToggleFocus",
+      "space g d h": "git::FileHistory",
+      "space g d d": "git::Diff",
+      "space g shift-s": "git::ViewStash",
+      "space g h shift-r": [
+        "git::RestoreFile",
+        {
+          "skip_prompt": false
+        }
+      ],
+      "space g l": [
+        "action::Sequence",
+        ["git_panel::ToggleFocus", "git_panel::ActivateHistoryTab"]
+      ],
+      "space g c": ["action::Sequence", ["git_panel::ToggleFocus", "git_panel::ActivateHistoryTab"]]
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == visual && !menu",
+    "bindings": {
+      "space g h r": "git::Restore",
+      "space g h s": "git::StageAndNext",
+      "space g shift-y": "editor::CopyPermalinkToLine",
+      "space g shift-b": "editor::OpenPermalinkToLine"
+    }
+  },
+  // Editing and insert-mode controls
+  {
+    "context": "Editor && mode == full && vim_mode == visual && !menu",
+    "bindings": {
+      "g d c": "editor::DiffClipboardWithSelection",
+      "[ shift-n": "vim::SelectPreviousSyntaxNode",
+      "[ n": "vim::SelectPreviousSyntaxNode",
+      "shift-p": [
+        "vim::Paste",
+        {
+          "preserve_clipboard": true
+        }
+      ],
+      "p": [
+        "vim::Paste",
+        {
+          "preserve_clipboard": true
+        }
+      ],
+      "ctrl-s": ["action::Sequence", ["vim::SwitchToNormalMode", "workspace::Save"]],
+      "alt-k": "editor::MoveLineUp",
+      "alt-j": "editor::MoveLineDown"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "shift-u": "vim::Redo",
+      "shift-y": "vim::YankToEndOfLine",
+      "v v": "vim::ToggleVisualBlock",
+      "shift-x": ["workspace::SendKeystrokes", "\" _ shift-x"],
+      "x": ["workspace::SendKeystrokes", "\" _ x"],
+      "alt-k": "editor::MoveLineUp",
+      "alt-j": "editor::MoveLineDown"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == insert",
+    "bindings": {
+      "j k": "vim::NormalBefore",
+      "ctrl-s": ["action::Sequence", ["vim::NormalBefore", "workspace::Save"]],
+      "alt-k": "editor::MoveLineUp",
+      "alt-j": "editor::MoveLineDown",
+      "alt-shift-o": [
+        "editor::InsertSnippet",
+        {
+          "snippet": "Ö"
+        }
+      ],
+      "alt-shift-a": [
+        "editor::InsertSnippet",
+        {
+          "snippet": "Ä"
+        }
+      ],
+      "alt-shift-u": [
+        "editor::InsertSnippet",
+        {
+          "snippet": "Ü"
+        }
+      ],
+      "alt-s": [
+        "editor::InsertSnippet",
+        {
+          "snippet": "ß"
+        }
+      ],
+      "alt-o": [
+        "editor::InsertSnippet",
+        {
+          "snippet": "ö"
+        }
+      ],
+      "alt-a": [
+        "editor::InsertSnippet",
+        {
+          "snippet": "ä"
+        }
+      ],
+      "alt-u": [
+        "editor::InsertSnippet",
+        {
+          "snippet": "ü"
+        }
+      ],
+      "ctrl-shift-space": "editor::ShowSignatureHelp"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == insert && edit_prediction",
+    "bindings": {
+      "alt-shift-k": "editor::AcceptNextWordEditPrediction",
+      "alt-shift-j": "editor::AcceptNextLineEditPrediction"
+    }
+  },
+  // Motions and navigation
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "[ shift-f": "vim::PreviousMethodEnd",
+      "[ f": "vim::PreviousMethodStart",
+      "] shift-f": "vim::NextMethodEnd",
+      "] f": "vim::NextMethodStart",
+      "s": "vim::HelixJumpToWord"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == visual && !menu",
+    "bindings": {
+      "[ shift-f": "vim::PreviousMethodEnd",
+      "[ f": "vim::PreviousMethodStart",
+      "] shift-f": "vim::NextMethodEnd",
+      "] f": "vim::NextMethodStart",
+      "#": "vim::SearchUnderCursorPrevious",
+      "*": "vim::SearchUnderCursor",
+      "s": "vim::HelixJumpToWord"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == operator && !menu",
+    "bindings": {
+      "[ shift-f": "vim::PreviousMethodEnd",
+      "[ f": "vim::PreviousMethodStart",
+      "] shift-f": "vim::NextMethodEnd",
+      "] f": "vim::NextMethodStart"
+    }
+  },
+  {
+    "context": "Editor && mode == full && (vim_mode == normal || vim_mode == visual) && !menu",
+    "bindings": {
+      "g s": "vim::PushSneak",
+      "g shift-s": "vim::PushSneakBackward"
+    }
+  },
+  // Syntax selection and surrounds
+  {
+    "context": "Editor && mode == full && vim_mode == visual && !menu",
+    "bindings": {
+      "shift-s": "vim::SelectLargerSyntaxNode",
+      "ctrl-space": "vim::SelectLargerSyntaxNode",
+      "g s a": "vim::PushAddSurrounds"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "shift-s": "vim::SelectLargerSyntaxNode",
+      "ctrl-space": "vim::SelectLargerSyntaxNode",
+      "g s d": "vim::PushDeleteSurrounds",
+      "g s a": "vim::PushAddSurrounds",
+      "g s r": "vim::PushChangeSurrounds"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == operator && !menu",
+    "bindings": {
+      "shift-s": "vim::SelectLargerSyntaxNode",
+      "ctrl-space": "vim::SelectLargerSyntaxNode"
+    }
+  },
+  // Interface, help and logs
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space ?": "zed::OpenKeymap",
+      "space shift-k": "zed::OpenDocs",
+      "space s h": "zed::OpenDocs",
+      "space s k": "zed::OpenKeymap",
+      "space s n h": "zed::OpenLog",
+      "space u shift-c": "theme_selector::Toggle",
+      "space u shift-i": "dev::OpenSyntaxTreeView",
+      "space u i": "editor::CopyHighlightJson",
+      "space u g": "editor::ToggleIndentGuides",
+      "space u b": "theme::ToggleMode",
+      "space u l": "editor::ToggleLineNumbers",
+      "space u shift-l": "editor::ToggleRelativeLineNumbers",
       "space u h": "editor::ToggleInlayHints",
-      "space u w": "editor::ToggleSoftWrap",
+      "space u w": "editor::ToggleSoftWrap"
+    }
+  },
+  // Windows and layout
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space u z": "workspace::ToggleCenteredLayout",
+      "space w m": "workspace::ToggleZoom",
+      "space w d": "pane::JoinIntoNext",
+      "space |": "pane::SplitRight",
+      "space -": "pane::SplitDown",
+      "ctrl-right": "vim::ResizePaneRight",
+      "ctrl-left": "vim::ResizePaneLeft",
+      "ctrl-down": "vim::ResizePaneUp",
+      "ctrl-up": "vim::ResizePaneDown",
       "space w w": "workspace::Save",
       "space w v": "pane::SplitRight",
-      "space w s": "pane::SplitDown",
+      "space w s": "pane::SplitDown"
+    }
+  },
+  // Terminal and pane navigation
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space x b": [
+        "task::Spawn",
+        {
+          "task_name": "btop"
+        }
+      ],
+      "space f t": "terminal_panel::Toggle",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-/": "terminal_panel::Toggle"
+    }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-/": "terminal_panel::Toggle",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-h": "workspace::ActivatePaneLeft"
+    }
+  },
+  // General tasks
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space o w": "task::Spawn",
+      "space o t": "task::Spawn"
+    }
+  },
+  // Legacy generic task aliases - NOT migrated Neotest bindings
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
       "space t t": "task::Spawn",
-      "space t r": "task::Rerun",
-      "space d d": "debugger::Start",
-      "space d b": "editor::ToggleBreakpoint",
+      "space t r": "task::Rerun"
+    }
+  },
+  // AI and existing CLI tasks
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space a t": "agent::ToggleFocus",
+      "space a n": "agent::NewThread",
+      "space a f": "agent::ToggleFocus",
+      "space a m": ["action::Sequence", ["agent::ToggleFocus", "agent::ToggleModelSelector"]],
       "space a a": "agent::ToggleFocus",
       "space a c": [
         "task::Spawn",
@@ -58,26 +405,96 @@
           "task_name": "Copilot CLI",
           "reveal_target": "center"
         }
-      ],
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-j": "workspace::ActivatePaneDown",
-      "ctrl-k": "workspace::ActivatePaneUp",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-/": "terminal_panel::Toggle"
+      ]
+    }
+  },
+  // Debugger function keys - inert outside the stopped state
+  {
+    "context": "Workspace && !debugger_stopped > (Editor && mode == full && vim_mode == normal && !menu)",
+    "bindings": {
+      "f8": null,
+      "f11": null,
+      "f5": null,
+      "f7": null,
+      "f6": null
+    }
+  },
+  // Debugger controls
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space d u": "debug_panel::ToggleFocus",
+      "space d l": "debugger::Rerun",
+      "space d d": "debugger::Start",
+      "space d b": "editor::ToggleBreakpoint"
     }
   },
   {
-    "context": "Editor && vim_mode == visual && !menu",
+    "context": "Workspace && !debugger_session > (Editor && mode == full && vim_mode == normal && !menu)",
     "bindings": {
-      "space c f": "editor::Format",
-      "space c a": "editor::ToggleCodeActions"
+      "space d c": "debugger::Start"
     }
   },
+  {
+    "context": "Workspace && debugger_session > (Editor && mode == full && vim_mode == normal && !menu)",
+    "bindings": {
+      "space d c": null,
+      "space d t": "debugger::Stop",
+      "space d f": ["action::Sequence", ["debug_panel::ToggleFocus", "debugger::FocusFrames"]],
+      "space d v": ["action::Sequence", ["debug_panel::ToggleFocus", "debugger::FocusVariables"]],
+      "space d r": ["action::Sequence", ["debug_panel::ToggleFocus", "debugger::FocusConsole"]],
+      "space d s": [
+        "action::Sequence",
+        ["debug_panel::ToggleFocus", "debugger::ToggleSessionPicker"]
+      ]
+    }
+  },
+  {
+    "context": "Workspace && debugger_stopped > (Editor && mode == full && vim_mode == normal && !menu)",
+    "bindings": {
+      "space d c": "debugger::Continue",
+      "space d shift-o": "debugger::StepOver",
+      "space d o": "debugger::StepOut",
+      "space d i": "debugger::StepInto",
+      "space d shift-c": "debugger::RunToCursor",
+      "f8": "debugger::Continue",
+      "f11": "debugger::Continue",
+      "f5": "debugger::StepInto",
+      "f7": "debugger::StepOut",
+      "f6": "debugger::StepOver"
+    }
+  },
+  {
+    "context": "Workspace && debugger_stopped > (Editor && mode == full && (vim_mode == normal || vim_mode == visual) && !menu)",
+    "bindings": {
+      "space d e": "debugger::EvaluateSelectedText"
+    }
+  },
+  {
+    "context": "Workspace && debugger_running > (Editor && mode == full && vim_mode == normal && !menu)",
+    "bindings": {
+      "space d shift-p": "debugger::Pause"
+    }
+  },
+  // Explicitly removed native binding
+  {
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "g shift-o": null
+    }
+  },
+  // Panel-only double Escape (never terminal Escape)
+  {
+    "context": "Dock > !Terminal && !menu",
+    "bindings": {
+      "escape escape": "workspace::FocusCenterPane"
+    }
+  },
+  // Empty-pane shortcuts
   {
     "context": "EmptyPane",
     "bindings": {
       "space space": "file_finder::Toggle",
-      "space f f": "file_finder::Toggle",
       "space e": "project_panel::ToggleFocus",
       "space a a": "agent::ToggleFocus"
     }
