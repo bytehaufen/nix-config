@@ -19,11 +19,8 @@ require("lazy").setup({
     -- import LazyVim plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     -- lazyvim extension modules
-    -- { import = "lazyvim.plugins.extras.ui.edgy" }, -- Must be imported before aerial and similar plugins
-
-    -- { import = "lazyvim.plugins.extras.ai.copilot-chat" },
-    -- { import = "lazyvim.plugins.extras.ai.copilot" }, -- Disabled because of noisiness
-    { import = "lazyvim.plugins.extras.ai.avante" },
+    { import = "lazyvim.plugins.extras.ai.copilot-native" },
+    { import = "lazyvim.plugins.extras.ai.sidekick" },
     { import = "lazyvim.plugins.extras.coding.blink" },
     { import = "lazyvim.plugins.extras.coding.luasnip" },
     { import = "lazyvim.plugins.extras.coding.mini-comment" },
@@ -34,9 +31,13 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.dap.nlua" },
     { import = "lazyvim.plugins.extras.editor.aerial" },
     { import = "lazyvim.plugins.extras.editor.harpoon2" },
+    { import = "lazyvim.plugins.extras.editor.illuminate" },
+    { import = "lazyvim.plugins.extras.editor.inc-rename" },
+    { import = "lazyvim.plugins.extras.editor.mini-diff" },
     { import = "lazyvim.plugins.extras.editor.neo-tree" },
     { import = "lazyvim.plugins.extras.editor.overseer" },
     { import = "lazyvim.plugins.extras.editor.refactoring" },
+    { import = "lazyvim.plugins.extras.editor.snacks_picker" },
     { import = "lazyvim.plugins.extras.formatting.prettier" },
     { import = "lazyvim.plugins.extras.lang.clangd" },
     { import = "lazyvim.plugins.extras.lang.cmake" },
@@ -49,28 +50,24 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.lang.nix" },
     { import = "lazyvim.plugins.extras.lang.python" },
     { import = "lazyvim.plugins.extras.lang.rust" },
-    { import = "lazyvim.plugins.extras.lang.svelte" },
     { import = "lazyvim.plugins.extras.lang.tailwind" },
     { import = "lazyvim.plugins.extras.lang.toml" },
-    { import = "lazyvim.plugins.extras.lang.typescript" },
-    { import = "lazyvim.plugins.extras.lang.vue" },
+    { import = "lazyvim.plugins.extras.lang.typescript.tsc" },
     { import = "lazyvim.plugins.extras.lang.yaml" },
     { import = "lazyvim.plugins.extras.linting.eslint" },
     { import = "lazyvim.plugins.extras.lsp.neoconf" },
     { import = "lazyvim.plugins.extras.test.core" },
-    { import = "lazyvim.plugins.extras.ui.mini-animate" },
+    { import = "lazyvim.plugins.extras.ui.smear-cursor" },
     { import = "lazyvim.plugins.extras.ui.treesitter-context" },
     { import = "lazyvim.plugins.extras.util.dot" },
     { import = "lazyvim.plugins.extras.util.octo" },
-    { import = "lazyvim.plugins.extras.util.project" },
 
     -- custom module configs
-    -- { import = "plugins.extras.coding.blink-extend" },  -- See copilot comment
-    { import = "plugins.extras.ai.avante-extend" },
+    { import = "plugins.extras.coding.yanky-extend" },
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
     { import = "plugins.extras.editor.neo-tree-extend" },
-    { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.markdown-extend" },
+    { import = "plugins.extras.lang.nix-extend" },
     { import = "plugins.extras.lang.rust-extend" }, -- Let use bacon-ls clippy and give diagnostics in tests
     { import = "plugins" },
   },
