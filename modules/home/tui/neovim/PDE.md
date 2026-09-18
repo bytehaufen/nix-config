@@ -28,6 +28,51 @@ dependencies from Eclipse: check the resulting diagnostics before expanding the
 selection. Private p2 repositories must be accessible to the server; Maven's
 `settings.xml` does not automatically supply p2 credentials.
 
+On Linux, the Nix launcher selects matching GLib/libsecret libraries for Equinox's
+desktop-keyring integration. This avoids native-library conflicts when accessing
+Eclipse's existing secure storage. The desktop keyring must be available and
+unlocked in the Neovim session; no passwords belong in Nix or `javaConfig.json`.
+Use HTTPS for authenticated p2 mirrors: HTTP exposes credentials in transit.
+
+### Reuse a local Eclipse bundle pool
+
+For a download-free **target**, use a local `pde-pool.target` instead of p2 sites:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde?>
+<target name="PDE local bundle pool" sequenceNumber="1">
+  <locations>
+    <location path="/home/rico/.p2/pool/plugins" type="Directory"/>
+  </locations>
+  <environment>
+    <os>linux</os>
+    <ws>gtk</ws>
+    <arch>x86_64</arch>
+  </environment>
+</target>
+```
+
+Adjust the path/environment for another machine. Keep `projects` unchanged in
+`javaConfig.json` and set `"targetPlatform": "./pde-pool.target"`. Keep both files
+out of shared commits using the checkout's `.git/info/exclude`. No Home Manager
+rebuild is needed for this target-only change: run `:PdeReloadTarget` in an already
+running session (it rereads the configured target path), or `:PdeStart` if stopped.
+
+PDE reads the pool in place; it does not copy, provision, or modify its bundles.
+The directory target bypasses remote p2 metadata, target downloads, and mirror
+authentication. JDT LS still has its own index/workspace, and separate source or
+Javadoc lookup may use the network. After Eclipse adds/removes bundles, reload the
+target to rescan the directory.
+
+This includes all cached versions, not just Eclipse's active target. Completion
+and diagnostics can therefore differ from Eclipse, and missing bundles cannot be
+downloaded through this target. Keep Eclipse/builds authoritative. To return to p2,
+restore the previous `targetPlatform` value and restart/reload; no cache deletion
+is needed. The repository's shared target and Eclipse's active target are unchanged.
+
+### Project Java runtime
+
 Projects requiring Java 23 need their actual runtime configured separately from
 the server's JDK. Set `PDE_JAVA_23_HOME` to the installed JDK/JRE home (the directory
 containing `bin/java`) before starting Neovim. For other execution environments,
@@ -62,6 +107,11 @@ background job, so an accepted request is not proof that resolution succeeded:
 watch LSP progress and logs. An explicit path changes the current server's target;
 update `javaConfig.json` too if it should survive a restart.
 
+Server errors sent through `window/logMessage` also produce a visible error
+notification. Bursts are grouped over one second, with at most three short
+summaries; full messages and stack traces remain in the logs. A disappearing
+progress indicator alone is not evidence of a successful target reload.
+
 Use the existing LSP mappings for completion, hover, definitions, references, and
 code actions. `<leader>co` organizes imports; `<leader>cxv` and `<leader>cxc`
 extract a variable or constant. Automatic formatting and organize-imports on save
@@ -95,6 +145,12 @@ must be upgraded and tested together. A separate
 workspace directory and `generatesMetadataFilesAtProjectRoot = false` do not by
 themselves guarantee that existing Eclipse metadata will remain untouched.
 
+The Nix package patches JDT LS 1.60.0's POSIX launcher to supply the executable as
+`argv[0]`. Otherwise its first JVM option is lost, including the upstream XML-limit
+workaround for JDK 24+. The patch preserves the upstream JVM options; it does not
+change XML limits in other applications. Its install-time regression test verifies
+argument forwarding without starting Java. Revisit this patch when upgrading JDT LS.
+
 Keep Eclipse for builds, JUnit/PDE tests, product launches, Xtend/EMF generation,
 and graphical editors. Debug/test adapters and automatic project selection are
 intentionally deferred.
@@ -116,3 +172,23 @@ third, unlisted project: imports stayed limited to the selection, cross-project
 definition lookup and completion worked, target reload was accepted, and project
 metadata remained unchanged. This does not establish memory use or target
 compatibility for a large production workspace.
+
+The Linux keyring launcher was also checked against an existing 363-project
+workspace: reload progressed past the native keyring hang and loaded private
+HTTPS repository metadata using existing credentials. Secure storage and checked
+project metadata stayed unchanged. Full target resolution still failed on a p2
+XML parsing limit; this is not a successful full-target or sustained-memory test.
+
+The launcher fix was subsequently checked offline against that failing cached p2
+metadata: the old launcher reproduced `JAXP00010003`, while the patched launcher
+passed both XML-limit options to a real JVM and parsed the complete document.
+This verifies the parsing fix, not full resolution of every target dependency.
+
+The local-pool option was checked with a separate temporary PDE project: definition
+lookup for Eclipse `IStatus` resolved to a JAR under the existing pool. The test
+server was stopped afterward. This does not establish that every project in a
+large selection resolves correctly against the pool's mixed versions.
+
+After changing the Nix launcher, activate Home Manager. To load changed Lua error
+handlers too, stop PDE and reopen Neovim before `:PdeStart`; `:PdeRestart` alone
+does not reload an already-loaded Lua module.

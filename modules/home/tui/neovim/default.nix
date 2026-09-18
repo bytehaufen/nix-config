@@ -7,7 +7,29 @@
 }: let
   configPath = "${config.home.homeDirectory}/nix-config/modules/home/tui/neovim";
   pdeBundles = pkgs.callPackage ./pde-bundles.nix {};
-  pdeJdtls = pkgs.jdt-language-server.override {jdk = pkgs.jdk25;};
+  pdeJdtls = (pkgs.jdt-language-server.override {jdk = pkgs.jdk25;}).overrideAttrs (old: {
+    postPatch =
+      (old.postPatch or "")
+      + ''
+        # 1.60.0 omits argv[0] on POSIX, swallowing its first XML-limit option.
+        # Fail on an upstream change so this compatibility patch gets reviewed.
+        substituteInPlace bin/jdtls.py \
+          --replace-fail 'os.execvp(java_executable, exec_args)' \
+            'os.execvp(java_executable, [java_executable] + exec_args)'
+      '';
+    doInstallCheck = true;
+    installCheckPhase = ''
+      runHook preInstallCheck
+      ${pkgs.python3}/bin/python3 ${./tests/jdtls-launcher.py} "$out/bin/jdtls.py"
+      runHook postInstallCheck
+    '';
+  });
+  pdeLauncher = pkgs.writeShellScriptBin "jdtls-pde" ''
+    # Equinox uses JNA for the Linux keyring. Keep GLib and libsecret from the
+    # same Nix package set instead of mixing host and Nix native libraries.
+    exec ${lib.getExe pdeJdtls} \
+      --jvm-arg=-Djna.library.path=${lib.makeLibraryPath [pkgs.glib pkgs.libsecret]} "$@"
+  '';
 in {
   imports = [./vrapper];
 
@@ -15,7 +37,7 @@ in {
     # Make a (writable) symlink to ~/.config
     xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";
     xdg.configFile."nvim-pde/tools.json".text = builtins.toJSON {
-      jdtls = lib.getExe pdeJdtls;
+      jdtls = lib.getExe pdeLauncher;
       javaHome = "${pkgs.jdk25}/lib/openjdk";
       flock = "${pkgs.util-linux}/bin/flock";
       bundles = "${pdeBundles}/share/java/pde/bundles.json";

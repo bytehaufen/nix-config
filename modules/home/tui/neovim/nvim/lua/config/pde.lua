@@ -6,6 +6,54 @@ local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "Java / PDE" })
 end
 
+local function server_log_handler()
+  local default_handler = vim.lsp.handlers["window/logMessage"]
+  local pending
+  return function(err, result, ctx, config)
+    -- Preserve complete server messages/stack traces in the normal LSP log.
+    if default_handler then
+      default_handler(err, result, ctx, config)
+    end
+    if err or not result or result.type ~= vim.lsp.protocol.MessageType.Error then
+      return
+    end
+    if not pending then
+      pending = { count = 0, summaries = {}, seen = {} }
+      -- A failed target can emit hundreds of errors. Bound the notification
+      -- size and batch the burst, without delaying it until the server is quiet.
+      vim.defer_fn(function()
+        local batch = pending
+        pending = nil
+        if vim.lsp.get_client_by_id(ctx.client_id) then
+          notify(
+            ("PDE/JDT LS reported %d error(s):\n%s\nInspect :JdtShowLogs for full details."):format(
+              batch.count,
+              table.concat(batch.summaries, "\n")
+            ),
+            vim.log.levels.ERROR
+          )
+        end
+      end, 1000)
+    end
+    local message = result.message or "Unknown server error"
+    local summary = message:match("[^\r\n]+") or "Unknown server error"
+    if message:find("jdk.xml.maxGeneralEntitySizeLimit", 1, true) then
+      summary = "Target metadata exceeds the XML parser limit. Check the PDE launcher."
+    elseif
+      message:find("current target platform contains errors", 1, true)
+      or message:find("Problems occurred while resolving the target contents", 1, true)
+    then
+      summary = "Target platform resolution failed."
+    end
+    summary = summary:sub(1, 240)
+    pending.count = pending.count + 1
+    if #pending.summaries < 3 and not pending.seen[summary] then
+      pending.seen[summary] = true
+      pending.summaries[#pending.summaries + 1] = summary
+    end
+  end
+end
+
 local function read_json(path)
   local ok, value = pcall(function()
     return vim.json.decode(table.concat(vim.fn.readfile(path), "\n"))
@@ -125,6 +173,7 @@ function M.build_config(workspace, tools)
       state .. "/workspace",
     },
     init_options = { bundles = bundles },
+    handlers = { ["window/logMessage"] = server_log_handler() },
     settings = {
       java = {
         autobuild = { enabled = false },
