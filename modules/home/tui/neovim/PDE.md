@@ -1,0 +1,363 @@
+# Java / Eclipse PDE
+
+This configuration uses `nvim-jdtls`, Nix-managed JDT LS on JDK 25, the
+Java bundles from [vscode-pde](https://github.com/testforstephen/vscode-pde),
+and Nix-packaged Microsoft Java Debug. It does not require VS Code or a
+Mason Java adapter. Activate the Home Manager configuration and reopen
+Neovim so the updated tools manifest supplies the debug bundle and Java 21.
+Lazy installs `nvim-jdtls` with the existing `nvim-dap` debugger UI.
+
+## Dependencies and updates
+
+JDT LS, JDK 21/25, and Microsoft Java Debug come directly from the flake's
+`nixpkgs` input. There is no local JDT LS override or launcher patch; the small
+`jdtls-pde` wrapper only supplies matching Nix GLib/libsecret libraries for JNA.
+
+Lazy owns `nvim-jdtls`, like the other editor plugins. Its revision is recorded
+in `lazy-lock.json`, without an additional `commit` override in the plugin spec.
+Nixpkgs also packages this plugin, but using it would introduce a second plugin
+ownership convention without reducing the PDE runtime integration.
+
+Only two PDE-specific source pins remain in `pde-bundles.nix`:
+
+| Source                                                                                        | Version | Why it is fetched separately                                                                                                                   |
+| --------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [vscode-pde](https://marketplace.visualstudio.com/items?itemName=yaozheng.vscode-pde)         | 0.11.1  | The locked nixpkgs does not package this importer. Its standard `buildVscodeMarketplaceExtension` helper handles the VSIX download/unpack.     |
+| [OSGi Event API](https://repo.maven.apache.org/maven2/org/osgi/org.osgi.service.event/1.4.1/) | 1.4.1   | The importer's e4 bundles require this API, which JDT LS and Java Debug do not supply; the locked nixpkgs has no compatible standalone bundle. |
+
+These fixed-output hashes verify downloads; removing them would not make a
+reproducible Nix fetch. This was checked against nixpkgs
+`885ba4d038f10c3d17d7a92e8c3cc185b99c9158`. When updating the lock, check for
+native packages before updating these two sources manually. Test JDT LS and the
+PDE bundles together using the disposable-workspace checks below.
+
+## Select a small workspace
+
+Create a local `javaConfig.json` at your checkout root. List individual Eclipse
+projects, including their required source dependencies, and a conventional
+PDE `.target` file. Project and target paths must be relative to this file
+(the pinned PDE importer cannot import an absolute `targetPlatform` path):
+
+```json
+{
+  "projects": ["./org.example.plugin", "./org.example.plugin.tests"],
+  "targetPlatform": "./target-platform/development.target"
+}
+```
+
+Keep this file untracked by adding `/javaConfig.json` to your repository's local
+exclude file (`git rev-parse --git-path info/exclude`). Preserve existing entries;
+the Neovim integration does not edit Git settings or create project configuration.
+
+Oomph `Targlet` locations are not supported in this first version. Use a regular
+PDE target with p2 or directory locations. A different target can resolve different
+dependencies from Eclipse: check the resulting diagnostics before expanding the
+selection. Private p2 repositories must be accessible to the server; Maven's
+`settings.xml` does not automatically supply p2 credentials.
+
+On Linux, the Nix launcher selects matching GLib/libsecret libraries for Equinox's
+desktop-keyring integration. This avoids native-library conflicts when accessing
+Eclipse's existing secure storage. The desktop keyring must be available and
+unlocked in the Neovim session; no passwords belong in Nix or `javaConfig.json`.
+Use HTTPS for authenticated p2 mirrors: HTTP exposes credentials in transit.
+
+### Reuse a local Eclipse bundle pool
+
+For a download-free **target**, use a local `pde-pool.target` instead of p2 sites:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde?>
+<target name="PDE local bundle pool" sequenceNumber="1">
+  <locations>
+    <location path="/home/rico/.p2/pool/plugins" type="Directory"/>
+  </locations>
+  <environment>
+    <os>linux</os>
+    <ws>gtk</ws>
+    <arch>x86_64</arch>
+  </environment>
+</target>
+```
+
+Adjust the path/environment for another machine. Keep `projects` unchanged in
+`javaConfig.json` and set `"targetPlatform": "./pde-pool.target"`. Keep both files
+out of shared commits using the checkout's `.git/info/exclude`. No Home Manager
+rebuild is needed for this target-only change: run `:PdeReloadTarget` in an already
+running session (it rereads the configured target path), or `:lsp enable jdtls` if disabled.
+
+PDE reads the pool in place; it does not copy, provision, or modify its bundles.
+The directory target bypasses remote p2 metadata, target downloads, and mirror
+authentication. JDT LS still has its own index/workspace, and separate source or
+Javadoc lookup may use the network. After Eclipse adds/removes bundles, reload the
+target to rescan the directory.
+
+This includes all cached versions, not just Eclipse's active target. Completion
+and diagnostics can therefore differ from Eclipse, and missing bundles cannot be
+downloaded through this target. Keep Eclipse/builds authoritative. To return to p2,
+restore the previous `targetPlatform` value and restart/reload; no cache deletion
+is needed. The repository's shared target and Eclipse's active target are unchanged.
+
+### Project Java runtime
+
+Nix supplies JavaSE-21 for projects/product launches and JavaSE-25 as the default.
+The language server itself still runs on JDK 25. Runtime overrides below replace
+entries by their exact execution-environment name; no aliases are added.
+
+Projects requiring Java 23 need their actual runtime configured separately from
+the server's JDK. Set `PDE_JAVA_23_HOME` to the installed JDK/JRE home (the directory
+containing `bin/java`) before starting Neovim. For other execution environments,
+set this in your local Lua configuration:
+
+```lua
+vim.g.pde_java_runtimes = {
+  { name = "JavaSE-23", path = "/path/to/java-23" },
+}
+```
+
+Project compiler settings remain authoritative. Custom JavaFX containers, classpath
+variables, or other Eclipse-specific extensions may need additional configuration;
+this integration does not import Eclipse's installed-runtime preferences.
+
+### Checkout formatter
+
+Add an optional formatter block to `javaConfig.json`, keeping the project list
+and target unchanged:
+
+```json
+"formatter": {
+  "path": "./releng/eclipse-setup/team-style.xml",
+  "profile": "Team Style"
+}
+```
+
+Use an exported Eclipse formatter XML file and the exact `<profile name="...">`
+inside it (not Eclipse's internal underscore-prefixed preference ID). Relative
+paths resolve against `javaConfig.json`; absolute local paths are also supported.
+The selected XML profile is read once at startup with Python's standard XML
+parser (Nix-managed; an existing `python3` is used before activation). Missing
+files/profiles, malformed XML, or unsupported indentation prevent startup with
+a visible error. No extra Python packages or checkout scans are needed.
+
+After import completes, attached Java buffers read their effective formatter
+preferences from JDT LS, including project-specific overrides. This sets local
+tabs/spaces, tab/indent width, and line width so `<leader>cf` does not override the
+XML with the editor's global two-space indentation. Other buffers are unaffected;
+automatic formatting remains disabled. Wait for import before formatting.
+Tab and space profiles are supported; mixed indentation profiles are rejected
+because JDT LS's formatting protocol forces either tabs or spaces. A project
+override using mixed indentation produces a warning instead of changing its buffer.
+
+Run `:lsp restart jdtls` after changing the formatter configuration or XML. Target reload
+alone does not apply formatter changes. When first installing this Lua change,
+stop PDE and reopen Neovim; opening a selected Java file starts PDE. Buffer indentation remains set after
+stopping PDE; reopen affected buffers if removing the formatter configuration.
+
+## Editor root versus Java workspace
+
+LazyVim navigation and root-based file/search pickers prefer the nearest Git
+checkout, ahead of LSP roots and nested `.project`/build markers. This policy
+applies to all filetypes, including before a language server attaches or while
+it is disabled. Git worktrees/submodules with a `.git` file are also boundaries.
+Outside Git, the existing LSP, project-marker, and current-directory fallbacks remain.
+Use `:LazyRoot` to inspect the detected roots; this does not automatically change
+Neovim's `:pwd`.
+
+The editor root does not expand Java's import scope: PDE still uses the directory
+containing `javaConfig.json` and imports only its selected projects. Restart
+Neovim after changing the root policy; no Home Manager rebuild is needed.
+
+## Commands
+
+Opening a Java file in a listed project starts PDE automatically. One server is
+shared by all selected projects in that checkout and reuses its cached workspace.
+Java files outside a configured checkout, or in unlisted projects, do not start it.
+
+| Command                   | Action                                                                        |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `:lsp restart jdtls`      | Restart Java clients and reread projects, target, and formatter configuration |
+| `:lsp disable jdtls`      | Stop Java clients and disable automatic startup until enabled again           |
+| `:lsp enable jdtls`       | Enable automatic startup, including for already-open selected Java buffers    |
+| `:lsp stop jdtls`         | Stop current Java clients without disabling automatic startup                 |
+| `:PdeReloadTarget [path]` | Reload the configured target, or another `.target` file                       |
+| `:PdeRun [path]`          | Incrementally build and run an existing PDE `.launch` without breakpoints     |
+| `:PdeDebug [path]`        | Incrementally build and debug an existing PDE `.launch`                       |
+| `:DapTerminate`           | Terminate the active debug session and its product process                    |
+| `:JdtShowLogs`            | Open the current PDE workspace log and Neovim's LSP log                       |
+
+These are Neovim's native `:lsp` commands, not custom lifecycle wrappers. Naming
+`jdtls` operates on Java clients across checkouts in the current Neovim instance;
+`:lsp restart` without a name restarts clients attached to the current buffer.
+Use `disable`, not `stop`, when Java should stay off as you open more files.
+After fixing a startup error, `:lsp enable jdtls` retries activation.
+
+The old `PdeStart`, `PdeStop`, and `PdeRestart` commands are removed. In attached
+PDE buffers, `:JdtRestart` delegates to native `:lsp restart`.
+`:JdtWipeDataAndRestart` remains blocked to prevent unintended cache deletion.
+Normal restarts retain caches; changing the project selection uses a separate
+workspace and detaches buffers belonging to removed projects.
+
+Relative reload paths are resolved against `javaConfig.json`, not the current
+working directory; explicit reload paths may also be absolute. Reload needs a
+running, initialized PDE server. It invokes
+`java.pde.reloadTargetPlatform` with the target file URI. The server schedules a
+background job, so an accepted request is not proof that resolution succeeded:
+watch LSP progress and logs. An explicit path changes the current server's target;
+update `javaConfig.json` too if it should survive a restart.
+
+Server errors sent through `window/logMessage` also produce a visible error
+notification. Bursts are grouped over one second, with at most three short
+summaries; full messages and stack traces remain in the logs. A disappearing
+progress indicator alone is not evidence of a successful target reload.
+
+Use the existing LSP mappings for completion, hover, definitions, references, and
+code actions. `<leader>co` organizes imports; `<leader>cxv` and `<leader>cxc`
+extract a variable or constant. Automatic formatting and organize-imports on save
+are disabled for attached Java buffers.
+
+## Run/debug an Eclipse product
+
+Open a selected Java file and wait for PDE import to finish. Keep that Java
+buffer loaded, save **all modified buffers in the checkout**, then run:
+
+```vim
+:PdeDebug com.coside.product/coside.product.launch
+:PdeRun com.coside.product/coside.product.launch
+```
+
+Only `org.eclipse.pde.ui.RuntimeWorkbench` launches are supported. With no path,
+the commands use the current `.launch` buffer or prompt for a filename. Paths
+with spaces are one filename; relative paths resolve against the current PDE
+checkout, not `:pwd`. An absolute path selects its own checkout's already-running
+PDE client. Neither command starts a server or attaches Java tooling to XML.
+
+Each launch explicitly performs an incremental JDT LS workspace build before
+asking PDE to resolve the existing application/product, bundle/feature selection,
+start levels, and VM/program arguments. A failed/cancelled build or incomplete
+resolution aborts; stale binaries are never a fallback. Background autobuild
+remains disabled. Xtend/EMF generation, custom builders, native libraries, and a
+resolvable target remain prerequisites supplied by Eclipse/build tooling.
+Include required feature/product projects in `javaConfig.json` when the launch
+selects workspace features; these commands never expand the selection for you.
+
+The launch's JRE container selects an exact configured runtime, such as JavaSE-21.
+An absent container uses the effective default runtime. Unknown JREs or missing
+executables abort with runtime-configuration guidance, never switch silently to
+the server JDK. Compiler settings remain authoritative: compiling for Java 25
+does not make those classes runnable on a JavaSE-21 launch.
+
+The original `.launch` is never rewritten. A copy under
+`<PDE state>/launch/<original-path-hash>/` uses its own `workspace/` and
+`configuration/` directories, with clearing disabled. PDE writes `config.ini`
+and `dev.properties` there; repeated launches retain this runtime state. The
+launch cannot reuse or clear Eclipse's existing product workspace through these
+commands. Same-named files in different directories have separate runtime state.
+
+For the pinned PDE resolver's environment-substitution defect, the XML helper
+expands only `${workspace_loc}`, `${workspace_loc:/Project/relative/path}` (actual
+selected Eclipse project names, including nested projects), and `${env_var:NAME}`.
+Missing projects/variables, other unresolved environment expressions, and
+`appendEnvironmentVariables=false` are errors. VM/program substitution remains
+PDE's responsibility. Python is Nix-managed, with the existing `python3` fallback.
+
+Use the existing debugger controls: F9 toggles a breakpoint, F6 steps over,
+F5 steps into, F7 steps out, F8 continues, `<leader>de` evaluates, and
+`<leader>du` toggles DAP View. Output uses the integrated terminal.
+Only one pending launch per client and no concurrent DAP session are allowed.
+Use `:DapTerminate` before another debug launch; do not use `dap.close()` to
+stop a product. Java Debug 0.53.2 disconnects an integrated-terminal VM before
+terminating it, so a scoped DAP disconnect hook also stops that terminal job.
+Revisit this workaround when upgrading Java Debug.
+
+For `PdeRun`, the pinned adapter releases its DAP session immediately after
+starting the no-debug process, not when the process exits. Its terminal buffer
+continues to hold output; interrupt a long-running no-debug app in that terminal.
+Use `PdeDebug` when debugger-controlled process termination is required.
+
+## Large repositories
+
+- Opening a Java file starts one server for its configured checkout. Only listed
+  projects attach; other projects remain outside this session. Opening a file
+  imports the full configured selection, not just that file's project.
+- Startup and shutdown follow native LSP behavior. There is no background crash
+  restart loop, but opening another Java file can retry a stopped/failed server
+  while its configuration is enabled. `:lsp disable jdtls` keeps Java off for
+  the rest of this Neovim session unless you enable it again.
+- Add projects manually and restart in batches. Closing a buffer does not unload
+  its project. References and refactorings cover imported projects, not the whole
+  repository; use Eclipse for repository-wide or cross-language refactoring.
+- The maximum heap is 6 GB, with 512 MB initially allocated. Total process memory
+  includes additional JVM overhead. Start with a small project selection.
+- Automatic workspace builds, Maven/Gradle import, CodeLens, main-class scanning,
+  and test discovery are disabled. Generated source roots remain available.
+- The PDE importer reads only the explicit list. Generic import uses an exclude-all
+  rule to prevent JDT LS's fallback Eclipse importer from scanning the monorepo.
+  Java resource filters are empty because JDT LS persists those filters into
+  `.project`; this avoids adding filter metadata to existing projects.
+- State is under `stdpath("cache")/jdtls-pde/<checkout-hash>/<selection-hash>`.
+  Unchanged selections reuse indexes. Changed selections use a separate workspace
+  so removed projects cannot remain imported. Older caches are retained.
+  Within that directory, `workspace/` holds project indexes; `config-<runtime-hash>/`
+  holds the Eclipse runtime cache. Changes to the JDT LS or JDK package paths, or
+  PDE bundle paths, select a fresh runtime cache without clearing the workspace
+  or downloaded targets. The old unversioned `config/` is no longer used and is
+  retained, not deleted. Restart Neovim after updating this Lua configuration.
+- A checkout-wide `flock` prevents concurrent Neovim processes from opening the
+  same PDE workspace. A crashed process releases the lock automatically. A server
+  exit is reported without an automatic restart loop.
+
+A separate workspace directory and `generatesMetadataFilesAtProjectRoot = false`
+do not by themselves guarantee that existing Eclipse metadata will remain untouched.
+
+Keep Eclipse/build tooling for generated sources, unsupported custom builds,
+JUnit/PDE tests, and graphical editors. Product run/debug uses the existing
+launch configuration; test adapters and automatic project selection remain deferred.
+
+## Validation
+
+Run the configuration and validation checks without your normal Neovim configuration:
+
+```sh
+NVIM_LOG_FILE=/tmp/nvim-pde-tests.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde.lua
+```
+
+These checks never start Java. Test bundle compatibility
+in a disposable PDE workspace before using a new server/bundle version. Ask the
+repository owner before starting a language server against their real checkout.
+
+With LazyVim and lazy.nvim installed, verify editor-root precedence over nested
+project markers and LSP roots, Git-file boundaries, and non-Git fallbacks without
+starting Java:
+
+```sh
+nvim --headless -u NONE -l modules/home/tui/neovim/tests/root.lua
+```
+
+With Lazy's `nvim-jdtls` installed, run the real Neovim clients and native
+commands against an in-process transport. This covers enable/disable/stop/restart,
+project pruning, cache reuse, formatter reloads, logs, and target reload:
+
+```sh
+NVIM_LOG_FILE=/tmp/nvim-pde-tests.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde-native.lua
+```
+
+The optional formatter integration check starts a real server in a disposable
+single-project workspace, wipes its startup buffer before import completes, tests
+XML style rules and standard LSP formatting, restarts through `:lsp restart`, then
+disables/stops it. It requires the
+Home Manager tools manifest and installed `nvim-jdtls`. To test a built generation
+without activating it, copy its `home-files/.config/nvim-pde/tools.json` into a
+temporary `nvim-pde/` configuration directory and set `XDG_CONFIG_HOME` to that
+directory's parent:
+
+```sh
+NVIM_LOG_FILE=/tmp/pde-formatter-integration.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde-formatter.lua
+```
+
+These checks do not establish full-monorepo memory stability, complete target
+resolution, or equivalence to Eclipse's active target. Keep large-workspace
+validation separate; a heap limit alone is not a stability guarantee.
+
+After changing the Nix launcher, activate Home Manager. To load changed Lua error
+handlers too, stop PDE and reopen Neovim, then open a selected Java file; `:lsp restart` alone
+does not reload an already-loaded Lua module.

@@ -6,6 +6,13 @@
   ...
 }: let
   configPath = "${config.home.homeDirectory}/nix-config/modules/home/tui/neovim";
+  pdeBundles = pkgs.callPackage ./pde-bundles.nix {};
+  pdeLauncher = pkgs.writeShellScriptBin "jdtls-pde" ''
+    # Equinox uses JNA for the Linux keyring. Keep GLib and libsecret from the
+    # same Nix package set instead of mixing host and Nix native libraries.
+    exec ${lib.getExe pkgs.jdt-language-server} \
+      --jvm-arg=-Djna.library.path=${lib.makeLibraryPath [pkgs.glib pkgs.libsecret]} "$@"
+  '';
 in {
   imports = [./vrapper];
 
@@ -16,6 +23,14 @@ in {
 
     # Make a (writable) symlink to ~/.config
     xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";
+    xdg.configFile."nvim-pde/tools.json".text = builtins.toJSON {
+      jdtls = lib.getExe pdeLauncher;
+      javaHome = "${pkgs.jdk25}/lib/openjdk";
+      java21Home = "${pkgs.jdk21}/lib/openjdk";
+      flock = "${pkgs.util-linux}/bin/flock";
+      bundles = "${pdeBundles}/share/java/pde/bundles.json";
+      python = "${pkgs.python3}/bin/python3";
+    };
     # home.file.".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";
 
     home.packages = with pkgs; [imagemagick gcc lynx markdownlint-cli2 go mermaid-cli];
