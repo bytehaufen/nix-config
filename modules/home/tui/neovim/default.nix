@@ -6,12 +6,20 @@
   ...
 }: let
   configPath = "${config.home.homeDirectory}/nix-config/modules/home/tui/neovim";
+  pdeBundles = pkgs.callPackage ./pde-bundles.nix {};
+  pdeJdtls = pkgs.jdt-language-server.override {jdk = pkgs.jdk25;};
 in {
   imports = [./vrapper];
 
   config = lib.mkIf config.opts.home.tui.enable {
     # Make a (writable) symlink to ~/.config
     xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";
+    xdg.configFile."nvim-pde/tools.json".text = builtins.toJSON {
+      jdtls = lib.getExe pdeJdtls;
+      javaHome = "${pkgs.jdk25}/lib/openjdk";
+      flock = "${pkgs.util-linux}/bin/flock";
+      bundles = "${pdeBundles}/share/java/pde/bundles.json";
+    };
     # home.file.".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";
 
     home.packages = with pkgs; [imagemagick gcc lynx markdownlint-cli2 go mermaid-cli];
