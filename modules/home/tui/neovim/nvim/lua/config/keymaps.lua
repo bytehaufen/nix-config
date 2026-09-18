@@ -18,6 +18,16 @@ vim.keymap.set("n", "<C-j>", "<cmd>TmuxNavigateDown<cr>")
 vim.keymap.set("n", "<C-k>", "<cmd>TmuxNavigateUp<cr>")
 vim.keymap.set("n", "<C-l>", "<cmd>TmuxNavigateRight<cr>")
 
+-- Reserve gt for type hierarchy; keep tab navigation on the leader mappings.
+-- Do not set nowait on the prefix: gth and gtl must still be reachable.
+vim.keymap.set("n", "gt", "<Nop>", { desc = "Type Hierarchy" })
+vim.keymap.set("n", "gth", function()
+  vim.lsp.buf.typehierarchy("supertypes")
+end, { desc = "Type Hierarchy: Supertypes" })
+vim.keymap.set("n", "gtl", function()
+  vim.lsp.buf.typehierarchy("subtypes")
+end, { desc = "Type Hierarchy: Subtypes" })
+
 vim.keymap.set("n", "vv", "<C-v>", { noremap = false, silent = true, desc = "Enter visual block mode" })
 
 vim.keymap.set("n", "U", "<C-r>, ", { noremap = true, silent = true, desc = "Redo" })
