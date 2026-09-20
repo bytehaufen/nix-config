@@ -19,7 +19,6 @@ require("lazy").setup({
     -- import LazyVim plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     -- lazyvim extension modules
-    { import = "lazyvim.plugins.extras.ai.copilot-native" },
     { import = "lazyvim.plugins.extras.ai.sidekick" },
     { import = "lazyvim.plugins.extras.coding.blink" },
     { import = "lazyvim.plugins.extras.coding.luasnip" },
@@ -63,6 +62,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.util.octo" },
 
     -- custom module configs
+    { import = "plugins.extras.ai.sidekick-extend" },
     { import = "plugins.extras.coding.yanky-extend" },
     { import = "plugins.extras.dap.core-extend" }, -- For custom keys
     { import = "plugins.extras.editor.neo-tree-extend" },
