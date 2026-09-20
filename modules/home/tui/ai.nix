@@ -9,6 +9,8 @@
     config.opts.home.programs.ollama.enable
     || config.opts.home.programs.ollama-vulkan.enable
     || config.opts.home.programs.ollama-cuda.enable;
+
+  llma-pkgs = inputs.llm-agents.packages.${pkgs.system};
 in {
   config = with pkgs; {
     home.packages =
@@ -36,9 +38,18 @@ in {
         ollama
       ]
       ++ lib.optionals config.opts.home.programs.openai-codex.enable [
-        inputs.llm-agents.packages.${pkgs.system}.codex-acp
-        inputs.llm-agents.packages.${pkgs.system}.codex
+        llma-pkgs.codex-acp
+        llma-pkgs.codex
       ];
+
+    xdg.desktopEntries = lib.mkIf config.opts.home.programs.openai-codex.enable {
+      chatgpt = {
+        name = "ChatGPT";
+        exec = "brave --app=https://chatgpt.com";
+        terminal = false;
+        categories = ["Network"];
+      };
+    };
 
     programs.zsh.shellAliases = lib.mkIf ollamaEnabled {
       ollama-64k = "OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_CONTEXT_LENGTH=65536 ollama serve";

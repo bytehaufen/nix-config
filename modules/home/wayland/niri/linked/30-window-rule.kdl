@@ -62,3 +62,7 @@ window-rule {
     open-focused true
     block-out-from "screencast"
 }
+window-rule {
+    match app-id="^brave-chatgpt.com__-Default$"
+    open-on-workspace "m1w1"
+}
