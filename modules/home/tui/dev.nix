@@ -13,6 +13,8 @@
         enableBashIntegration = true;
         enableNushellIntegration = true;
 
+        config.global.hide_env_diff = true;
+
         stdlib = ''
           : "''${XDG_CACHE_HOME:=''${HOME}/.cache}"
 
