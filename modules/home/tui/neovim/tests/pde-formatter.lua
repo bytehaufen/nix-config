@@ -71,7 +71,13 @@ vim.bo.filetype = "java"
 local bootstrap = vim.api.nvim_get_current_buf()
 local client
 local ok, failure = xpcall(function()
-	pde.start()
+	assert(
+		vim.wait(1000, function()
+			client = vim.lsp.get_clients({ name = "jdtls", _uninitialized = true })[1]
+			return client ~= nil
+		end),
+		"Opening Java must start PDE automatically"
+	)
 	vim.cmd.edit(project .. "/src/Example.java")
 	vim.bo.filetype = "java"
 	vim.bo.expandtab, vim.bo.shiftwidth, vim.bo.tabstop = true, 2, 2
@@ -97,9 +103,11 @@ local ok, failure = xpcall(function()
 	print("PASS: real PDE formatter loads XML, applies profile rules, and uses tabs/4 and width 140")
 end, debug.traceback)
 pde.stop()
-if not vim.wait(15000, function()
-	return #vim.lsp.get_clients({ name = "jdtls" }) == 0
-end, 100) and client then
+if
+	not vim.wait(15000, function()
+		return #vim.lsp.get_clients({ name = "jdtls", _uninitialized = true }) == 0
+	end, 100) and client
+then
 	client:stop(true)
 end
 if not ok then

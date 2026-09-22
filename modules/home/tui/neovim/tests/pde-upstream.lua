@@ -115,13 +115,15 @@ pde.setup()
 vim.cmd.edit(task .. "/plugin/First.java")
 vim.bo.filetype = "java"
 local first = vim.api.nvim_get_current_buf()
-pde.start()
 assert(vim.wait(500, function()
-	return clients[1].attached_buffers[first]
+	return clients[1] and clients[1].attached_buffers[first]
 end))
 vim.cmd.edit(task .. "/plugin/Second.java")
 vim.bo.filetype = "java"
 vim.bo.expandtab, vim.bo.shiftwidth = true, 2
+assert(vim.wait(500, function()
+	return clients[1].attached_buffers[vim.api.nvim_get_current_buf()]
+end))
 vim.api.nvim_buf_delete(first, { force = true })
 clients[1].attached_buffers[first] = nil
 clients[1].handlers["language/status"](nil, { type = "ServiceReady", message = "Ready" }, { client_id = 1 })
