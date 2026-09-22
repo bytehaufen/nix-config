@@ -120,20 +120,22 @@ override using mixed indentation produces a warning instead of changing its buff
 
 Run `:PdeRestart` after changing the formatter configuration or XML. Target reload
 alone does not apply formatter changes. When first installing this Lua change,
-stop PDE and reopen Neovim before `:PdeStart`. Buffer indentation remains set after
+stop PDE and reopen Neovim; opening a selected Java file starts PDE. Buffer indentation remains set after
 stopping PDE; reopen affected buffers if removing the formatter configuration.
 
 ## Commands
 
-Open a Java file in a listed project, then run `:PdeStart`.
+Opening a Java file in a listed project starts PDE automatically. One server is
+shared by all selected projects in that checkout and reuses its cached workspace.
+Java files outside a configured checkout, or in unlisted projects, do not start it.
 
-| Command                   | Action                                                                |
-| ------------------------- | --------------------------------------------------------------------- |
-| `:PdeStart`               | Start manually, or attach buffers to this workspace's existing server |
-| `:PdeStop`                | Stop this workspace's server gracefully                               |
-| `:PdeRestart`             | Restart and reread projects, target, and formatter configuration      |
-| `:PdeReloadTarget [path]` | Reload the configured target, or another `.target` file               |
-| `:JdtShowLogs`            | Open Java language-server logs                                        |
+| Command                   | Action                                                                                  |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| `:PdeStart`               | Start manually, or attach buffers to this workspace's existing server                   |
+| `:PdeStop`                | Stop gracefully and suppress autostart for this checkout until explicitly started again |
+| `:PdeRestart`             | Restart and reread projects, target, and formatter configuration                        |
+| `:PdeReloadTarget [path]` | Reload the configured target, or another `.target` file                                 |
+| `:JdtShowLogs`            | Open Java language-server logs                                                          |
 
 In attached PDE buffers, `:JdtRestart` aliases `:PdeRestart` so the replacement
 server stays managed. `:JdtWipeDataAndRestart` is blocked: upstream cache wiping
@@ -160,8 +162,13 @@ are disabled for attached Java buffers.
 
 ## Large repositories
 
-- Opening files never starts a server. Files in listed projects attach after an
-  explicit start; other projects remain outside this session.
+- Opening a Java file starts one server for its configured checkout. Only listed
+  projects attach; other projects remain outside this session. Opening a file
+  imports the full configured selection, not just that file's project.
+- Startup is attempted once per checkout per Neovim session. After `:PdeStop`,
+  a server failure, or a configuration error, use `:PdeStart` or `:PdeRestart`
+  explicitly to retry. Opening further files does not undo your stop or loop on
+  failures. Reopening Neovim enables automatic startup again.
 - Add projects manually and restart in batches. Closing a buffer does not unload
   its project. References and refactorings cover imported projects, not the whole
   repository; use Eclipse for repository-wide or cross-language refactoring.
@@ -230,5 +237,5 @@ resolution, or equivalence to Eclipse's active target. Keep large-workspace
 validation separate; a heap limit alone is not a stability guarantee.
 
 After changing the Nix launcher, activate Home Manager. To load changed Lua error
-handlers too, stop PDE and reopen Neovim before `:PdeStart`; `:PdeRestart` alone
+handlers too, stop PDE and reopen Neovim, then open a selected Java file; `:PdeRestart` alone
 does not reload an already-loaded Lua module.

@@ -1,5 +1,8 @@
 local M = {}
 local sessions = {}
+-- Attempt once per checkout per Neovim session. Explicit commands can retry;
+-- opening more files must not undo :PdeStop or loop after a crash/config error.
+local autostart_attempted = {}
 local uv = vim.uv
 
 local function notify(message, level)
@@ -321,6 +324,7 @@ end
 
 function M.start()
   local root = M.root()
+  autostart_attempted[root] = true
   local existing = sessions[root]
   if existing then
     assert(not existing.stopping, "PDE server is still stopping")
@@ -428,7 +432,8 @@ function M.start()
 end
 
 function M.stop()
-  local session = current_session()
+  local session, root = current_session()
+  autostart_attempted[root] = true
   if session then
     session.stopping = true
     local client = vim.lsp.get_client_by_id(session.id)
@@ -503,6 +508,35 @@ function M.reload_target(path)
   assert(sent, "Could not send PDE target reload request")
 end
 
+local function autostart(buf)
+  if
+    not vim.api.nvim_buf_is_loaded(buf)
+    or vim.bo[buf].filetype ~= "java"
+    or vim.bo[buf].buftype ~= ""
+    or vim.api.nvim_buf_get_name(buf) == ""
+  then
+    return
+  end
+  local ok, root = pcall(M.root, vim.api.nvim_buf_get_name(buf))
+  if not ok then
+    return -- Ordinary Java projects without javaConfig.json are not PDE workspaces.
+  end
+  local session = sessions[root]
+  if session then
+    if not session.stopping and selected(buf, session.workspace) then
+      vim.lsp.buf_attach_client(buf, session.id)
+    end
+  elseif not autostart_attempted[root] then
+    autostart_attempted[root] = true
+    if selected(buf, M.workspace(root)) then
+      -- FileType callbacks can run after the user switches buffers.
+      vim.api.nvim_buf_call(buf, M.start)
+    else
+      autostart_attempted[root] = nil
+    end
+  end
+end
+
 function M.setup()
   for name, fn in pairs({ PdeStart = M.start, PdeStop = M.stop, PdeRestart = M.restart }) do
     vim.api.nvim_create_user_command(name, guarded(fn), { desc = name:gsub("Pde", "PDE ") })
@@ -514,18 +548,25 @@ function M.setup()
     end),
     { nargs = "?", complete = "file", desc = "Reload the PDE target platform" }
   )
-  local group = vim.api.nvim_create_augroup("pde-manual", { clear = true })
+  local function schedule_start(buf)
+    vim.schedule(guarded(function()
+      autostart(buf)
+    end))
+  end
+  local group = vim.api.nvim_create_augroup("pde-auto", { clear = true })
   vim.api.nvim_create_autocmd("FileType", {
     group = group,
     pattern = "java",
     callback = function(args)
-      for _, session in pairs(sessions) do
-        if not session.stopping and selected(args.buf, session.workspace) then
-          vim.lsp.buf_attach_client(args.buf, session.id)
-        end
-      end
+      schedule_start(args.buf)
     end,
   })
+  -- Also cover buffers restored/opened before this module was configured.
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.bo[buf].filetype == "java" then
+      schedule_start(buf)
+    end
+  end
 end
 
 return M

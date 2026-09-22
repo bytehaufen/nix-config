@@ -84,9 +84,24 @@ package.preload.jdtls = function()
 end
 local pde = require("config.pde")
 pde.setup()
+open(root .. "/Standalone.java", "java")
+open(repo .. "/excluded/src/Example.java", "java")
+vim.wait(50)
+assert(#starts == 0 and #notifications == 0, "Unconfigured/unlisted Java files must not start PDE or notify")
 local api = open(repo .. "/api/src/Example.java", "java")
 local client = open(repo .. "/nested/client/src/Example.java", "java")
-assert(#starts == 0, "Opening a Java buffer must never start a server")
+-- Change buffers before the scheduled start: it must retain the Java root.
+open(root .. "/notes.txt", "text")
+assert(
+	vim.wait(500, function()
+		return #starts == 1
+	end),
+	"Listed Java files must automatically start PDE"
+)
+assert(starts[1].config.root_dir == repo and (starts[1].buf == api or starts[1].buf == client))
+vim.wait(50)
+assert(#starts == 1, "Multiple Java buffers must share one automatic start")
+vim.api.nvim_set_current_buf(client)
 assert(pde.root() == repo, "Nested .project must not become the LSP root")
 local ws = pde.workspace(repo)
 selection.targetPlatform = repo .. "/fixture.target"
@@ -172,6 +187,9 @@ fails(function()
 	pde.reload_target("")
 end, "Start PDE")
 assert(#starts == 2, "Stopping must not restart the server")
+open(repo .. "/api/src/AfterStop.java", "java")
+vim.wait(50)
+assert(#starts == 2, "Explicit stop must suppress autostart until manually started again")
 
 -- A checkout profile must survive initialization and control format requests,
 -- without changing unrelated buffers or requiring another server per project.
@@ -275,8 +293,50 @@ write(repo .. "/javaConfig.json", "not json")
 fails(function()
 	pde.workspace(repo)
 end, "Cannot read JSON")
+-- A malformed checkout gets one visible failure, not a retry on every file.
+local bad = root .. "/bad"
+write(bad .. "/javaConfig.json", "not json")
+notification_count = #notifications
+open(bad .. "/First.java", "java")
+vim.wait(50)
+assert(#notifications == notification_count + 1)
+open(bad .. "/Second.java", "java")
+vim.wait(50)
+assert(#notifications == notification_count + 1 and #starts == 3)
+
+-- Explicit commands can retry, but a crashed server must not restart on open.
+selection.projects = { "api" }
+json(repo .. "/javaConfig.json", selection)
+vim.api.nvim_set_current_buf(api)
+pde.start()
+assert(#starts == 4)
+clients[4] = nil
+starts[4].config.on_exit(1, 0)
+vim.wait(50)
+open(repo .. "/api/src/AfterCrash.java", "java")
+vim.wait(50)
+assert(#starts == 4, "Opening Java after a crash must not cause a restart loop")
+-- Loading the configuration after a Java buffer exists must also start it.
+local restored = root .. "/restored"
+write(restored .. "/api/.project", "<projectDescription/>")
+write(restored .. "/api/Restored.java", "class Restored {}")
+write(restored .. "/fixture.target", '<target name="restored"/>')
+json(restored .. "/javaConfig.json", { projects = { "api" }, targetPlatform = "fixture.target" })
+vim.api.nvim_del_augroup_by_name("pde-auto")
+open(restored .. "/api/Restored.java", "java")
+assert(#starts == 4)
+pde.setup()
+assert(
+	vim.wait(500, function()
+		return #starts == 5
+	end),
+	"Already-open Java buffers must autostart too"
+)
+assert(starts[5].config.root_dir == restored, "Autostart suppression must be per checkout")
+pde.stop()
+vim.wait(50)
 vim.lsp.handlers["window/logMessage"] = original_log_handler
 print(
-	"PDE checks passed: manual lifecycle, root selection, imports, reload, formatter, runtime/config validation, error notifications"
+	"PDE checks passed: guarded autostart, lifecycle, root selection, imports, reload, formatter, config validation, error notifications"
 )
 vim.cmd.quitall()
