@@ -78,6 +78,7 @@
       ollama-cuda.enable = true;
       llama-cpp-cuda.enable = false;
       openai-codex.enable = true;
+      omp.enable = true;
 
       discord.enable = false;
       nchat.enable = true;

@@ -40,6 +40,9 @@ in {
       ++ lib.optionals config.opts.home.programs.openai-codex.enable [
         llma-pkgs.codex-acp
         llma-pkgs.codex
+      ]
+      ++ lib.optionals config.opts.home.programs.omp.enable [
+        llma-pkgs.omp
       ];
 
     xdg.desktopEntries = lib.mkIf config.opts.home.programs.openai-codex.enable {
@@ -49,6 +52,10 @@ in {
         terminal = false;
         categories = ["Network"];
       };
+    };
+
+    home.file.".omp/agent/config.yml" = lib.mkIf config.opts.home.programs.omp.enable {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/modules/home/tui/omp/config.yml";
     };
 
     programs.zsh.shellAliases = lib.mkIf ollamaEnabled {

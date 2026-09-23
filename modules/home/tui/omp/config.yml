@@ -1,0 +1,11 @@
+modelRoles:
+  default: openai-codex/gpt-6-astra
+symbolPreset: nerd
+composer:
+  shape: band
+theme:
+  dark: titanium
+  light: light
+setupVersion: 2
+tui:
+  vimMode: true

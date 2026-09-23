@@ -46,6 +46,7 @@
       copilot.enable = true;
       ollama.enable = true;
       openai-codex.enable = true;
+      omp.enable = true;
 
       discord.enable = true;
       luanti.enable = true;

@@ -42,6 +42,7 @@ in {
       ollama-cuda = mkEnableOption "Enable Ollama - Get up and running large language models with
         nvidia backend";
       openai-codex = mkEnableOption "Enable Codex CLI - Lightweight coding agent that runs in your terminal";
+      omp = mkEnableOption "Enable Oh My Pi, a terminal-based AI coding agent with support for multiple models";
     };
 
     services = {
