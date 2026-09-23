@@ -157,6 +157,18 @@ function M.build_config(workspace, tools)
   -- A changed selection must not leave removed projects in the Eclipse workspace.
   local generation = vim.fn.sha256(table.concat(workspace.projects, "\n")):sub(1, 16)
   local state = base .. "/" .. generation
+  -- Equinox persists bundle locations. Nix upgrades need a fresh runtime cache,
+  -- but must keep the selected projects' workspace and indexes.
+  local bundle_paths = vim.deepcopy(bundles)
+  table.sort(bundle_paths)
+  local runtime_key = vim.fn
+    .sha256(vim.json.encode({
+      canonical(tools.jdtls),
+      canonical(tools.javaHome),
+      bundle_paths,
+    }))
+    :sub(1, 16)
+  local runtime = state .. "/config-" .. runtime_key
   local runtimes = { { name = "JavaSE-25", path = tools.javaHome, default = true } }
   if vim.env.PDE_JAVA_23_HOME and vim.env.PDE_JAVA_23_HOME ~= "" then
     runtimes[#runtimes + 1] = { name = "JavaSE-23", path = vim.env.PDE_JAVA_23_HOME }
@@ -185,7 +197,7 @@ function M.build_config(workspace, tools)
       "--jvm-arg=-Xmx6g",
       "--jvm-arg=-XX:+UseG1GC",
       "-configuration",
-      state .. "/config",
+      runtime,
       "-data",
       state .. "/workspace",
     },
@@ -253,7 +265,7 @@ except (OSError, ET.ParseError, ValueError) as error:
   end
   -- These must reach initialize, before any import/build/filter job starts.
   config.init_options.settings = vim.deepcopy(config.settings)
-  return config, state
+  return config, state, runtime
 end
 
 local function sync_formatter(client, buf)
@@ -308,7 +320,7 @@ end
 local function launch(dispatchers, config)
   local workspace = M.workspace(config.root_dir)
   local tools = read_json((vim.env.XDG_CONFIG_HOME or (vim.env.HOME .. "/.config")) .. "/nvim-pde/tools.json")
-  local generated, state = M.build_config(workspace, tools)
+  local generated, state, runtime = M.build_config(workspace, tools)
   -- Client.create already references these tables when it calls the factory.
   -- Mutate their contents so initialize and didChangeConfiguration agree.
   config.settings.java = generated.settings.java
@@ -316,7 +328,7 @@ local function launch(dispatchers, config)
   config.init_options = generated.init_options
   config.init_options.extendedClientCapabilities = vim.deepcopy(require("jdtls.capabilities"))
   config._pde = { workspace = workspace, state = state, ready = false }
-  vim.fn.mkdir(state .. "/config", "p")
+  vim.fn.mkdir(runtime, "p")
   vim.fn.mkdir(state .. "/workspace", "p")
   notify(
     ("Starting PDE for %d selected projects; references cover this selection. Heap limit: 6 GB."):format(

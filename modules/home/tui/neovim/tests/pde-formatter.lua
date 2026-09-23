@@ -101,6 +101,24 @@ local ok, failure = xpcall(function()
 		assert(result:find("sum(int a, int b)\n\t{", 1, true), "XML brace rule was ignored: " .. result)
 	end
 	local previous_id = client.id
+	local workspace_state = client.config._pde.state
+	-- Simulate a Nix bundle-package upgrade: same JARs at different locations.
+	local tools_path = (vim.env.XDG_CONFIG_HOME or (vim.env.HOME .. "/.config")) .. "/nvim-pde/tools.json"
+	local tools = vim.json.decode(table.concat(vim.fn.readfile(tools_path), "\n"))
+	local _, _, old_runtime = pde.build_config(pde.workspace(repo), tools)
+	local bundles = vim.json.decode(table.concat(vim.fn.readfile(tools.bundles), "\n"))
+	vim.fn.mkdir(task .. "/upgraded-bundles", "p")
+	for i, bundle in ipairs(bundles) do
+		local alias = task .. "/upgraded-bundles/" .. vim.fs.basename(bundle)
+		assert(vim.uv.fs_symlink(bundle, alias))
+		bundles[i] = alias
+	end
+	tools.bundles = task .. "/upgraded-bundles/bundles.json"
+	write(tools.bundles, vim.json.encode(bundles))
+	vim.env.XDG_CONFIG_HOME = task .. "/config"
+	write(task .. "/config/nvim-pde/tools.json", vim.json.encode(tools))
+	local _, _, new_runtime = pde.build_config(pde.workspace(repo), tools)
+	assert(new_runtime ~= old_runtime)
 	vim.cmd("lsp restart jdtls")
 	assert(
 		vim.wait(60000, function()
@@ -109,10 +127,17 @@ local ok, failure = xpcall(function()
 		end, 100),
 		"Native restart must release the workspace lock and initialize a replacement"
 	)
+	assert(client.config._pde.state == workspace_state, "Runtime upgrades must preserve workspace indexes")
+	assert(vim.fn.isdirectory(old_runtime) == 1 and vim.fn.isdirectory(new_runtime) == 1)
+	local log = table.concat(vim.fn.readfile(vim.lsp.log.get_filename()), "\n")
+	assert(
+		not log:find("Failed to load extension bundles", 1, true),
+		"Bundle upgrade caused an extension-loading failure"
+	)
 	local formatted_again =
 		client:request_sync("textDocument/formatting", vim.lsp.util.make_formatting_params(), 20000, 0)
 	assert(formatted_again and not formatted_again.err, vim.inspect(formatted_again))
-	print("PASS: real PDE XML formatter, wiped startup buffer, native restart and workspace-lock reuse")
+	print("PASS: real PDE XML formatter, native restart with relocated bundles, preserved workspace and runtime caches")
 end, debug.traceback)
 vim.cmd("lsp disable jdtls")
 if

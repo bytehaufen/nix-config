@@ -39,6 +39,39 @@ assert(vim.tbl_contains(config.cmd, "--jvm-arg=-Xmx6g"))
 assert(vim.deep_equal(config.init_options.settings, config.settings))
 assert(vim.deep_equal(config.settings.java.import.exclusions, { "**" }))
 assert(vim.deep_equal(config.settings.java.project.resourceFilters, {}))
+local function runtime_path(value)
+	for i, arg in ipairs(value.cmd) do
+		if arg == "-configuration" then
+			return value.cmd[i + 1]
+		end
+	end
+	error("Missing Eclipse runtime configuration")
+end
+local runtime = runtime_path(config)
+assert(runtime ~= state .. "/config", "Do not reuse the stale unversioned runtime cache")
+local function check_runtime_change(changed_tools)
+	local changed, changed_state, changed_runtime = pde.build_config(pde.workspace(repo), changed_tools)
+	assert(changed_runtime == runtime_path(changed) and changed_runtime ~= runtime)
+	assert(changed_state == state and changed.cmd[#changed.cmd] == config.cmd[#config.cmd], "Keep workspace indexes")
+	assert(changed.cmd[5] == config.cmd[5], "Keep the checkout lock across runtime upgrades")
+	local repeated = pde.build_config(pde.workspace(repo), changed_tools)
+	assert(runtime_path(repeated) == changed_runtime, "Unchanged packages must reuse the runtime cache")
+end
+local changed_tools = vim.deepcopy(tools)
+changed_tools.jdtls = root .. "/new-jdtls"
+write(changed_tools.jdtls, "#!/bin/sh\nexit 0")
+assert(vim.uv.fs_chmod(changed_tools.jdtls, 493))
+check_runtime_change(changed_tools)
+changed_tools = vim.deepcopy(tools)
+changed_tools.javaHome = root .. "/new-jdk"
+vim.fn.mkdir(changed_tools.javaHome .. "/bin", "p")
+assert(vim.uv.fs_symlink(java, changed_tools.javaHome .. "/bin/java"))
+check_runtime_change(changed_tools)
+write(root .. "/new-package/fake.jar", "fixture")
+json(tools.bundles, { root .. "/new-package/fake.jar" })
+check_runtime_change(tools)
+json(tools.bundles, { root .. "/fake.jar" })
+assert(runtime_path(pde.build_config(pde.workspace(repo), tools)) == runtime, "Package rollback must reuse its cache")
 selection.projects = { "api" }
 json(repo .. "/javaConfig.json", selection)
 local _, reduced = pde.build_config(pde.workspace(repo), tools)
