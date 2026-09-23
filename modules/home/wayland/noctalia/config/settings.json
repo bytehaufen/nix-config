@@ -436,15 +436,14 @@
     "hooks": {
         "colorGeneration": "",
         "darkModeChange": "",
-        "enabled": false,
+        "enabled": true,
         "performanceModeDisabled": "",
         "performanceModeEnabled": "",
         "screenLock": "",
         "screenUnlock": "",
         "session": "",
-        "startup": "",
-        "wallpaperChange": "",
-        "session_unlocked": "systemctl --user restart kanshi.service"
+        "startup": "noctalia-shell ipc call idleInhibitor enable",
+        "wallpaperChange": ""
     },
     "idle": {
         "customCommands": "[]",
