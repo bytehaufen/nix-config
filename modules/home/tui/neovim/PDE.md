@@ -191,6 +191,11 @@ are disabled for attached Java buffers.
 - State is under `stdpath("cache")/jdtls-pde/<checkout-hash>/<selection-hash>`.
   Unchanged selections reuse indexes. Changed selections use a separate workspace
   so removed projects cannot remain imported. Older caches are retained.
+  Within that directory, `workspace/` holds project indexes; `config-<runtime-hash>/`
+  holds the Eclipse runtime cache. Changes to the JDT LS or JDK package paths, or
+  PDE bundle paths, select a fresh runtime cache without clearing the workspace
+  or downloaded targets. The old unversioned `config/` is no longer used and is
+  retained, not deleted. Restart Neovim after updating this Lua configuration.
 - A checkout-wide `flock` prevents concurrent Neovim processes from opening the
   same PDE workspace. A crashed process releases the lock automatically. A server
   exit is reported without an automatic restart loop.
