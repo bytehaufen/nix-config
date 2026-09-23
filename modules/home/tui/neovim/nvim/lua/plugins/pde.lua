@@ -10,7 +10,8 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- LazyVim also excludes disabled servers from Mason's automatic enable.
+      -- config.pde owns the native jdtls config/enable call; skip LazyVim's
+      -- generic Java setup and Mason installation/automatic activation.
       servers = { jdtls = { enabled = false } },
     },
   },

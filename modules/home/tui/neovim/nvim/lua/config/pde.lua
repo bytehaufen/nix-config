@@ -1,8 +1,4 @@
 local M = {}
-local sessions = {}
--- Attempt once per checkout per Neovim session. Explicit commands can retry;
--- opening more files must not undo :PdeStop or loop after a crash/config error.
-local autostart_attempted = {}
 local uv = vim.uv
 
 local function notify(message, level)
@@ -260,25 +256,9 @@ except (OSError, ET.ParseError, ValueError) as error:
   return config, state
 end
 
-local function current_session()
-  local root = M.root()
-  return sessions[root], root
-end
-
-local function attach_buffers(session)
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if selected(buf, session.workspace) then
-      vim.lsp.buf_attach_client(buf, session.id)
-    end
-  end
-end
-
-local function sync_formatter(session, buf)
-  if not session.ready or not session.workspace.formatter then
-    return
-  end
-  local client = vim.lsp.get_client_by_id(session.id)
-  if not client then
+local function sync_formatter(client, buf)
+  local state = client.config._pde
+  if not state.ready or not state.workspace.formatter or not selected(buf, state.workspace) then
     return
   end
   local uri = vim.uri_from_bufnr(buf)
@@ -288,9 +268,10 @@ local function sync_formatter(session, buf)
     arguments = { uri, { prefix .. "tabulation.char", prefix .. "tabulation.size", prefix .. "lineSplit" } },
   }, function(err, settings)
     if
-      sessions[session.workspace.root] ~= session
-      or session.stopping
-      or not selected(buf, session.workspace)
+      vim.lsp.get_client_by_id(client.id) ~= client
+      or client:is_stopped()
+      or client.config._pde ~= state
+      or not selected(buf, state.workspace)
       or vim.uri_from_bufnr(buf) ~= uri
     then
       return
@@ -322,128 +303,62 @@ local function sync_formatter(session, buf)
   end, buf)
 end
 
-function M.start()
-  local root = M.root()
-  autostart_attempted[root] = true
-  local existing = sessions[root]
-  if existing then
-    assert(not existing.stopping, "PDE server is still stopping")
-    attach_buffers(existing)
-    notify("PDE server already running. Use :PdeRestart to apply configuration changes.")
-    return
-  end
-  local workspace = M.workspace(root)
-  local buf = vim.api.nvim_get_current_buf()
-  if not selected(buf, workspace) then
-    buf = nil
-    for _, candidate in ipairs(vim.api.nvim_list_bufs()) do
-      if selected(candidate, workspace) then
-        buf = candidate
-        break
-      end
-    end
-  end
-  assert(buf, "Open a Java file in a project listed in javaConfig.json before :PdeStart")
+-- A cmd factory runs for every new process, including native :lsp restart,
+-- which otherwise reuses the old Client.config verbatim.
+local function launch(dispatchers, config)
+  local workspace = M.workspace(config.root_dir)
   local tools = read_json((vim.env.XDG_CONFIG_HOME or (vim.env.HOME .. "/.config")) .. "/nvim-pde/tools.json")
-  local config, state = M.build_config(workspace, tools)
-  local ok, blink = pcall(require, "blink.cmp")
-  config.capabilities = ok and blink.get_lsp_capabilities() or vim.lsp.protocol.make_client_capabilities()
-  local session = { workspace = workspace, buffers = {} }
-  config.on_attach = function(_, attached_buf)
-    session.buffers[attached_buf] = true
-    sync_formatter(session, attached_buf)
-    -- nvim-jdtls installs buffer commands in LspAttach after on_attach. Replace
-    -- them afterward so there is only one owner of this workspace's lifecycle.
-    vim.schedule(function()
-      if sessions[root] ~= session or session.stopping or not vim.api.nvim_buf_is_valid(attached_buf) then
-        return
-      end
-      vim.api.nvim_buf_create_user_command(attached_buf, "JdtRestart", function()
-        vim.cmd.PdeRestart()
-      end, { desc = "Restart the managed PDE workspace" })
-      vim.api.nvim_buf_create_user_command(attached_buf, "JdtWipeDataAndRestart", function()
-        notify("Cache wiping is disabled for managed PDE workspaces. Use :PdeRestart.", vim.log.levels.WARN)
-      end, { desc = "PDE cache wiping is not supported" })
-    end)
-    vim.b[attached_buf].autoformat = false
-    local jdtls = require("jdtls")
-    for key, mapping in pairs({
-      ["<leader>co"] = { jdtls.organize_imports, "Organize Imports" },
-      ["<leader>cxv"] = { jdtls.extract_variable, "Extract Variable" },
-      ["<leader>cxc"] = { jdtls.extract_constant, "Extract Constant" },
-    }) do
-      vim.keymap.set("n", key, mapping[1], { buffer = attached_buf, desc = mapping[2] })
-    end
-  end
-  config.on_init = function(client)
-    if workspace.formatter then
-      -- Install on the initialized client, outside nvim-jdtls's wrapper, which
-      -- drops status notifications once its original startup buffer is wiped.
-      local upstream = client.handlers["language/status"]
-      client.handlers["language/status"] = function(err, result, ctx, handler_config)
-        if
-          not err
-          and result
-          and result.type == "ServiceReady"
-          and sessions[root] == session
-          and not session.stopping
-          and not session.ready
-        then
-          session.ready = true
-          for attached_buf in pairs(session.buffers) do
-            if selected(attached_buf, workspace) then
-              sync_formatter(session, attached_buf)
-            end
-          end
-        end
-        if upstream then
-          return upstream(err, result, ctx, handler_config)
-        end
-      end
-    end
-    vim.schedule(function()
-      if sessions[root] == session and not session.stopping then
-        attach_buffers(session)
-      end
-    end)
-  end
-  config.on_exit = function(code, signal)
-    vim.schedule(function()
-      if sessions[root] == session then
-        sessions[root] = nil
-      end
-      if not session.stopping then
-        local message = code == 73 and "Another Neovim process owns this PDE workspace; stop that server first."
-          or ("PDE server exited (code %s, signal %s). Inspect :JdtShowLogs; restart explicitly."):format(code, signal)
-        notify(message, vim.log.levels.WARN)
-      end
-    end)
-  end
+  local generated, state = M.build_config(workspace, tools)
+  -- Client.create already references these tables when it calls the factory.
+  -- Mutate their contents so initialize and didChangeConfiguration agree.
+  config.settings.java = generated.settings.java
+  config.handlers["window/logMessage"] = generated.handlers["window/logMessage"]
+  config.init_options = generated.init_options
+  config.init_options.extendedClientCapabilities = vim.deepcopy(require("jdtls.capabilities"))
+  config._pde = { workspace = workspace, state = state, ready = false }
   vim.fn.mkdir(state .. "/config", "p")
   vim.fn.mkdir(state .. "/workspace", "p")
-  session.id = require("jdtls").start_or_attach(config, {}, { bufnr = buf })
-  assert(session.id, "JDT LS failed to start; inspect :messages")
-  sessions[root] = session
   notify(
     ("Starting PDE for %d selected projects; references cover this selection. Heap limit: 6 GB."):format(
       #workspace.projects
     )
   )
+  return vim.lsp.rpc.start(generated.cmd, dispatchers, { cwd = workspace.root })
 end
 
-function M.stop()
-  local session, root = current_session()
-  autostart_attempted[root] = true
-  if session then
-    session.stopping = true
-    local client = vim.lsp.get_client_by_id(session.id)
-    if client then
-      client:stop()
-    else
-      sessions[session.workspace.root] = nil
+local function root_dir(buf, on_dir)
+  if vim.bo[buf].buftype ~= "" or vim.api.nvim_buf_get_name(buf) == "" then
+    return
+  end
+  local ok, root = pcall(M.root, vim.api.nvim_buf_get_name(buf))
+  if not ok then
+    return
+  end
+  local workspace
+  for _, client in ipairs(vim.lsp.get_clients({ name = "jdtls", _uninitialized = true })) do
+    if client.config.root_dir == root and not client:is_stopped() and client.config._pde then
+      workspace = client.config._pde.workspace
+      break
     end
-  else
-    notify("No PDE server running for this workspace")
+  end
+  if selected(buf, workspace or M.workspace(root)) then
+    on_dir(root)
+  end
+end
+
+local function current_client()
+  for _, client in ipairs(vim.lsp.get_clients({ name = "jdtls", bufnr = 0 })) do
+    if client.config._pde then
+      return client
+    end
+  end
+  local ok, root = pcall(M.root)
+  if ok then
+    for _, client in ipairs(vim.lsp.get_clients({ name = "jdtls" })) do
+      if client.config._pde and client.config.root_dir == root then
+        return client
+      end
+    end
   end
 end
 
@@ -456,38 +371,10 @@ local function guarded(fn)
   end
 end
 
-function M.restart()
-  local session, root = current_session()
-  if not session then
-    return M.start()
-  end
-  M.stop()
-  local attempts = 0
-  local function wait_for_exit()
-    if not sessions[root] then
-      -- Do not start in an unrelated workspace if the user changed buffers.
-      if M.root() == root then
-        M.start()
-      else
-        notify("PDE stopped. Return to its workspace and run :PdeStart.")
-      end
-    elseif attempts < 100 then
-      attempts = attempts + 1
-      vim.defer_fn(guarded(wait_for_exit), 100)
-    else
-      notify("PDE is still stopping; run :PdeStart after it exits.", vim.log.levels.WARN)
-    end
-  end
-  vim.defer_fn(guarded(wait_for_exit), 100)
-end
-
 function M.reload_target(path)
-  local session, root = current_session()
-  local client = session and vim.lsp.get_client_by_id(session.id)
-  assert(
-    client and client.initialized and not session.stopping,
-    "Start PDE and wait for initialization before reloading a target"
-  )
+  local client = current_client()
+  assert(client and not client:is_stopped(), "Enable jdtls and wait for initialization before reloading a target")
+  local root = client.config.root_dir
   local commands = (client.server_capabilities.executeCommandProvider or {}).commands or {}
   assert(
     vim.tbl_contains(commands, "java.pde.reloadTargetPlatform"),
@@ -508,39 +395,7 @@ function M.reload_target(path)
   assert(sent, "Could not send PDE target reload request")
 end
 
-local function autostart(buf)
-  if
-    not vim.api.nvim_buf_is_loaded(buf)
-    or vim.bo[buf].filetype ~= "java"
-    or vim.bo[buf].buftype ~= ""
-    or vim.api.nvim_buf_get_name(buf) == ""
-  then
-    return
-  end
-  local ok, root = pcall(M.root, vim.api.nvim_buf_get_name(buf))
-  if not ok then
-    return -- Ordinary Java projects without javaConfig.json are not PDE workspaces.
-  end
-  local session = sessions[root]
-  if session then
-    if not session.stopping and selected(buf, session.workspace) then
-      vim.lsp.buf_attach_client(buf, session.id)
-    end
-  elseif not autostart_attempted[root] then
-    autostart_attempted[root] = true
-    if selected(buf, M.workspace(root)) then
-      -- FileType callbacks can run after the user switches buffers.
-      vim.api.nvim_buf_call(buf, M.start)
-    else
-      autostart_attempted[root] = nil
-    end
-  end
-end
-
 function M.setup()
-  for name, fn in pairs({ PdeStart = M.start, PdeStop = M.stop, PdeRestart = M.restart }) do
-    vim.api.nvim_create_user_command(name, guarded(fn), { desc = name:gsub("Pde", "PDE ") })
-  end
   vim.api.nvim_create_user_command(
     "PdeReloadTarget",
     guarded(function(args)
@@ -548,25 +403,90 @@ function M.setup()
     end),
     { nargs = "?", complete = "file", desc = "Reload the PDE target platform" }
   )
-  local function schedule_start(buf)
-    vim.schedule(guarded(function()
-      autostart(buf)
-    end))
-  end
-  local group = vim.api.nvim_create_augroup("pde-auto", { clear = true })
-  vim.api.nvim_create_autocmd("FileType", {
-    group = group,
-    pattern = "java",
-    callback = function(args)
-      schedule_start(args.buf)
-    end,
-  })
-  -- Also cover buffers restored/opened before this module was configured.
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.bo[buf].filetype == "java" then
-      schedule_start(buf)
+  vim.api.nvim_create_user_command(
+    "JdtShowLogs",
+    guarded(function()
+      local client = current_client()
+      assert(client, "Open a buffer in a running PDE workspace first")
+      vim.api.nvim_cmd({ cmd = "split", args = { client.config._pde.state .. "/workspace/.metadata/.log" } }, {})
+      vim.api.nvim_cmd({ cmd = "vsplit", args = { vim.lsp.log.get_filename() } }, {})
+    end),
+    { desc = "Open PDE and Neovim language-server logs" }
+  )
+  local ok, blink = pcall(require, "blink.cmp")
+  -- Blink only supplies completion capabilities unless Neovim defaults are requested.
+  local capabilities = ok and blink.get_lsp_capabilities(nil, true) or vim.lsp.protocol.make_client_capabilities()
+  local kinds = capabilities.textDocument.codeAction.codeActionLiteralSupport.codeActionKind.valueSet
+  for _, kind in ipairs({ "source.generate.toString", "source.generate.hashCodeEquals", "source.organizeImports" }) do
+    if not vim.tbl_contains(kinds, kind) then
+      kinds[#kinds + 1] = kind
     end
   end
+  vim.lsp.config("jdtls", {
+    cmd = launch,
+    root_dir = guarded(root_dir),
+    workspace_required = true,
+    filetypes = { "java" },
+    capabilities = capabilities,
+    settings = {},
+    flags = { debounce_text_changes = 300 },
+    exit_timeout = 10000,
+    on_exit = function(code)
+      if code == 73 then
+        notify("Another Neovim process owns this PDE workspace; stop that server first.", vim.log.levels.WARN)
+      end
+    end,
+    handlers = {
+      ["language/status"] = function(err, result, ctx)
+        local client = vim.lsp.get_client_by_id(ctx.client_id)
+        if not err and result and result.type == "ServiceReady" and client and not client:is_stopped() then
+          client.config._pde.ready = true
+          for buf in pairs(client.attached_buffers) do
+            sync_formatter(client, buf)
+          end
+        end
+      end,
+    },
+    on_init = function(client)
+      -- Native restart reattaches old buffers. Prune removed projects before
+      -- didOpen, and attach any newly selected projects already open in Neovim.
+      for buf in pairs(client.attached_buffers) do
+        if vim.bo[buf].buftype == "" and not selected(buf, client.config._pde.workspace) then
+          vim.lsp.buf_detach_client(buf, client.id)
+        end
+      end
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if selected(buf, client.config._pde.workspace) then
+          vim.lsp.buf_attach_client(buf, client.id)
+        end
+      end
+    end,
+    on_attach = function(client, buf)
+      sync_formatter(client, buf)
+      vim.b[buf].autoformat = false
+      local jdtls = require("jdtls")
+      for key, mapping in pairs({
+        ["<leader>co"] = { jdtls.organize_imports, "Organize Imports" },
+        ["<leader>cxv"] = { jdtls.extract_variable, "Extract Variable" },
+        ["<leader>cxc"] = { jdtls.extract_constant, "Extract Constant" },
+      }) do
+        vim.keymap.set("n", key, mapping[1], { buffer = buf, desc = mapping[2] })
+      end
+      -- Override plugin commands after its LspAttach callback has installed them.
+      vim.schedule(function()
+        if not vim.api.nvim_buf_is_valid(buf) or client:is_stopped() then
+          return
+        end
+        vim.api.nvim_buf_create_user_command(buf, "JdtRestart", function()
+          vim.cmd("lsp restart")
+        end, { desc = "Restart using Neovim's LSP lifecycle" })
+        vim.api.nvim_buf_create_user_command(buf, "JdtWipeDataAndRestart", function()
+          notify("Cache wiping is disabled. Use :lsp restart instead.", vim.log.levels.WARN)
+        end, { desc = "PDE cache wiping is not supported" })
+      end)
+    end,
+  })
+  vim.lsp.enable("jdtls")
 end
 
 return M
