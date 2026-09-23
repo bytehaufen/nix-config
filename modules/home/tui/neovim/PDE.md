@@ -58,7 +58,7 @@ Adjust the path/environment for another machine. Keep `projects` unchanged in
 `javaConfig.json` and set `"targetPlatform": "./pde-pool.target"`. Keep both files
 out of shared commits using the checkout's `.git/info/exclude`. No Home Manager
 rebuild is needed for this target-only change: run `:PdeReloadTarget` in an already
-running session (it rereads the configured target path), or `:PdeStart` if stopped.
+running session (it rereads the configured target path), or `:lsp enable jdtls` if disabled.
 
 PDE reads the pool in place; it does not copy, provision, or modify its bundles.
 The directory target bypasses remote p2 metadata, target downloads, and mirror
@@ -118,7 +118,7 @@ Tab and space profiles are supported; mixed indentation profiles are rejected
 because JDT LS's formatting protocol forces either tabs or spaces. A project
 override using mixed indentation produces a warning instead of changing its buffer.
 
-Run `:PdeRestart` after changing the formatter configuration or XML. Target reload
+Run `:lsp restart jdtls` after changing the formatter configuration or XML. Target reload
 alone does not apply formatter changes. When first installing this Lua change,
 stop PDE and reopen Neovim; opening a selected Java file starts PDE. Buffer indentation remains set after
 stopping PDE; reopen affected buffers if removing the formatter configuration.
@@ -129,18 +129,26 @@ Opening a Java file in a listed project starts PDE automatically. One server is
 shared by all selected projects in that checkout and reuses its cached workspace.
 Java files outside a configured checkout, or in unlisted projects, do not start it.
 
-| Command                   | Action                                                                                  |
-| ------------------------- | --------------------------------------------------------------------------------------- |
-| `:PdeStart`               | Start manually, or attach buffers to this workspace's existing server                   |
-| `:PdeStop`                | Stop gracefully and suppress autostart for this checkout until explicitly started again |
-| `:PdeRestart`             | Restart and reread projects, target, and formatter configuration                        |
-| `:PdeReloadTarget [path]` | Reload the configured target, or another `.target` file                                 |
-| `:JdtShowLogs`            | Open Java language-server logs                                                          |
+| Command                   | Action                                                                        |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `:lsp restart jdtls`      | Restart Java clients and reread projects, target, and formatter configuration |
+| `:lsp disable jdtls`      | Stop Java clients and disable automatic startup until enabled again           |
+| `:lsp enable jdtls`       | Enable automatic startup, including for already-open selected Java buffers    |
+| `:lsp stop jdtls`         | Stop current Java clients without disabling automatic startup                 |
+| `:PdeReloadTarget [path]` | Reload the configured target, or another `.target` file                       |
+| `:JdtShowLogs`            | Open the current PDE workspace log and Neovim's LSP log                       |
 
-In attached PDE buffers, `:JdtRestart` aliases `:PdeRestart` so the replacement
-server stays managed. `:JdtWipeDataAndRestart` is blocked: upstream cache wiping
-bypasses PDE's lifecycle and selection-specific state management. No cache is
-deleted by these commands.
+These are Neovim's native `:lsp` commands, not custom lifecycle wrappers. Naming
+`jdtls` operates on Java clients across checkouts in the current Neovim instance;
+`:lsp restart` without a name restarts clients attached to the current buffer.
+Use `disable`, not `stop`, when Java should stay off as you open more files.
+After fixing a startup error, `:lsp enable jdtls` retries activation.
+
+The old `PdeStart`, `PdeStop`, and `PdeRestart` commands are removed. In attached
+PDE buffers, `:JdtRestart` delegates to native `:lsp restart`.
+`:JdtWipeDataAndRestart` remains blocked to prevent unintended cache deletion.
+Normal restarts retain caches; changing the project selection uses a separate
+workspace and detaches buffers belonging to removed projects.
 
 Relative reload paths are resolved against `javaConfig.json`, not the current
 working directory; explicit reload paths may also be absolute. Reload needs a
@@ -165,10 +173,10 @@ are disabled for attached Java buffers.
 - Opening a Java file starts one server for its configured checkout. Only listed
   projects attach; other projects remain outside this session. Opening a file
   imports the full configured selection, not just that file's project.
-- Startup is attempted once per checkout per Neovim session. After `:PdeStop`,
-  a server failure, or a configuration error, use `:PdeStart` or `:PdeRestart`
-  explicitly to retry. Opening further files does not undo your stop or loop on
-  failures. Reopening Neovim enables automatic startup again.
+- Startup and shutdown follow native LSP behavior. There is no background crash
+  restart loop, but opening another Java file can retry a stopped/failed server
+  while its configuration is enabled. `:lsp disable jdtls` keeps Java off for
+  the rest of this Neovim session unless you enable it again.
 - Add projects manually and restart in batches. Closing a buffer does not unload
   its project. References and refactorings cover imported projects, not the whole
   repository; use Eclipse for repository-wide or cross-language refactoring.
@@ -205,27 +213,28 @@ intentionally deferred.
 
 ## Validation
 
-Run the Lua lifecycle checks without loading your normal Neovim configuration:
+Run the configuration and validation checks without your normal Neovim configuration:
 
 ```sh
 NVIM_LOG_FILE=/tmp/nvim-pde-tests.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde.lua
 ```
 
-These checks mock the LSP client and never start Java. Test bundle compatibility
+These checks never start Java. Test bundle compatibility
 in a disposable PDE workspace before using a new server/bundle version. Ask the
 repository owner before starting a language server against their real checkout.
 
-With the pinned `nvim-jdtls` installed, also run its real wrappers and commands
-against a mocked transport. This covers wiping the startup buffer during import,
-restart ownership, cache-wipe refusal, and upstream formatter settings merging:
+With the pinned `nvim-jdtls` installed, run the real Neovim clients and native
+commands against an in-process transport. This covers enable/disable/stop/restart,
+project pruning, cache reuse, formatter reloads, logs, and target reload:
 
 ```sh
-NVIM_LOG_FILE=/tmp/nvim-pde-tests.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde-upstream.lua
+NVIM_LOG_FILE=/tmp/nvim-pde-tests.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde-native.lua
 ```
 
 The optional formatter integration check starts a real server in a disposable
 single-project workspace, wipes its startup buffer before import completes, tests
-XML style rules and standard LSP formatting, then stops it. It requires the
+XML style rules and standard LSP formatting, restarts through `:lsp restart`, then
+disables/stops it. It requires the
 activated tool manifest and installed `nvim-jdtls`:
 
 ```sh
@@ -237,5 +246,5 @@ resolution, or equivalence to Eclipse's active target. Keep large-workspace
 validation separate; a heap limit alone is not a stability guarantee.
 
 After changing the Nix launcher, activate Home Manager. To load changed Lua error
-handlers too, stop PDE and reopen Neovim, then open a selected Java file; `:PdeRestart` alone
+handlers too, stop PDE and reopen Neovim, then open a selected Java file; `:lsp restart` alone
 does not reload an already-loaded Lua module.

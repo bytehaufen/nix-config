@@ -100,9 +100,21 @@ local ok, failure = xpcall(function()
 	if not vim.env.PDE_TEST_FORMATTER then
 		assert(result:find("sum(int a, int b)\n\t{", 1, true), "XML brace rule was ignored: " .. result)
 	end
-	print("PASS: real PDE formatter loads XML, applies profile rules, and uses tabs/4 and width 140")
+	local previous_id = client.id
+	vim.cmd("lsp restart jdtls")
+	assert(
+		vim.wait(60000, function()
+			client = vim.lsp.get_clients({ name = "jdtls" })[1]
+			return client and client.id ~= previous_id and client.config._pde.ready
+		end, 100),
+		"Native restart must release the workspace lock and initialize a replacement"
+	)
+	local formatted_again =
+		client:request_sync("textDocument/formatting", vim.lsp.util.make_formatting_params(), 20000, 0)
+	assert(formatted_again and not formatted_again.err, vim.inspect(formatted_again))
+	print("PASS: real PDE XML formatter, wiped startup buffer, native restart and workspace-lock reuse")
 end, debug.traceback)
-pde.stop()
+vim.cmd("lsp disable jdtls")
 if
 	not vim.wait(15000, function()
 		return #vim.lsp.get_clients({ name = "jdtls", _uninitialized = true }) == 0
