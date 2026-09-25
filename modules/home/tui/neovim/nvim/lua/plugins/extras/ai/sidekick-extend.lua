@@ -29,6 +29,15 @@ return {
       nes = {
         enabled = false,
       },
+      cli = {
+        tools = {
+          pi = {
+            cmd = { "omp" },
+            is_proc = "\\<omp\\>",
+            url = "https://github.com/can1357/oh-my-pi",
+          },
+        },
+      },
     },
   },
 }
