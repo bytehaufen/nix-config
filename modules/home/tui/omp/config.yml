@@ -46,5 +46,5 @@ bash:
 astGrep:
   enabled: true
 plan:
-  defaultOnStartup: true
+  defaultOnStartup: false
 disabledExtensions: []

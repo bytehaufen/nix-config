@@ -10,6 +10,8 @@
     || config.opts.home.programs.ollama-vulkan.enable
     || config.opts.home.programs.ollama-cuda.enable;
 
+  ompEnabled = config.opts.home.programs.omp.enable;
+
   llma-pkgs = inputs.llm-agents.packages.${pkgs.system};
 in {
   config = with pkgs; {
@@ -41,7 +43,7 @@ in {
         llma-pkgs.codex-acp
         llma-pkgs.codex
       ]
-      ++ lib.optionals config.opts.home.programs.omp.enable [
+      ++ lib.optionals ompEnabled [
         llma-pkgs.omp
       ];
 
@@ -54,14 +56,18 @@ in {
       };
     };
 
-    home.file.".omp/agent/config.yml" = lib.mkIf config.opts.home.programs.omp.enable {
+    home.file.".omp/agent/config.yml" = lib.mkIf ompEnabled {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/modules/home/tui/omp/config.yml";
     };
 
-    programs.zsh.shellAliases = lib.mkIf ollamaEnabled {
-      ollama-64k = "OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_CONTEXT_LENGTH=65536 ollama serve";
-      ollama-128k = "OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_CONTEXT_LENGTH=131072 ollama serve";
-      ollama-256k = "OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_CONTEXT_LENGTH=262144 ollama serve";
-    };
+    programs.zsh.shellAliases =
+      lib.optionalAttrs ollamaEnabled {
+        ollama-64k = "OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_CONTEXT_LENGTH=65536 ollama serve";
+        ollama-128k = "OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_CONTEXT_LENGTH=131072 ollama serve";
+        ollama-256k = "OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_CONTEXT_LENGTH=262144 ollama serve";
+      }
+      // lib.optionalAttrs ompEnabled {
+        omps = "omp -p --model '@smol'";
+      };
   };
 }
