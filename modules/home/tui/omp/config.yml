@@ -1,9 +1,9 @@
 modelRoles:
-  default: openai-codex/gpt-6-sol:high
+  default: openai-codex/gpt-6-astra:medium
   plan: openai-codex/gpt-6-astra:high
   task: openai-codex/gpt-6-sol:medium
   smol: openai-codex/gpt-6-luna:medium
-  slow: openai-codex/gpt-6-astra:high
+  slow: openai-codex/gpt-6-astra:xhigh
   commit: openai-codex/gpt-5.6-luna:low
   tiny: openai-codex/gpt-5.6-luna:low
   vision: openai-codex/gpt-6-sol:medium
@@ -48,3 +48,7 @@ astGrep:
 plan:
   defaultOnStartup: false
 disabledExtensions: []
+cycleOrder:
+  - smol
+  - default
+  - slow
