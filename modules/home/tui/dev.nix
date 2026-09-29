@@ -43,6 +43,14 @@
         DIRENV_LOG_FORMAT = "";
       };
 
+      sessionPath = [
+        "${config.home.homeDirectory}/.npm-global/bin"
+      ];
+
+      file.".npmrc".text = ''
+        prefix=${config.home.homeDirectory}/.npm-global
+      '';
+
       packages = with pkgs; [
         # General
         just # Make like command runner
