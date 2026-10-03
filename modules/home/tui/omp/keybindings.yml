@@ -1,0 +1,9 @@
+tui.editor.cursorUp: [up, ctrl+p]
+tui.editor.cursorDown: [down, ctrl+n]
+
+tui.select.up: [up, ctrl+p]
+tui.select.down: [down, ctrl+n]
+
+# Disable existing
+app.model.cycleForward: [alt+n]
+app.session.togglePath: []

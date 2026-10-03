@@ -56,8 +56,15 @@ in {
       };
     };
 
-    home.file.".omp/agent/config.yml" = lib.mkIf ompEnabled {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/modules/home/tui/omp/config.yml";
+    home.file = let
+      ompDirectory = "${config.home.homeDirectory}/nix-config/modules/home/tui/omp";
+    in {
+      ".omp/agent/config.yml" = lib.mkIf ompEnabled {
+        source = config.lib.file.mkOutOfStoreSymlink "${ompDirectory}/config.yml";
+      };
+      ".omp/agent/keybindings.yml" = lib.mkIf ompEnabled {
+        source = config.lib.file.mkOutOfStoreSymlink "${ompDirectory}/keybindings.yml";
+      };
     };
 
     programs.zsh.shellAliases =
