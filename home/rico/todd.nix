@@ -84,6 +84,7 @@
       nchat.enable = true;
       obs.enable = false;
       teams.enable = true;
+      translator.enable = true;
     };
 
     services = {

@@ -4,6 +4,10 @@
   ...
 }: {
   config = lib.mkIf config.opts.home.tui.enable {
+    home.sessionSearchVariables.XDG_DATA_DIRS = [
+      "${config.home.profileDirectory}/share"
+    ];
+
     xdg = {
       enable = true;
       cacheHome = config.home.homeDirectory + "/.local/cache";

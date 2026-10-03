@@ -16,6 +16,7 @@
     ./ssh.nix
     ./starship.nix
     ./tmux.nix
+    ./translator.nix
     ./xdg.nix
     ./yazi
     ./zellij
