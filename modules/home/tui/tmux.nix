@@ -13,7 +13,7 @@
       clock24 = true;
       customPaneNavigationAndResize = false; # That is the default
 
-      escapeTime = 1;
+      escapeTime = 50;
 
       historyLimit = 10000;
       keyMode = "vi";
@@ -52,21 +52,14 @@
 
 
         # Update files on focus (using for vim)
-        set -g focus-events on
-
-        set -g default-terminal "tmux-256color"
+        set -s focus-events on
 
         # 256 colors support
-        set-option -sa terminal-features ',xterm-kitty:RGB'
+        set -as terminal-features ',xterm-kitty:RGB:extkeys:sync:hyperlinks'
 
         # Set titles
         set-option -g set-titles on
         set-option -g set-titles-string '[#S:#I #T] #W'
-
-        # Termux specific
-        set-option -g focus-events on
-
-        set-option -g status "on"
 
         ######################
         # Keys configuration #
@@ -128,8 +121,8 @@
         set -g bell-action any
         set -g visual-bell off
 
-        # Highlight alerted windows in the current session
-        setw -g window-status-bell-style "bold,fg=#e0af68,bg=#16161e"
+        set -s extended-keys on
+        set -s extended-keys-format csi-u
 
         ##############################
         # TokyoNight colors for Tmux #
