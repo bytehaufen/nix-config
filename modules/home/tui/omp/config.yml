@@ -52,3 +52,6 @@ cycleOrder:
   - smol
   - default
   - slow
+autolearn:
+  enabled: true
+  autoContinue: true
