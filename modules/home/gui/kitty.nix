@@ -16,6 +16,9 @@
         "ctrl+shift+minus" = "change_font_size all -1.0";
         "ctrl+shift+0" = "change_font_size all 0";
         "ctrl+shift+u" = "kitten unicode_input";
+
+        # Preserve Shift+Enter through tmux
+        "shift+enter" = "send_text normal,application \\e[13;2u";
       };
 
       font = {
