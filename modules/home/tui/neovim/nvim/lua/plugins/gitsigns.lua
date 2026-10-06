@@ -6,6 +6,8 @@ return {
 
     -- Let mini.diff handle visualization
     opts = function(_, opts)
+      opts.current_line_blame = true
+
       local original_on_attach = opts.on_attach
 
       opts.on_attach = function(bufnr)
@@ -30,5 +32,15 @@ return {
         })
       end
     end,
+
+    keys = {
+      {
+        "<leader>uB",
+        function()
+          require("gitsigns").toggle_current_line_blame()
+        end,
+        desc = "Toggle Inline Git Blame",
+      },
+    },
   },
 }
