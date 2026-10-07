@@ -13,11 +13,12 @@ vim.g.lazyvim_rust_diagnostics = "bacon-ls"
 -- Remove the default `~` char for end of buffer
 vim.opt.fillchars = "eob: "
 
--- Root markers, first lsp, then file/directory patterns
+-- Prefer the Git checkout for navigation, even when an LSP owns a nested project.
+-- Separate detectors express priority; a marker group finds the nearest match.
 vim.g.root_spec = {
+  ".git",
   "lsp",
   {
-    ".git",
     ".lazy.lua",
     ".project", -- Eclipse project file
     ".svn",

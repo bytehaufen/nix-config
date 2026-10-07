@@ -123,6 +123,20 @@ alone does not apply formatter changes. When first installing this Lua change,
 stop PDE and reopen Neovim; opening a selected Java file starts PDE. Buffer indentation remains set after
 stopping PDE; reopen affected buffers if removing the formatter configuration.
 
+## Editor root versus Java workspace
+
+LazyVim navigation and root-based file/search pickers prefer the nearest Git
+checkout, ahead of LSP roots and nested `.project`/build markers. This policy
+applies to all filetypes, including before a language server attaches or while
+it is disabled. Git worktrees/submodules with a `.git` file are also boundaries.
+Outside Git, the existing LSP, project-marker, and current-directory fallbacks remain.
+Use `:LazyRoot` to inspect the detected roots; this does not automatically change
+Neovim's `:pwd`.
+
+The editor root does not expand Java's import scope: PDE still uses the directory
+containing `javaConfig.json` and imports only its selected projects. Restart
+Neovim after changing the root policy; no Home Manager rebuild is needed.
+
 ## Commands
 
 Opening a Java file in a listed project starts PDE automatically. One server is
@@ -227,6 +241,14 @@ NVIM_LOG_FILE=/tmp/nvim-pde-tests.log nvim --headless -u NONE -l modules/home/tu
 These checks never start Java. Test bundle compatibility
 in a disposable PDE workspace before using a new server/bundle version. Ask the
 repository owner before starting a language server against their real checkout.
+
+With LazyVim and lazy.nvim installed, verify editor-root precedence over nested
+project markers and LSP roots, Git-file boundaries, and non-Git fallbacks without
+starting Java:
+
+```sh
+nvim --headless -u NONE -l modules/home/tui/neovim/tests/root.lua
+```
 
 With the pinned `nvim-jdtls` installed, run the real Neovim clients and native
 commands against an in-process transport. This covers enable/disable/stop/restart,
