@@ -4,10 +4,6 @@
   ...
 }: {
   config = lib.mkIf config.opts.home.tui.enable {
-    home.sessionSearchVariables.XDG_DATA_DIRS = [
-      "${config.home.profileDirectory}/share"
-    ];
-
     xdg = {
       enable = true;
       cacheHome = config.home.homeDirectory + "/.local/cache";
@@ -65,8 +61,10 @@
         "/usr/local/share"
         "/usr/share"
         "${config.home.homeDirectory}/.local/share"
-        "${config.home.homeDirectory}/.nix-profile/share/applications"
-        "${config.home.homeDirectory}/.nix-profile/share/"
+        # "${config.home.homeDirectory}/.nix-profile/share/applications"
+        # "${config.home.homeDirectory}/.nix-profile/share/"
+        "${config.home.profileDirectory}/share"
+        "${config.home.profileDirectory}/share/applications"
       ];
     };
   };

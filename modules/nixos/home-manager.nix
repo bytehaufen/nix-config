@@ -12,7 +12,7 @@
   config = lib.mkIf config.opts.nixos.home-manager.enable {
     home-manager = {
       useGlobalPkgs = true;
-      useUserPackages = true;
+      useUserPackages = false;
     };
   };
 }
