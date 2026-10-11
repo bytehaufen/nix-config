@@ -7,7 +7,7 @@
   translatorEnabled = config.opts.home.programs.translator.enable;
 in {
   config = lib.mkIf translatorEnabled {
-    home.packages = with pkgs; [
+    home.packages = with pkgs.stable; [
       translatelocally
 
       translatelocally-models.de-en-base
