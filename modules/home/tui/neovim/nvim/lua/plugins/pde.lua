@@ -2,6 +2,7 @@ return {
   {
     "mfussenegger/nvim-jdtls",
     commit = "6e9d953f0b82bccdb834cfde0e893f3119c22592",
+    dependencies = { "mfussenegger/nvim-dap" },
     lazy = false,
     config = function()
       require("config.pde").setup()

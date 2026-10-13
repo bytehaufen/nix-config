@@ -170,6 +170,9 @@ function M.build_config(workspace, tools)
     :sub(1, 16)
   local runtime = state .. "/config-" .. runtime_key
   local runtimes = { { name = "JavaSE-25", path = tools.javaHome, default = true } }
+  if tools.java21Home then
+    runtimes[#runtimes + 1] = { name = "JavaSE-21", path = tools.java21Home }
+  end
   if vim.env.PDE_JAVA_23_HOME and vim.env.PDE_JAVA_23_HOME ~= "" then
     runtimes[#runtimes + 1] = { name = "JavaSE-23", path = vim.env.PDE_JAVA_23_HOME }
   end
@@ -407,7 +410,220 @@ function M.reload_target(path)
   assert(sent, "Could not send PDE target reload request")
 end
 
+local function quote_arguments(arguments)
+  assert(type(arguments) == "table" and vim.islist(arguments), "PDE resolver returned invalid arguments")
+  local quoted = {}
+  for _, argument in ipairs(arguments) do
+    assert(type(argument) == "string", "PDE resolver returned a non-string argument")
+    quoted[#quoted + 1] = '"' .. argument:gsub("\\", "\\\\"):gsub('"', '\\"') .. '"'
+  end
+  return table.concat(quoted, " ")
+end
+
+function M.launch_product(path, no_debug)
+  if not path or path == "" then
+    local buffer_path = vim.api.nvim_buf_get_name(0)
+    if buffer_path:match("%.launch$") then
+      path = buffer_path
+    else
+      local root = M.root()
+      vim.ui.input(
+        { prompt = "PDE launch file: ", default = root .. "/", completion = "file" },
+        guarded(function(input)
+          if input and input ~= "" then
+            M.launch_product(input:sub(1, 1) == "/" and input or root .. "/" .. input, no_debug)
+          end
+        end)
+      )
+      return
+    end
+  end
+  local root = path:sub(1, 1) == "/" and M.root(path) or M.root()
+  path = canonical(path:sub(1, 1) == "/" and path or root .. "/" .. path)
+  assert(path:match("%.launch$") and vim.fn.filereadable(path) == 1, "Readable .launch file required: " .. path)
+  assert(inside(path, root), "Launch must be inside its PDE checkout: " .. root)
+  local client
+  for _, candidate in ipairs(vim.lsp.get_clients({ name = "jdtls", _uninitialized = true })) do
+    if candidate.config.root_dir == root and candidate.config._pde and not candidate:is_stopped() then
+      client = candidate
+      break
+    end
+  end
+  assert(client, "Open a selected Java file in this checkout to start PDE before launching")
+  local state = client.config._pde
+  assert(state.ready, "Wait for PDE import to finish before launching; inspect :JdtShowLogs")
+  local function attached_java()
+    for buf in pairs(client.attached_buffers) do
+      if vim.api.nvim_buf_is_valid(buf) and selected(buf, state.workspace) then
+        return buf
+      end
+    end
+  end
+  assert(attached_java(), "Open a selected Java file and keep it loaded before launching")
+  local commands = (client.server_capabilities.executeCommandProvider or {}).commands or {}
+  for _, command in ipairs({ "java.pde.resolveLaunchArguments", "vscode.java.startDebugSession" }) do
+    assert(
+      vim.tbl_contains(commands, command),
+      "Missing " .. command .. "; activate updated Home Manager tools, reopen Neovim, and inspect :JdtShowLogs"
+    )
+  end
+  local dap = require("dap")
+  assert(not state.launching, "A PDE launch is already pending; wait for it to finish")
+  assert(not next(dap.sessions()), "A DAP session is active; use :DapTerminate first")
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    local name = vim.api.nvim_buf_get_name(buf)
+    assert(
+      not (vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].modified and name ~= "" and inside(canonical(name), root)),
+      "Save modified checkout buffers before launching: " .. name
+    )
+  end
+  state.launching = true
+  local function finish(error)
+    state.launching = false
+    if error then
+      notify(tostring(error), vim.log.levels.ERROR)
+    end
+  end
+  local function continuation(fn)
+    return function(...)
+      local ok, error = pcall(function(...)
+        assert(
+          vim.lsp.get_client_by_id(client.id) == client
+            and client.config._pde == state
+            and not client:is_stopped()
+            and state.ready
+            and vim.lsp.is_enabled("jdtls"),
+          "PDE launch cancelled: server restarted or disabled; open a selected Java file and wait for import"
+        )
+        local buf = attached_java()
+        assert(buf, "PDE launch cancelled: keep a selected Java buffer loaded and attached")
+        fn(buf, ...)
+      end, ...)
+      if not ok then
+        finish(error)
+      end
+    end
+  end
+  continuation(function()
+    local tools = read_json((vim.env.XDG_CONFIG_HOME or (vim.env.HOME .. "/.config")) .. "/nvim-pde/tools.json")
+    local python = tools.python or vim.fn.exepath("python3")
+    assert(vim.fn.executable(python) == 1, "Missing Python XML reader; activate Home Manager")
+    local helper = vim.api.nvim_get_runtime_file("lua/config/pde-launch.py", false)[1]
+    assert(helper, "Missing PDE launch helper; update the Neovim configuration")
+    vim.system(
+      { python, helper },
+      {
+        text = true,
+        stdin = vim.json.encode({
+          source = path,
+          directory = state.state .. "/launch/" .. vim.fn.sha256(path):sub(1, 16),
+          workspace = state.state .. "/workspace",
+          projects = state.workspace.projects,
+          runtimes = client.config.settings.java.configuration.runtimes,
+        }),
+      },
+      vim.schedule_wrap(continuation(function(buf, result)
+        assert(result.code == 0, "Cannot prepare PDE launch: " .. (result.stderr or "XML helper failed"))
+        local prepared = vim.json.decode(result.stdout)
+        assert(
+          type(prepared) == "table" and prepared.launch and prepared.javaExec and prepared.projectName,
+          "PDE launch helper returned incomplete metadata"
+        )
+        local sent = client:request(
+          "java/buildWorkspace",
+          false,
+          continuation(function(build_buf, err, status)
+            assert(not err, "PDE build failed; inspect :JdtShowLogs: " .. (err and err.message or ""))
+            local statuses = { [0] = "failed", [2] = "contains errors", [3] = "cancelled" }
+            assert(
+              status == 1,
+              "PDE build "
+                .. (statuses[status] or "returned an invalid result")
+                .. "; fix errors before launching (:JdtShowLogs)"
+            )
+            local resolved_sent = client:request(
+              "workspace/executeCommand",
+              {
+                command = "java.pde.resolveLaunchArguments",
+                arguments = { vim.uri_from_fname(prepared.launch) },
+              },
+              continuation(function(_, resolve_err, resolved)
+                assert(
+                  not resolve_err,
+                  "PDE launch resolution failed; inspect :JdtShowLogs: " .. (resolve_err and resolve_err.message or "")
+                )
+                assert(
+                  type(resolved) == "table"
+                    and type(resolved.classpath) == "table"
+                    and vim.islist(resolved.classpath)
+                    and #resolved.classpath > 0,
+                  "PDE resolver returned no launch classpath; inspect :JdtShowLogs and selected features/bundles"
+                )
+                assert(not next(dap.sessions()), "A DAP session is active; use :DapTerminate first")
+                assert(
+                  dap.adapters.java,
+                  "Java DAP adapter unavailable; reopen a selected Java file with updated tools"
+                )
+                local config = {
+                  type = "java",
+                  request = "launch",
+                  name = "PDE: " .. vim.fs.basename(path),
+                  mainClass = "org.eclipse.equinox.launcher.Main",
+                  projectName = prepared.projectName,
+                  javaExec = prepared.javaExec,
+                  cwd = client.config.root_dir,
+                  modulePaths = {},
+                  classPaths = resolved.classpath,
+                  args = quote_arguments(resolved.programArguments),
+                  vmArgs = quote_arguments(resolved.vmArguments),
+                  noDebug = no_debug,
+                  console = "integratedTerminal",
+                }
+                if resolved.environment ~= nil and resolved.environment ~= vim.NIL then
+                  config.env = resolved.environment
+                end
+                -- Java Debug 0.53.2 disposes the integrated-terminal VM before
+                -- attempting VM.exit, so disconnect alone leaves its process alive.
+                dap.listeners.after.disconnect["pde-product"] = function(session, _, _, request)
+                  if
+                    request.terminateDebuggee
+                    and session.config.cwd == config.cwd
+                    and session.config.name == config.name
+                    and session.config.mainClass == config.mainClass
+                    and session.term_buf
+                    and vim.api.nvim_buf_is_valid(session.term_buf)
+                  then
+                    local job = vim.b[session.term_buf].terminal_job_id
+                    if job and vim.fn.jobwait({ job }, 0)[1] == -1 then
+                      vim.fn.jobstop(job)
+                    end
+                  end
+                end
+                dap.run(config)
+                finish()
+              end),
+              build_buf
+            )
+            assert(resolved_sent, "Could not send PDE launch resolution request; inspect :JdtShowLogs")
+          end),
+          buf
+        )
+        assert(sent, "Could not send PDE build request; inspect :JdtShowLogs")
+      end))
+    )
+  end)()
+end
+
 function M.setup()
+  for command, no_debug in pairs({ PdeRun = true, PdeDebug = false }) do
+    vim.api.nvim_create_user_command(
+      command,
+      guarded(function(args)
+        M.launch_product(args.args, no_debug)
+      end),
+      { nargs = "?", complete = "file", desc = "Build and " .. (no_debug and "run" or "debug") .. " a PDE product" }
+    )
+  end
   vim.api.nvim_create_user_command(
     "PdeReloadTarget",
     guarded(function(args)
