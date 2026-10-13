@@ -39,6 +39,7 @@ in {
     xdg.configFile."nvim-pde/tools.json".text = builtins.toJSON {
       jdtls = lib.getExe pdeLauncher;
       javaHome = "${pkgs.jdk25}/lib/openjdk";
+      java21Home = "${pkgs.jdk21}/lib/openjdk";
       flock = "${pkgs.util-linux}/bin/flock";
       bundles = "${pdeBundles}/share/java/pde/bundles.json";
       python = "${pkgs.python3}/bin/python3";

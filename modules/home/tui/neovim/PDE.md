@@ -1,9 +1,11 @@
 # Java / Eclipse PDE
 
-This configuration uses `nvim-jdtls`, Nix-managed JDT LS on JDK 25, and the
-Java bundles from [vscode-pde](https://github.com/testforstephen/vscode-pde).
-It does not require VS Code. Activate the Home Manager configuration and let
-Lazy install `nvim-jdtls` before using the commands.
+This configuration uses `nvim-jdtls`, Nix-managed JDT LS on JDK 25, the
+Java bundles from [vscode-pde](https://github.com/testforstephen/vscode-pde),
+and Nix-packaged Microsoft Java Debug. It does not require VS Code or a
+Mason Java adapter. Activate the Home Manager configuration and reopen
+Neovim so the updated tools manifest supplies the debug bundle and Java 21.
+Lazy installs `nvim-jdtls` with the existing `nvim-dap` debugger UI.
 
 ## Select a small workspace
 
@@ -73,6 +75,10 @@ restore the previous `targetPlatform` value and restart/reload; no cache deletio
 is needed. The repository's shared target and Eclipse's active target are unchanged.
 
 ### Project Java runtime
+
+Nix supplies JavaSE-21 for projects/product launches and JavaSE-25 as the default.
+The language server itself still runs on JDK 25. Runtime overrides below replace
+entries by their exact execution-environment name; no aliases are added.
 
 Projects requiring Java 23 need their actual runtime configured separately from
 the server's JDK. Set `PDE_JAVA_23_HOME` to the installed JDK/JRE home (the directory
@@ -150,6 +156,9 @@ Java files outside a configured checkout, or in unlisted projects, do not start 
 | `:lsp enable jdtls`       | Enable automatic startup, including for already-open selected Java buffers    |
 | `:lsp stop jdtls`         | Stop current Java clients without disabling automatic startup                 |
 | `:PdeReloadTarget [path]` | Reload the configured target, or another `.target` file                       |
+| `:PdeRun [path]`          | Incrementally build and run an existing PDE `.launch` without breakpoints     |
+| `:PdeDebug [path]`        | Incrementally build and debug an existing PDE `.launch`                       |
+| `:DapTerminate`           | Terminate the active debug session and its product process                    |
 | `:JdtShowLogs`            | Open the current PDE workspace log and Neovim's LSP log                       |
 
 These are Neovim's native `:lsp` commands, not custom lifecycle wrappers. Naming
@@ -181,6 +190,65 @@ Use the existing LSP mappings for completion, hover, definitions, references, an
 code actions. `<leader>co` organizes imports; `<leader>cxv` and `<leader>cxc`
 extract a variable or constant. Automatic formatting and organize-imports on save
 are disabled for attached Java buffers.
+
+## Run/debug an Eclipse product
+
+Open a selected Java file and wait for PDE import to finish. Keep that Java
+buffer loaded, save **all modified buffers in the checkout**, then run:
+
+```vim
+:PdeDebug com.coside.product/coside.product.launch
+:PdeRun com.coside.product/coside.product.launch
+```
+
+Only `org.eclipse.pde.ui.RuntimeWorkbench` launches are supported. With no path,
+the commands use the current `.launch` buffer or prompt for a filename. Paths
+with spaces are one filename; relative paths resolve against the current PDE
+checkout, not `:pwd`. An absolute path selects its own checkout's already-running
+PDE client. Neither command starts a server or attaches Java tooling to XML.
+
+Each launch explicitly performs an incremental JDT LS workspace build before
+asking PDE to resolve the existing application/product, bundle/feature selection,
+start levels, and VM/program arguments. A failed/cancelled build or incomplete
+resolution aborts; stale binaries are never a fallback. Background autobuild
+remains disabled. Xtend/EMF generation, custom builders, native libraries, and a
+resolvable target remain prerequisites supplied by Eclipse/build tooling.
+Include required feature/product projects in `javaConfig.json` when the launch
+selects workspace features; these commands never expand the selection for you.
+
+The launch's JRE container selects an exact configured runtime, such as JavaSE-21.
+An absent container uses the effective default runtime. Unknown JREs or missing
+executables abort with runtime-configuration guidance, never switch silently to
+the server JDK. Compiler settings remain authoritative: compiling for Java 25
+does not make those classes runnable on a JavaSE-21 launch.
+
+The original `.launch` is never rewritten. A copy under
+`<PDE state>/launch/<original-path-hash>/` uses its own `workspace/` and
+`configuration/` directories, with clearing disabled. PDE writes `config.ini`
+and `dev.properties` there; repeated launches retain this runtime state. The
+launch cannot reuse or clear Eclipse's existing product workspace through these
+commands. Same-named files in different directories have separate runtime state.
+
+For the pinned PDE resolver's environment-substitution defect, the XML helper
+expands only `${workspace_loc}`, `${workspace_loc:/Project/relative/path}` (actual
+selected Eclipse project names, including nested projects), and `${env_var:NAME}`.
+Missing projects/variables, other unresolved environment expressions, and
+`appendEnvironmentVariables=false` are errors. VM/program substitution remains
+PDE's responsibility. Python is Nix-managed, with the existing `python3` fallback.
+
+Use the existing debugger controls: F9 toggles a breakpoint, F6 steps over,
+F5 steps into, F7 steps out, F8 continues, `<leader>de` evaluates, and
+`<leader>du` toggles DAP View. Output uses the integrated terminal.
+Only one pending launch per client and no concurrent DAP session are allowed.
+Use `:DapTerminate` before another debug launch; do not use `dap.close()` to
+stop a product. Java Debug 0.53.2 disconnects an integrated-terminal VM before
+terminating it, so a scoped DAP disconnect hook also stops that terminal job.
+Revisit this workaround when upgrading Java Debug.
+
+For `PdeRun`, the pinned adapter releases its DAP session immediately after
+starting the no-debug process, not when the process exits. Its terminal buffer
+continues to hold output; interrupt a long-running no-debug app in that terminal.
+Use `PdeDebug` when debugger-controlled process termination is required.
 
 ## Large repositories
 
@@ -226,9 +294,9 @@ workaround for JDK 24+. The patch preserves the upstream JVM options; it does no
 change XML limits in other applications. Its install-time regression test verifies
 argument forwarding without starting Java. Revisit this patch when upgrading JDT LS.
 
-Keep Eclipse for builds, JUnit/PDE tests, product launches, Xtend/EMF generation,
-and graphical editors. Debug/test adapters and automatic project selection are
-intentionally deferred.
+Keep Eclipse/build tooling for generated sources, unsupported custom builds,
+JUnit/PDE tests, and graphical editors. Product run/debug uses the existing
+launch configuration; test adapters and automatic project selection remain deferred.
 
 ## Validation
 
