@@ -6,18 +6,17 @@ return {
     opts = {
       foldKeymaps = {
         setup = true,
-        hOnlyOpensOnFirstColumn = true,
+        closeOnlyOnFirstColumn = true,
       },
       autoFold = {
         enabled = true,
         kinds = { "imports" }, ---@type lsp.FoldingRangeKind[]
       },
     },
-  },
-  {
-    "kevinhwang91/nvim-ufo",
-    dependencies = {
-      { "kevinhwang91/promise-async" },
-    },
+    -- Disable vim's auto-folding
+    init = function()
+      vim.opt.foldlevel = 99
+      vim.opt.foldlevelstart = 99
+    end,
   },
 }
