@@ -8,6 +8,21 @@
     programs.tmux = {
       enable = true;
 
+      # Fix cursor artifacts during synchronized redraws:
+      # https://github.com/tmux/tmux/issues/5619
+      # Use the regular package once nixpkgs provides tmux >= 3.8.
+      package =
+        if lib.versionOlder pkgs.tmux.version "3.8"
+        then
+          pkgs.tmux.overrideAttrs (_: {
+            version = "3.8";
+            src = pkgs.fetchurl {
+              url = "https://github.com/tmux/tmux/releases/download/3.8/tmux-3.8.tar.gz";
+              hash = "sha256-55xpnH6UnczQpKEl4XuNEmHjEbFpedvI6zRULzlm2C4=";
+            };
+          })
+        else pkgs.tmux;
+
       aggressiveResize = true;
       baseIndex = 1;
       clock24 = true;
