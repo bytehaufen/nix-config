@@ -10,6 +10,9 @@ return {
         layout = { preset = "ivy", preview = "right" },
         win = { preview = { enabled = true, wrap = true, width = 0.5 } },
       }
+
+      opts.image = opts.image or {}
+      opts.image.enabled = true
     end,
   },
 }

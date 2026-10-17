@@ -8,6 +8,58 @@ return {
   {
     "OXY2DEV/markview.nvim",
     lazy = false,
+
+    config = function(_, opts)
+      local doc = require("snacks.image.doc")
+      local inline = require("snacks.image.inline")
+      local renderers = setmetatable({}, { __mode = "v" })
+
+      local function paused(buf)
+        return not vim.api.nvim_buf_is_valid(buf) or vim.b[buf].markdown_images_disabled == true
+      end
+
+      -- Block new images, including pending asynchronous results.
+      local find = doc.find
+      doc.find = function(buf, callback, find_opts)
+        if paused(buf) then
+          return callback({})
+        end
+        return find(buf, function(images)
+          if vim.api.nvim_buf_is_valid(buf) then
+            callback(paused(buf) and {} or images)
+          end
+        end, find_opts)
+      end
+
+      -- Clear images and pause updates while Markview is disabled.
+      local update = inline.update
+      inline.update = function(self)
+        renderers[self.buf] = self
+        if paused(self.buf) then
+          for _, img in pairs(self.imgs) do
+            img:close()
+          end
+          self.imgs, self.idx = {}, {}
+          return
+        end
+        return update(self)
+      end
+
+      vim.api.nvim_create_autocmd("User", {
+        group = vim.api.nvim_create_augroup("MarkdownImages", { clear = true }),
+        pattern = { "MarkviewEnable", "MarkviewDisable" },
+        callback = function(event)
+          local buf = event.data.buffer
+          vim.b[buf].markdown_images_disabled = event.match == "MarkviewDisable"
+          if renderers[buf] then
+            renderers[buf]:update()
+          end
+        end,
+      })
+
+      require("markview").setup(opts)
+    end,
+
     keys = {
       {
         "<leader>um",
@@ -16,6 +68,7 @@ return {
         desc = "Toggle Markview",
       },
     },
+    opts = { latex = { enable = false } },
   },
 
   {
