@@ -674,11 +674,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1792301045,
-        "narHash": "sha256-RPf7xUK2t0yFAlYzGBj/7uiigM8t0OJv3UQQO9Ykmz0=",
+        "lastModified": 1792587474,
+        "narHash": "sha256-6zPomi6Y2rFRlpf26v3UgxBH8aT4z8BmkcJ1lTh7cVI=",
         "owner": "bytehaufen",
         "repo": "workaholick",
-        "rev": "218527a51b149e9d79780d04b3b23c2d863c27ae",
+        "rev": "296bfe08cb0b7e038bd949bb8f9225858bbfd339",
         "type": "github"
       },
       "original": {
