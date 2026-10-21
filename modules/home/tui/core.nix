@@ -42,9 +42,6 @@
     };
 
     home.packages = with pkgs; [
-      # Work time tracking
-      workaholick
-
       # Archives
       unrar
       unzip

@@ -1,0 +1,20 @@
+store_path = "~/Sync/workaholick/data.jsonl"
+
+[schedule]
+mon_minutes = 480
+tue_minutes = 480
+wed_minutes = 480
+thu_minutes = 480
+fri_minutes = 480
+sat_minutes = 0
+sun_minutes = 0
+
+[cli]
+formatter = "markdown"
+
+[rounding]
+interval_minutes = 5
+start = "ceil"
+break_start = "floor"
+break_end = "ceil"
+end = "floor"

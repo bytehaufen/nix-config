@@ -17,6 +17,7 @@
     ./starship.nix
     ./tmux.nix
     ./translator.nix
+    ./workaholick
     ./xdg.nix
     ./yazi
     ./zellij
