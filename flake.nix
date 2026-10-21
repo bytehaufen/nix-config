@@ -43,8 +43,7 @@
     };
 
     workaholick = {
-      # FIXME: Use non SSH after release
-      url = "git+ssh://git@github.com/bytehaufen/workaholick.git";
+      url = "github:bytehaufen/workaholick";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
