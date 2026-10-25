@@ -40,6 +40,9 @@ vim.filetype.add({
 vim.opt.spelllang = { "en", "de_20" }
 vim.opt.spell = true
 
+-- Avoid recursive Rust injections caused by empty clipped ranges.
+vim.treesitter.query.set("rust", "injections", "")
+
 local options = {
   autoindent = true,
   autowrite = true,
