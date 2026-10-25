@@ -66,3 +66,7 @@ window-rule {
     match app-id="^brave-chatgpt.com__-Default$"
     open-on-workspace "m1w1"
 }
+window-rule {
+    match app-id="^Workaholick$"
+    open-on-workspace "m3w1"
+}
