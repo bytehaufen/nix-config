@@ -67,7 +67,6 @@
 
       extraConfig = ''
         environment {
-            NOCTALIA_PAM_SERVICE "noctalia"
             VK_DRIVER_FILES "/run/opengl-driver/share/vulkan/icd.d"
         }
       '';

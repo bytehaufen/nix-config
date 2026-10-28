@@ -2,11 +2,9 @@
   pkgs,
   config,
   ...
-}: let
-  package = pkgs.noctalia-shell;
-in {
+}: {
   home.packages = [
-    package
+    pkgs.noctalia
     pkgs.app2unit # Launch Desktop Entries (or arbitrary commands) as Systemd user units
   ];
 

@@ -1,0 +1,183 @@
+# Migrated for bytehaufen/nix-config from Noctalia v4.
+# Source destination: modules/home/wayland/noctalia/config/config.toml
+
+[shell]
+font_family = "DejaVu Sans"
+avatar_path = "/home/rico/Pictures/Avatars/bytehaufen.png"
+telemetry_enabled = false
+clipboard_enabled = true
+clipboard_auto_paste = "off"
+
+[shell.animation]
+enabled = true
+speed = 1.0
+
+[shell.panel]
+launcher_placement = "floating"
+launcher_position = "center"
+control_center_placement = "attached"
+wallpaper_placement = "attached"
+
+[shell.launcher]
+layout = "full"
+app_grid = false
+sort_by_usage = true
+auto_paste = "off"
+
+[theme]
+mode = "dark"
+source = "builtin"
+builtin = "Tokyo-Night"
+sync_color_scheme = true
+
+[wallpaper]
+enabled = true
+directory = "/home/rico/Pictures/Wallpapers"
+fill_mode = "crop"
+transition = ["fade", "disc", "stripes", "wipe", "honeycomb"]
+transition_duration = 1500
+
+[wallpaper.automation]
+enabled = false
+interval_seconds = 300
+order = "random"
+recursive = true
+
+[backdrop]
+enabled = false
+
+[bar.main]
+position = "top"
+background_opacity = 0.93
+radius = 12
+margin_ends = 4
+margin_edge = 4
+padding = 2
+widget_spacing = 6
+capsule = true
+start = [
+  "launcher",
+  "clock",
+  "cpu",
+  "cpu-temp",
+  "ram",
+  "active_window",
+  "media",
+]
+center = ["workspaces"]
+end = [
+  "tray",
+  "notifications",
+  "battery",
+  "volume",
+  "brightness",
+  "control-center",
+]
+
+[widget.launcher]
+glyph = "rocket"
+
+[widget.clock]
+format = "{:%H:%M %a, %b %d}"
+
+[widget.cpu]
+type = "sysmon"
+stat = "cpu_usage"
+
+[widget.cpu-temp]
+type = "sysmon"
+stat = "cpu_temp"
+
+[widget.ram]
+type = "sysmon"
+stat = "ram_used"
+
+[widget.active_window]
+max_length = 145
+display = "icon_and_text"
+title_scroll = "on_hover"
+
+[widget.media]
+max_length = 145
+title_scroll = "on_hover"
+artist_first = false
+
+[widget.workspaces]
+style = "regular"
+label_source = "id"
+max_label_chars = 2
+show_labels = true
+labels_only_when_occupied = true
+hide_when_empty = false
+focused_color = "primary"
+occupied_color = "secondary"
+empty_color = "secondary"
+
+[dock]
+enabled = false
+
+[desktop_widgets]
+enabled = true
+
+[notification]
+enable_daemon = true
+position = "top_right"
+background_opacity = 1.0
+layer = "overlay"
+keep_dismissed_in_history = true
+
+[osd]
+position = "top_right"
+hide_delay_ms = 2000
+background_opacity = 1.0
+
+[audio]
+enable_overdrive = false
+enable_sounds = false
+
+[brightness]
+enable_ddcutil = false
+
+[location]
+auto_locate = false
+address = "Dresden"
+
+[weather]
+enabled = true
+unit = "celsius"
+effects = true
+
+[nightlight]
+enabled = true
+force = false
+temperature_day = 6500
+temperature_night = 4000
+
+[system.monitor]
+enabled = true
+
+[control_center.calendar]
+show_week_numbers = true
+
+[idle]
+behavior_order = ["screen-off", "lock", "suspend"]
+pre_action_fade_seconds = 5.0
+
+[idle.behavior.screen-off]
+timeout = 600
+action = "screen_off"
+enabled = true
+
+[idle.behavior.lock]
+timeout = 660
+action = "lock"
+enabled = true
+
+[idle.behavior.suspend]
+timeout = 1800
+action = "lock_and_suspend"
+enabled = true
+
+[hooks]
+# Preserves v4 startup behavior: suppresses all idle actions until caffeine is disabled.
+started = "noctalia msg caffeine-enable"

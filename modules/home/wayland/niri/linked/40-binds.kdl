@@ -188,13 +188,13 @@ binds {
         spawn "nautilus"
     }
     Mod+Space {
-        spawn-sh "noctalia-shell ipc call launcher toggle"
+        spawn-sh "noctalia msg panel-toggle launcher"
     }
     XF86Search {
-        spawn-sh "noctalia-shell ipc call launcher toggle"
+        spawn-sh "noctalia msg panel-toggle launcher"
     }
     Mod+Alt+L {
-        spawn-sh "noctalia-shell ipc call lockScreen lock"
+        spawn-sh "noctalia msg session lock"
     }
     Mod+BackSpace {
         switch-layout "next"
@@ -206,38 +206,38 @@ binds {
         spawn "screenshot-area"
     }
     Mod+Shift+N {
-        spawn-sh "noctalia-shell ipc call desktopWidgets edit"
+        spawn-sh "noctalia msg desktop-widgets-edit"
     }
     // Keyboard hotkeys
     XF86AudioRaiseVolume allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call volume increase"
+        spawn-sh "noctalia msg volume-up"
     }
     XF86AudioLowerVolume allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call volume decrease"
+        spawn-sh "noctalia msg volume-down"
     }
     XF86AudioMute allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call volume muteOutput"
+        spawn-sh "noctalia msg volume-mute"
     }
     XF86AudioMicMute allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call volume muteInput"
+        spawn-sh "noctalia msg mic-mute"
     }
     XF86AudioPlay allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call media playPause"
+        spawn-sh "noctalia msg media toggle"
     }
     XF86AudioStop allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call media pause"
+        spawn-sh "noctalia msg media pause"
     }
     XF86AudioPrev allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call media previous"
+        spawn-sh "noctalia msg media previous"
     }
     XF86AudioNext allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call media next"
+        spawn-sh "noctalia msg media next"
     }
     XF86MonBrightnessUp allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call brightness increase"
+        spawn-sh "noctalia msg brightness-up"
     }
     XF86MonBrightnessDown allow-when-locked=true {
-        spawn-sh "noctalia-shell ipc call brightness decrease"
+        spawn-sh "noctalia msg brightness-down"
     }
     XF86KbdBrightnessUp allow-when-locked=true {
         spawn-sh "brightnessctl --device=kbd_backlight set 10%+"
