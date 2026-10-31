@@ -7,16 +7,7 @@
 }: let
   configPath = "${config.home.homeDirectory}/nix-config/modules/home/tui/neovim";
   pdeBundles = pkgs.callPackage ./pde-bundles.nix {};
-  pdeJdtls = (pkgs.jdt-language-server.override {jdk = pkgs.jdk25;}).overrideAttrs (old: {
-    postPatch =
-      (old.postPatch or "")
-      + ''
-        # 1.60.0 omits argv[0] on POSIX, swallowing its first XML-limit option.
-        # Fail on an upstream change so this compatibility patch gets reviewed.
-        substituteInPlace bin/jdtls.py \
-          --replace-fail 'os.execvp(java_executable, exec_args)' \
-            'os.execvp(java_executable, [java_executable] + exec_args)'
-      '';
+  pdeJdtls = pkgs.jdt-language-server.overrideAttrs (_: {
     doInstallCheck = true;
     installCheckPhase = ''
       runHook preInstallCheck
