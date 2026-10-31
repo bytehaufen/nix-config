@@ -13,6 +13,7 @@ in {
       # DBus service that provides power management support to applications
       upower = {
         enable = true;
+        percentageCritical = 10;
         criticalPowerAction = "Hibernate";
         percentageAction = hibernatePercentage;
       };
