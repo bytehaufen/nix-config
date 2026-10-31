@@ -103,8 +103,8 @@ in {
         zz = "zi";
         l = "eza --classify --group-directories-first --color=auto --color-scale --all";
         la = "eza --classify --group-directories-first --color=auto --color-scale --all";
-        ll = "eza --long --links --group --modified --classify --git --group-directories-first --color=auto --color-scale --icons";
-        lla = "eza --long --all --links --group --modified --classify --git --group-directories-first --color=auto --color-scale --icons";
+        ll = "eza --long --links --group --modified --classify --git --group-directories-first --color=auto --color-scale --icons always";
+        lla = "eza --long --all --links --group --modified --classify --git --group-directories-first --color=auto --color-scale --icons always";
         ls = "eza --classify --group-directories-first --color=auto --color-scale";
         md = "mkdir -p";
         mkdir = "mkdir -p";
