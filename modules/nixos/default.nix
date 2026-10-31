@@ -21,7 +21,6 @@
     ./quietboot.nix
     ./security.nix
     ./smb.nix
-    ./systemd-initrd.nix
     ./upower.nix
     ./wireless.nix
     ./zsh.nix
