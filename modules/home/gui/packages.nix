@@ -7,7 +7,6 @@
   config = lib.mkIf config.opts.home.gui.enable {
     home.packages = with pkgs; [
       gnome-calculator # Calculator
-      keepassxc # Password manager
       mission-center # System monitor
       nautilus # File manager
       overskride # Bluetooth / Obex client

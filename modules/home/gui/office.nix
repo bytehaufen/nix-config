@@ -15,9 +15,6 @@
 
       # PDF Viewer
       kdePackages.okular
-
-      # Note-taking apps
-      obsidian
     ];
 
     programs.zathura = {
