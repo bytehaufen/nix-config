@@ -12,7 +12,7 @@
 
   ompEnabled = config.opts.home.programs.omp.enable;
 
-  llma-pkgs = inputs.llm-agents.packages.${pkgs.system};
+  llma-pkgs = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
 in {
   config = with pkgs; {
     home.packages =
