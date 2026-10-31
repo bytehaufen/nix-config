@@ -11,6 +11,8 @@ in {
     home = {
       packages = [pkgs.figlet]; # Required by alias clock
 
+      sessionPath = [config.xdg.binHome];
+
       sessionVariables = {
         LESSHISTFILE = "${cache}/less/history";
         LESSKEY = "${conf}/less/lesskey";
