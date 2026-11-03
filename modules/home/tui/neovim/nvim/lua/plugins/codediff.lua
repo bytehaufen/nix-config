@@ -50,7 +50,7 @@ return {
     },
     opts = {
       codediff = {
-        readonly = true,
+        readonly = false,
       },
       keymaps = {
         clear_comments = false,
