@@ -10,6 +10,10 @@ in {
   imports = [./vrapper];
 
   config = lib.mkIf config.opts.home.tui.enable {
+    catppuccin = {
+      nvim.enable = false; # The native plugin is configured by LazyVim.
+    };
+
     # Make a (writable) symlink to ~/.config
     xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";
     # home.file.".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "${configPath}/nvim";

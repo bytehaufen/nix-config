@@ -20,6 +20,35 @@
     lib.concatMapStringsSep "\n"
     (name: ''include "linked/${name}"'')
     linkedFiles;
+  # Included separately so color-only border settings do not enable borders.
+  niriColors = pkgs.writeText "niri-catppuccin-mocha.kdl" ''
+    layout {
+        focus-ring {
+            active-color "#89b4fa"
+            inactive-color "#585b70"
+            urgent-color "#f38ba8"
+        }
+        border {
+            active-color "#89b4fa"
+            inactive-color "#585b70"
+            urgent-color "#f38ba8"
+        }
+        tab-indicator {
+            active-color "#89b4fa"
+            inactive-color "#585b70"
+            urgent-color "#f38ba8"
+        }
+        insert-hint {
+            color "#89b4fa80"
+        }
+    }
+    recent-windows {
+        highlight {
+            active-color "#89b4fa"
+            urgent-color "#f38ba8"
+        }
+    }
+  '';
 in {
   imports = [
     ./monitors.nix
@@ -55,6 +84,9 @@ in {
     xdg.configFile."niri/linked".source = config.lib.file.mkOutOfStoreSymlink linkedTarget;
     xdg.configFile."niri/config.kdl".text = ''
       ${linkedIncludes}
+
+      // Niri has no native Catppuccin port; these are official Mocha swatches.
+      include "${niriColors}"
 
       ${cfg.extraConfig}
     '';

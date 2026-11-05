@@ -29,9 +29,7 @@
           };
 
           delta = {
-            features = "side-by-side decorations";
             navigate = true;
-            dark = true;
           };
 
           "delta \"interactive\"" = {
@@ -97,20 +95,9 @@
       # Git **delta**
       delta = {
         enable = true;
-        options = {
-          dark = true;
-          minus-style = "syntax '#37222c'";
-          minus-non-emph-style = "syntax '#37222c'";
-          minus-emph-style = "syntax '#713137'";
-          minus-empty-line-marker-style = "syntax '#37222c'";
-          line-numbers-minus-style = "#914c54";
-          plus-style = "syntax '#20303b'";
-          plus-non-emph-style = "syntax '#20303b'";
-          plus-emph-style = "syntax '#2c5a66'";
-          plus-empty-line-marker-style = "syntax '#20303b'";
-          line-numbers-plus-style = "#449dab";
-          line-numbers-zero-style = "#3b4261";
-        };
+        enableGitIntegration = true;
+        # Keep Catppuccin and the existing side-by-side/decorations features together.
+        options.features = lib.mkForce "catppuccin-${config.catppuccin.flavor} side-by-side decorations";
       };
 
       # Github-cli
@@ -132,31 +119,12 @@
         settings = {
           gui = {
             nerdFontsVersion = "3";
-            theme = {
-              activeBorderColor = [
-                "#ff9e64"
-                "bold"
-              ];
-              inactiveBorderColor = ["#27a1b9"];
-              searchingActiveBorderColor = [
-                "#ff9e64"
-                "bold"
-              ];
-              optionsTextColor = ["#7aa2f7"];
-              selectedLineBgColor = ["#283457"];
-              cherryPickedCommitFgColor = ["#7aa2f7"];
-              cherryPickedCommitBgColor = ["#bb9af7"];
-              markedBaseCommitFgColor = ["#7aa2f7"];
-              markedBaseCommitBgColor = ["#e0af68"];
-              unstagedChangesColor = ["#db4b4b"];
-              defaultFgColor = ["#c0caf5"];
-            };
           };
           git = {
             diffRenderers = [
               {
                 colorArg = "always";
-                command = "delta --dark --paging=never -s";
+                command = "delta --paging=never -s";
               }
             ];
             parseEmoji = true;

@@ -18,6 +18,9 @@
           success_symbol = "[›](bold green)";
           error_symbol = "[›](bold red)";
         };
+        directory.style = "bold lavender";
+
+        git_branch.style = "bold mauve";
 
         git_status = {
           deleted = "✗";

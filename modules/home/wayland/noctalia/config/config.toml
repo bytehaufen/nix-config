@@ -26,9 +26,9 @@ auto_paste = "off"
 
 [theme]
 mode = "dark"
-source = "builtin"
-builtin = "Tokyo-Night"
-sync_color_scheme = true
+source = "community"
+community_palette = "Catppuccin Mocha Blue"
+sync_color_scheme = false
 
 [wallpaper]
 enabled = true

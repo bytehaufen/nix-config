@@ -14,8 +14,8 @@ composer:
   shape: band
   tokenRate: true
 theme:
-  dark: titanium
-  light: light
+  dark: dark-catppuccin
+  light: dark-catppuccin
 setupVersion: 2
 tui:
   vimMode: true

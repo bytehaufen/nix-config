@@ -10,7 +10,6 @@
       mission-center # System monitor
       nautilus # File manager
       overskride # Bluetooth / Obex client
-      imv # Image viewer
       gparted # Partition editor
 
       # Screenshot
@@ -24,5 +23,6 @@
       wl-screenrec # Screen recording utility for Wayland
       wlr-randr # Wayland screen management utility
     ];
+    programs.imv.enable = true;
   };
 }

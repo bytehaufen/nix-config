@@ -27,10 +27,8 @@
         size = 10;
       };
 
-      themeFile = "tokyo_night_night";
-
       settings = {
-        auto_reload_config = -42.0; # Negative value == disable
+        auto_reload_config = 0.1;
         scrollback_lines = 10000;
         confirm_os_window_close = 0;
         window_padding_width = 5;

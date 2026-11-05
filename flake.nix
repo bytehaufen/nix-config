@@ -6,6 +6,10 @@
       url = "github:yaxitech/ragenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    catppuccin = {
+      url = "github:catppuccin/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     disko = {
       url = "github:nix-community/disko";
@@ -29,8 +33,6 @@
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
     };
-
-    nix-colors.url = "github:misterio77/nix-colors";
 
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgsStable.url = "github:nixos/nixpkgs/nixos-26.05";

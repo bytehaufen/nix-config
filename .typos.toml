@@ -6,4 +6,4 @@ extend-exclude = ["themes/", "data/", "static-surprises/", "resources/"]
 [default]
 binary = false
 # Words to ignore
-extend-ignore-re = ["crypted", "daed", "fo", "ba", "edn", "noice"]
+extend-ignore-re = ["crypted", "daed", "fo", "ba", "edn", "noice", "@thm_[A-Za-z0-9_]+"]

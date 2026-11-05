@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   pkgs,
   ...
@@ -23,7 +22,7 @@ in {
       path="$RECORD_PATH/record_$(date +%Y-%m-%d_%H-%M-%S)"
 
       ${notify-send} -t ${notification-time} "Screen recording" "Select an area to start the recording..."
-      geometry="$(${slurp} -c '#${config.colorScheme.palette.base0F}' -w 2 -d -o || true)"
+      geometry="$(${slurp} -w 2 -d -o || true)"
 
       if [ -z "$geometry" ]; then
         ${notify-send} -t ${notification-time} "Screen recording" "Cancelled"
@@ -46,7 +45,7 @@ in {
     mkdir -p "$HOME/Pictures/Screenshots"
     cd "$HOME/Pictures/Screenshots" || exit
 
-    geometry="$(${slurp} -c '#ff3f3faf' -w 2 -d -o || true)"
+    geometry="$(${slurp} -w 2 -d -o || true)"
 
     if [ -n "$geometry" ]; then
       ${grim} -g "$geometry" -t png area.png

@@ -139,22 +139,23 @@
         set -s extended-keys on
         set -s extended-keys-format csi-u
 
-        ##############################
-        # TokyoNight colors for Tmux #
-        ##############################
+        ################################
+        # Static Catppuccin palette #
+        ################################
 
-        set -g mode-style "fg=#7aa2f7,bg=#3b4261"
+        # Keep the custom status layout, bell alerts, and clock formats.
+        set -g mode-style "fg=#{@thm_blue},bg=#{@thm_surface_0}"
 
-        set -g message-style "fg=#7aa2f7,bg=#3b4261"
-        set -g message-command-style "fg=#7aa2f7,bg=#3b4261"
+        set -g message-style "fg=#{@thm_blue},bg=#{@thm_surface_0}"
+        set -g message-command-style "fg=#{@thm_blue},bg=#{@thm_surface_0}"
 
-        set -g pane-border-style "fg=#3b4261"
-        set -g pane-active-border-style "fg=#7aa2f7"
+        set -g pane-border-style "fg=#{@thm_overlay_0}"
+        set -g pane-active-border-style "fg=#{@thm_blue}"
 
         set -g status "on"
         set -g status-justify "left"
 
-        set -g status-style "fg=#7aa2f7,bg=#16161e"
+        set -g status-style "fg=#{@thm_fg},bg=#{@thm_bg}"
 
         set -g status-left-length "100"
         set -g status-right-length "100"
@@ -163,20 +164,23 @@
         set -g status-right-style NONE
 
         # Current session + bell alerts from other sessions
-        set -g status-left "#[fg=#15161e,bg=#7aa2f7,bold] #S #[fg=#7aa2f7,bg=#16161e,nobold,nounderscore,noitalics]#{S:#{?session_bell_flag,#[fg=#e0af68]#[bg=#16161e]#[fg=#16161e]#[bg=#e0af68]#[bold] ! #{session_name} #[fg=#e0af68]#[bg=#16161e]#[nobold],},}"
+        set -g status-left "#[fg=#{@thm_bg},bg=#{@thm_blue},bold] #S #[fg=#{@thm_blue},bg=#{@thm_bg},nobold,nounderscore,noitalics]#{S:#{?session_bell_flag,#[fg=#{@thm_red}]#[bg=#{@thm_bg}]#[fg=#{@thm_bg}]#[bg=#{@thm_red}]#[bold] ! #{session_name} #[fg=#{@thm_red}]#[bg=#{@thm_bg}]#[nobold],},}"
 
-        set -g status-right "#[fg=#16161e,bg=#16161e,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#16161e] #{prefix_highlight} #[fg=#3b4261,bg=#16161e,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#3b4261] %Y-%m-%d  %I:%M %p #[fg=#7aa2f7,bg=#3b4261,nobold,nounderscore,noitalics]#[fg=#15161e,bg=#7aa2f7,bold] #h "
+        set -g status-right "#[fg=#{@thm_bg},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[fg=#{@thm_blue},bg=#{@thm_bg}] #{prefix_highlight} #[fg=#{@thm_surface_0},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[fg=#{@thm_fg},bg=#{@thm_surface_0}] %Y-%m-%d  %I:%M %p #[fg=#{@thm_blue},bg=#{@thm_surface_0},nobold,nounderscore,noitalics]#[fg=#{@thm_bg},bg=#{@thm_blue},bold] #h "
         if-shell '[ "$(tmux show-option -gqv "clock-mode-style")" == "24" ]' {
-          set -g status-right "#[fg=#16161e,bg=#16161e,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#16161e] #{prefix_highlight} #[fg=#3b4261,bg=#16161e,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#3b4261] %Y-%m-%d  %H:%M #[fg=#7aa2f7,bg=#3b4261,nobold,nounderscore,noitalics]#[fg=#15161e,bg=#7aa2f7,bold] #h "
+          set -g status-right "#[fg=#{@thm_bg},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[fg=#{@thm_blue},bg=#{@thm_bg}] #{prefix_highlight} #[fg=#{@thm_surface_0},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[fg=#{@thm_fg},bg=#{@thm_surface_0}] %Y-%m-%d  %H:%M #[fg=#{@thm_blue},bg=#{@thm_surface_0},nobold,nounderscore,noitalics]#[fg=#{@thm_bg},bg=#{@thm_blue},bold] #h "
         }
 
-        setw -g window-status-activity-style "underscore,fg=#a9b1d6,bg=#16161e"
-        setw -g window-status-bell-style "bold,fg=#e0af68,bg=#16161e"
+        setw -g window-status-activity-style "underscore,fg=#{@thm_subtext_1},bg=#{@thm_bg}"
+        setw -g window-status-bell-style "bold,fg=#{@thm_bg},bg=#{@thm_red}"
         setw -g window-status-separator ""
-        setw -g window-status-style "NONE,fg=#a9b1d6,bg=#16161e"
-        setw -g window-status-format "#[fg=#16161e,bg=#16161e,nobold,nounderscore,noitalics]#[default] #I  #W #F #[fg=#16161e,bg=#16161e,nobold,nounderscore,noitalics]"
-        setw -g window-status-current-format "#[fg=#16161e,bg=#3b4261,nobold,nounderscore,noitalics]#[fg=#7aa2f7,bg=#3b4261,bold] #I  #W #F #[fg=#3b4261,bg=#16161e,nobold,nounderscore,noitalics]"
+        setw -g window-status-style "NONE,fg=#{@thm_subtext_1},bg=#{@thm_bg}"
+        setw -g window-status-format "#[fg=#{@thm_bg},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[default] #I  #W #F #[fg=#{@thm_bg},bg=#{@thm_bg},nobold,nounderscore,noitalics]"
+        setw -g window-status-current-format "#[fg=#{@thm_bg},bg=#{@thm_surface_0},nobold,nounderscore,noitalics]#[fg=#{@thm_blue},bg=#{@thm_surface_0},bold] #I  #W #F #[fg=#{@thm_surface_0},bg=#{@thm_bg},nobold,nounderscore,noitalics]"
       '';
     };
+    catppuccin.tmux.extraConfig = ''
+      set -g @catppuccin_window_current_number_color "#{@thm_blue}"
+    '';
   };
 }
