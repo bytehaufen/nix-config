@@ -10,7 +10,16 @@
       enable = isStandalone;
     };
 
-    xdg.portal.extraPortals = lib.optionals isStandalone [pkgs.xdg-desktop-portal-gtk];
+    xdg.portal = lib.mkIf isStandalone {
+      extraPortals = [pkgs.xdg-desktop-portal-gtk];
+      config.niri = {
+        default = ["gnome" "gtk"];
+        "org.freedesktop.impl.portal.Access" = ["gtk"];
+        "org.freedesktop.impl.portal.FileChooser" = ["gtk"];
+        "org.freedesktop.impl.portal.Notification" = ["gtk"];
+        "org.freedesktop.impl.portal.Secret" = ["gnome-keyring"];
+      };
+    };
     services.gnome-keyring.enable = isStandalone;
 
     systemd.user.services.polkit-gnome = lib.mkIf isStandalone {
