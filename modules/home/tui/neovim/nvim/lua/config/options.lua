@@ -15,9 +15,9 @@ vim.opt.fillchars = "eob: "
 
 -- Root markers, first lsp, then file/directory patterns
 vim.g.root_spec = {
+  ".git",
   "lsp",
   {
-    ".git",
     ".lazy.lua",
     ".project", -- Eclipse project file
     ".svn",
