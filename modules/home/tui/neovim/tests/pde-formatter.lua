@@ -65,6 +65,16 @@ write(project .. "/src/Example.java", "public class Example { public int sum(int
 write(project .. "/src/Bootstrap.java", "class Bootstrap {}")
 local pde = require("config.pde")
 vim.lsp.log.set_level("debug")
+local server_errors = {}
+local log_handler = vim.lsp.handlers["window/logMessage"]
+vim.lsp.handlers["window/logMessage"] = function(err, result, ctx, config)
+	if not err and result and result.type == vim.lsp.protocol.MessageType.Error then
+		server_errors[#server_errors + 1] = result.message
+	end
+	if log_handler then
+		return log_handler(err, result, ctx, config)
+	end
+end
 print("Test state: " .. task)
 pde.setup()
 vim.cmd.edit(project .. "/src/Bootstrap.java")
@@ -130,14 +140,10 @@ local ok, failure = xpcall(function()
 	)
 	assert(client.config._pde.state == workspace_state, "Runtime upgrades must preserve workspace indexes")
 	assert(vim.fn.isdirectory(old_runtime) == 1 and vim.fn.isdirectory(new_runtime) == 1)
-	local log = table.concat(vim.fn.readfile(vim.lsp.log.get_filename()), "\n")
-	assert(
-		not log:find("Failed to load extension bundles", 1, true),
-		"Bundle upgrade caused an extension-loading failure"
-	)
 	local formatted_again =
 		client:request_sync("textDocument/formatting", vim.lsp.util.make_formatting_params(), 20000, 0)
 	assert(formatted_again and not formatted_again.err, vim.inspect(formatted_again))
+	assert(#server_errors == 0, "JDT LS reported errors during import/restart:\n" .. table.concat(server_errors, "\n"))
 	print("PASS: real PDE XML formatter, native restart with relocated bundles, preserved workspace and runtime caches")
 end, debug.traceback)
 vim.cmd("lsp disable jdtls")
