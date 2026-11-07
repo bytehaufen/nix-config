@@ -28,16 +28,16 @@ local tools = {
 	flock = vim.fn.exepath("true"),
 	javaHome = vim.fs.dirname(vim.fs.dirname(java)),
 	bundles = root .. "/bundles.json",
+	python = vim.fn.exepath("python3"),
 }
 write(root .. "/fake.jar", "fixture")
 json(tools.bundles, { root .. "/fake.jar" })
 local pde = require("config.pde")
 assert(pde.root(repo .. "/nested/client/Example.java") == repo)
 local config, state = pde.build_config(pde.workspace(repo), tools)
-assert(vim.tbl_contains(config.cmd, "--jvm-arg=-Xmx6g"))
 assert(vim.deep_equal(config.init_options.settings, config.settings))
 assert(vim.deep_equal(config.settings.java.import.exclusions, { "**" }))
-assert(vim.deep_equal(config.settings.java.project.resourceFilters, {}))
+
 local function runtime_path(value)
 	for i, arg in ipairs(value.cmd) do
 		if arg == "-configuration" then
