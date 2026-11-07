@@ -36,6 +36,12 @@ libraries. Keep that packaging outside this editor configuration. COSIDE's
 project-specific setup and update instructions live in its `releng/README.md`.
 Test server/bundle updates together with the disposable checks below.
 
+All manifest bundles load during initialization. The client answers JDT LS's
+`_java.reloadBundles.command` request with an empty change list: there are no
+additional bundles to discover during startup. Updates use native restart,
+not live extension discovery. Other client-command features, including the
+interactive import chooser, remain enabled.
+
 Lazy owns `nvim-jdtls`, like the other editor plugins; `lazy-lock.json` records
 its revision without an additional `commit` override in the plugin spec.
 
