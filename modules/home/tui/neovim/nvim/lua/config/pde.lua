@@ -659,6 +659,12 @@ function M.setup()
     filetypes = { "java" },
     capabilities = capabilities,
     settings = {},
+    commands = {
+      ["_java.reloadBundles.command"] = function()
+        -- Nix bundles load at initialization; updates use native restart.
+        return {}
+      end,
+    },
     flags = { debounce_text_changes = 300 },
     exit_timeout = 10000,
     on_exit = function(code)
