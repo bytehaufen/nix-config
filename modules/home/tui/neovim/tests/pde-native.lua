@@ -50,16 +50,22 @@ local selection = {
 	formatter = { path = "team.xml", profile = "Team" },
 }
 json(repo .. "/javaConfig.json", selection)
-local java = vim.fn.resolve(vim.fn.exepath("java"))
+local java_home = vim.fs.dirname(vim.fs.dirname(vim.fn.resolve(vim.fn.exepath("java"))))
 write(task .. "/fake.jar", "fixture")
 json(task .. "/bundles.json", { task .. "/fake.jar" })
-vim.env.XDG_CONFIG_HOME = task .. "/config"
-json(task .. "/config/nvim-pde/tools.json", {
+local tools = {
 	jdtls = vim.fn.exepath("true"),
 	flock = vim.fn.exepath("true"),
-	javaHome = vim.fs.dirname(vim.fs.dirname(java)),
+	javaHome = java_home,
+	java21Home = java_home,
 	bundles = task .. "/bundles.json",
-})
+	python = vim.fn.exepath("python3"),
+}
+vim.env.XDG_CONFIG_HOME = task .. "/config"
+json(task .. "/config/nvim-pde/tools.json", tools)
+local tools_path = task .. "/tools.json"
+json(tools_path, tools)
+vim.env.PDE_TOOLS_JSON = nil
 local transports, notices = {}, {}
 vim.notify = function(message)
 	notices[#notices + 1] = message
@@ -149,13 +155,34 @@ end
 vim.wait(50)
 assert(#transports == 0 and #notices == 0, "Non-Java startup must neither start JDTLS nor report errors")
 assert(vim.lsp.is_enabled("jdtls"), "PDE must register with the native LSP lifecycle")
-assert(vim.fn.exists(":PdeStart") == 0 and vim.fn.exists(":PdeRestart") == 0 and vim.fn.exists(":PdeStop") == 0)
 open(task .. "/Outside.java", "java")
 local excluded = open(repo .. "/excluded/Example.java", "java")
 local nested = open(repo .. "/api/nested/Example.java", "java")
 vim.wait(50)
 assert(#transports == 0 and #notices == 0)
-local api = open(repo .. "/api/Example.java", "java")
+local function cannot_start_without_manifest(path)
+	local previous_notices = #notices
+	local ok, err = pcall(open, path, "java")
+	vim.wait(2000, function()
+		return #notices > previous_notices
+	end, 10)
+	local guidance = ok and "" or tostring(err)
+	for i = previous_notices + 1, #notices do
+		guidance = guidance .. "\n" .. tostring(notices[i])
+	end
+	assert(#transports == 0 and #clients() == 0, "Java must not start from the stale home manifest")
+	assert(
+		guidance:find("PDE_TOOLS_JSON", 1, true)
+			and (guidance:lower():find("shell", 1, true) or guidance:lower():find("nix develop", 1, true)),
+		"Missing actionable PDE_TOOLS_JSON shell guidance: " .. guidance
+	)
+end
+cannot_start_without_manifest(repo .. "/api/Example.java")
+vim.env.PDE_TOOLS_JSON = ""
+cannot_start_without_manifest(repo .. "/client/Example.java")
+vim.env.PDE_TOOLS_JSON = tools_path
+write(repo .. "/api/Ready.java", "class Ready {}")
+local api = open(repo .. "/api/Ready.java", "java")
 local dep = open(repo .. "/client/Example.java", "java")
 wait(function()
 	return current() and current().attached_buffers[api] and current().attached_buffers[dep]
@@ -178,7 +205,14 @@ assert(prompts == 0 and #transports == 1 and not transports[1].closed)
 write(old_data .. "/.metadata/.log", "PDE log fixture")
 vim.cmd.JdtShowLogs()
 assert(vim.fn.bufnr(old_data .. "/.metadata/.log") >= 0, "Logs command must resolve the dynamic launcher workspace")
--- Native restart reuses Client.config: our dynamic launcher must reread JSON.
+-- Native restart reuses Client.config: it must reread PDE_TOOLS_JSON.
+local updated_tools = vim.deepcopy(tools)
+updated_tools.jdtls = task .. "/updated-jdtls"
+write(updated_tools.jdtls, "#!/bin/sh\nexit 0")
+assert(vim.uv.fs_chmod(updated_tools.jdtls, 493))
+local updated_tools_path = task .. "/updated-tools.json"
+json(updated_tools_path, updated_tools)
+vim.env.PDE_TOOLS_JSON = updated_tools_path
 selection.projects = { "api" }
 selection.formatter.profile = "Other"
 json(repo .. "/javaConfig.json", selection)
@@ -188,6 +222,7 @@ wait(function()
 	return current() and current().id ~= first.id and current().attached_buffers[api]
 end, "Native restart must replace and reconnect the server")
 assert(#transports == 2 and transports[1].closed)
+assert(transports[2].cmd[6] == updated_tools.jdtls, "Native restart must read the switched tools manifest")
 assert(transports[2].cmd[#transports[2].cmd] ~= old_data, "Removed projects require a fresh workspace generation")
 assert(not current().attached_buffers[dep], "Native restart must not reattach removed projects")
 assert(transports[2].initialize.initializationOptions.settings.java.format.settings.profile == "Other")

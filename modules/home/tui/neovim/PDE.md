@@ -1,35 +1,43 @@
 # Java / Eclipse PDE
 
-This configuration uses `nvim-jdtls`, Nix-managed JDT LS on JDK 25, the
+This configuration uses `nvim-jdtls`, project-provided JDT LS on JDK 25, the
 Java bundles from [vscode-pde](https://github.com/testforstephen/vscode-pde),
-and Nix-packaged Microsoft Java Debug. It does not require VS Code or a
-Mason Java adapter. Activate the Home Manager configuration and reopen
-Neovim so the updated tools manifest supplies the debug bundle and Java 21.
+and Microsoft Java Debug. It does not require VS Code or a Mason Java adapter.
 Lazy installs `nvim-jdtls` with the existing `nvim-dap` debugger UI.
 
-## Dependencies and updates
+## Project toolchain
 
-JDT LS, JDK 21/25, and Microsoft Java Debug come directly from the flake's
-`nixpkgs` input. There is no local JDT LS override or launcher patch; the small
-`jdtls-pde` wrapper only supplies matching Nix GLib/libsecret libraries for JNA.
+Start Neovim from the project's Nix development shell. That shell must export
+`PDE_TOOLS_JSON`, an absolute path to its generated tools manifest. For example,
+from the project checkout:
 
-Lazy owns `nvim-jdtls`, like the other editor plugins. Its revision is recorded
-in `lazy-lock.json`, without an additional `commit` override in the plugin spec.
-Nixpkgs also packages this plugin, but using it would introduce a second plugin
-ownership convention without reducing the PDE runtime integration.
+```sh
+nix develop -c nvim
+```
 
-Only two PDE-specific source pins remain in `pde-bundles.nix`:
+Home Manager no longer provisions Java/PDE tools or `nvim-pde/tools.json`.
+There is no fallback to an old Home Manager manifest, Mason, or a Python on
+`PATH`. Missing `PDE_TOOLS_JSON` produces guidance when a selected Java project
+tries to start; opening unrelated files does not require the toolchain.
 
-| Source                                                                                        | Version | Why it is fetched separately                                                                                                                   |
-| --------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [vscode-pde](https://marketplace.visualstudio.com/items?itemName=yaozheng.vscode-pde)         | 0.11.1  | The locked nixpkgs does not package this importer. Its standard `buildVscodeMarketplaceExtension` helper handles the VSIX download/unpack.     |
-| [OSGi Event API](https://repo.maven.apache.org/maven2/org/osgi/org.osgi.service.event/1.4.1/) | 1.4.1   | The importer's e4 bundles require this API, which JDT LS and Java Debug do not supply; the locked nixpkgs has no compatible standalone bundle. |
+The manifest is a JSON object with these fields:
 
-These fixed-output hashes verify downloads; removing them would not make a
-reproducible Nix fetch. This was checked against nixpkgs
-`885ba4d038f10c3d17d7a92e8c3cc185b99c9158`. When updating the lock, check for
-native packages before updating these two sources manually. Test JDT LS and the
-PDE bundles together using the disposable-workspace checks below.
+| Field        | Value                                                              |
+| ------------ | ------------------------------------------------------------------ |
+| `jdtls`      | JDT LS launcher executable, including its Nix native-library setup |
+| `javaHome`   | JDK 25 home used for the default JavaSE-25 runtime                 |
+| `java21Home` | Optional JDK 21 home for launches explicitly requesting JavaSE-21  |
+| `flock`      | Locking executable                                                 |
+| `bundles`    | Path to a JSON array of PDE and Java Debug bundle paths            |
+| `python`     | Python executable with the standard XML parser                     |
+
+The project flake owns tool versions, source hashes, and the compatible native
+libraries. Keep that packaging outside this editor configuration. COSIDE's
+project-specific setup and update instructions live in its `releng/README.md`.
+Test server/bundle updates together with the disposable checks below.
+
+Lazy owns `nvim-jdtls`, like the other editor plugins; `lazy-lock.json` records
+its revision without an additional `commit` override in the plugin spec.
 
 ## Select a small workspace
 
@@ -70,7 +78,7 @@ For a download-free **target**, use a local `pde-pool.target` instead of p2 site
 <?pde?>
 <target name="PDE local bundle pool" sequenceNumber="1">
   <locations>
-    <location path="/home/rico/.p2/pool/plugins" type="Directory"/>
+    <location path="/absolute/path/to/p2/pool/plugins" type="Directory"/>
   </locations>
   <environment>
     <os>linux</os>
@@ -82,7 +90,7 @@ For a download-free **target**, use a local `pde-pool.target` instead of p2 site
 
 Adjust the path/environment for another machine. Keep `projects` unchanged in
 `javaConfig.json` and set `"targetPlatform": "./pde-pool.target"`. Keep both files
-out of shared commits using the checkout's `.git/info/exclude`. No Home Manager
+out of shared commits using the checkout's `.git/info/exclude`. No toolchain
 rebuild is needed for this target-only change: run `:PdeReloadTarget` in an already
 running session (it rereads the configured target path), or `:lsp enable jdtls` if disabled.
 
@@ -100,14 +108,14 @@ is needed. The repository's shared target and Eclipse's active target are unchan
 
 ### Project Java runtime
 
-Nix supplies JavaSE-21 for projects/product launches and JavaSE-25 as the default.
-The language server itself still runs on JDK 25. Runtime overrides below replace
-entries by their exact execution-environment name; no aliases are added.
+The tools manifest supplies JavaSE-25 as the default runtime and can supply
+JavaSE-21 for launches that explicitly request it. JDT LS itself runs on JDK 25.
+Project language, bytecode, and API compatibility settings remain separate:
+running tooling on JDK 25 does not retarget a Java 23 project.
 
-Projects requiring Java 23 need their actual runtime configured separately from
-the server's JDK. Set `PDE_JAVA_23_HOME` to the installed JDK/JRE home (the directory
-containing `bin/java`) before starting Neovim. For other execution environments,
-set this in your local Lua configuration:
+When an actual Java 23 runtime is required, set `PDE_JAVA_23_HOME` to its installed
+JDK/JRE home (the directory containing `bin/java`) before starting Neovim.
+For other execution environments, use local Lua configuration:
 
 ```lua
 vim.g.pde_java_runtimes = {
@@ -134,10 +142,10 @@ and target unchanged:
 Use an exported Eclipse formatter XML file and the exact `<profile name="...">`
 inside it (not Eclipse's internal underscore-prefixed preference ID). Relative
 paths resolve against `javaConfig.json`; absolute local paths are also supported.
-The selected XML profile is read once at startup with Python's standard XML
-parser (Nix-managed; an existing `python3` is used before activation). Missing
-files/profiles, malformed XML, or unsupported indentation prevent startup with
-a visible error. No extra Python packages or checkout scans are needed.
+The selected XML profile is read once at startup with the manifest's Python
+standard XML parser. Missing files/profiles, malformed XML, or unsupported
+indentation prevent startup with a visible error. No extra Python packages or
+checkout scans are needed.
 
 After import completes, attached Java buffers read their effective formatter
 preferences from JDT LS, including project-specific overrides. This sets local
@@ -221,8 +229,8 @@ Open a selected Java file and wait for PDE import to finish. Keep that Java
 buffer loaded, save **all modified buffers in the checkout**, then run:
 
 ```vim
-:PdeDebug com.coside.product/coside.product.launch
-:PdeRun com.coside.product/coside.product.launch
+:PdeDebug product/example.launch
+:PdeRun product/example.launch
 ```
 
 Only `org.eclipse.pde.ui.RuntimeWorkbench` launches are supported. With no path,
@@ -258,7 +266,7 @@ expands only `${workspace_loc}`, `${workspace_loc:/Project/relative/path}` (actu
 selected Eclipse project names, including nested projects), and `${env_var:NAME}`.
 Missing projects/variables, other unresolved environment expressions, and
 `appendEnvironmentVariables=false` are errors. VM/program substitution remains
-PDE's responsibility. Python is Nix-managed, with the existing `python3` fallback.
+PDE's responsibility. Python is supplied by the project tools manifest.
 
 Use the existing debugger controls: F9 toggles a breakpoint, F6 steps over,
 F5 steps into, F7 steps out, F8 continues, `<leader>de` evaluates, and
@@ -344,11 +352,10 @@ NVIM_LOG_FILE=/tmp/nvim-pde-tests.log nvim --headless -u NONE -l modules/home/tu
 The optional formatter integration check starts a real server in a disposable
 single-project workspace, wipes its startup buffer before import completes, tests
 XML style rules and standard LSP formatting, restarts through `:lsp restart`, then
-disables/stops it. It requires the
-Home Manager tools manifest and installed `nvim-jdtls`. To test a built generation
-without activating it, copy its `home-files/.config/nvim-pde/tools.json` into a
-temporary `nvim-pde/` configuration directory and set `XDG_CONFIG_HOME` to that
-directory's parent:
+disables/stops it. It requires `PDE_TOOLS_JSON` from the project development
+shell and installed `nvim-jdtls`. It reads the real tools manifest, then switches
+to a disposable manifest to verify that native restart picks up relocated
+bundles without losing workspace indexes:
 
 ```sh
 NVIM_LOG_FILE=/tmp/pde-formatter-integration.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde-formatter.lua
@@ -358,6 +365,7 @@ These checks do not establish full-monorepo memory stability, complete target
 resolution, or equivalence to Eclipse's active target. Keep large-workspace
 validation separate; a heap limit alone is not a stability guarantee.
 
-After changing the Nix launcher, activate Home Manager. To load changed Lua error
-handlers too, stop PDE and reopen Neovim, then open a selected Java file; `:lsp restart` alone
-does not reload an already-loaded Lua module.
+After updating the project toolchain, re-enter its development shell and reopen
+Neovim. An existing process does not inherit changes from another shell.
+Native `:lsp restart jdtls` rereads the current process's `PDE_TOOLS_JSON` and
+workspace configuration, but does not reload an already-loaded Lua module.

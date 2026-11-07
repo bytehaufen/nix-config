@@ -61,6 +61,12 @@ local function read_json(path)
   return value
 end
 
+local function read_tools()
+  local path = vim.env.PDE_TOOLS_JSON
+  assert(path and path ~= "", "Missing PDE_TOOLS_JSON; start Neovim from the project's Nix development shell")
+  return read_json(path)
+end
+
 local function canonical(path)
   return uv.fs_realpath(path) or vim.fs.normalize(vim.fn.fnamemodify(path, ":p"))
 end
@@ -145,7 +151,7 @@ local function selected(buf, workspace)
 end
 
 function M.build_config(workspace, tools)
-  assert(vim.fn.executable(tools.jdtls or "") == 1, "Missing Nix JDT LS; activate the Home Manager configuration")
+  assert(vim.fn.executable(tools.jdtls or "") == 1, "Missing project JDT LS; re-enter the Nix development shell")
   assert(vim.fn.executable(tools.flock or "") == 1, "Missing flock executable")
   assert(vim.fn.isdirectory(tools.javaHome or "") == 1, "Missing server JDK")
   local bundles = read_json(tools.bundles)
@@ -229,8 +235,8 @@ function M.build_config(workspace, tools)
     -- JDT LS also overwrites XML tab settings with java.format defaults.
     -- Parse the selected profile once at startup using a real XML parser;
     -- never scan projects or guess indentation from source-file contents.
-    local python = tools.python or vim.fn.exepath("python3")
-    assert(vim.fn.executable(python) == 1, "Missing Python XML reader; activate Home Manager")
+    local python = tools.python
+    assert(vim.fn.executable(python or "") == 1, "Missing Python XML reader in PDE_TOOLS_JSON")
     local parsed = vim
       .system({
         python,
@@ -318,7 +324,7 @@ end
 -- which otherwise reuses the old Client.config verbatim.
 local function launch(dispatchers, config)
   local workspace = M.workspace(config.root_dir)
-  local tools = read_json((vim.env.XDG_CONFIG_HOME or (vim.env.HOME .. "/.config")) .. "/nvim-pde/tools.json")
+  local tools = read_tools()
   local generated, state, runtime = M.build_config(workspace, tools)
   -- Client.create already references these tables when it calls the factory.
   -- Mutate their contents so initialize and didChangeConfiguration agree.
@@ -460,7 +466,7 @@ function M.launch_product(path, no_debug)
   for _, command in ipairs({ "java.pde.resolveLaunchArguments", "vscode.java.startDebugSession" }) do
     assert(
       vim.tbl_contains(commands, command),
-      "Missing " .. command .. "; activate updated Home Manager tools, reopen Neovim, and inspect :JdtShowLogs"
+      "Missing " .. command .. "; re-enter the Nix development shell, reopen Neovim, and inspect :JdtShowLogs"
     )
   end
   local dap = require("dap")
@@ -501,9 +507,9 @@ function M.launch_product(path, no_debug)
     end
   end
   continuation(function()
-    local tools = read_json((vim.env.XDG_CONFIG_HOME or (vim.env.HOME .. "/.config")) .. "/nvim-pde/tools.json")
-    local python = tools.python or vim.fn.exepath("python3")
-    assert(vim.fn.executable(python) == 1, "Missing Python XML reader; activate Home Manager")
+    local tools = read_tools()
+    local python = tools.python
+    assert(vim.fn.executable(python or "") == 1, "Missing Python XML reader in PDE_TOOLS_JSON")
     local helper = vim.api.nvim_get_runtime_file("lua/config/pde-launch.py", false)[1]
     assert(helper, "Missing PDE launch helper; update the Neovim configuration")
     vim.system(
