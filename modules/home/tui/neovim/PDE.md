@@ -45,12 +45,20 @@ interactive import chooser, remain enabled.
 Lazy owns `nvim-jdtls`, like the other editor plugins; `lazy-lock.json` records
 its revision without an additional `commit` override in the plugin spec.
 
-## Select a small workspace
+## Workspace project selection
 
-Create a local `javaConfig.json` at your checkout root. List individual Eclipse
-projects, including their required source dependencies, and a conventional
-PDE `.target` file. Project and target paths must be relative to this file
-(the pinned PDE importer cannot import an absolute `targetPlatform` path):
+For COSIDE, `releng/setup/coside-project-set.psf` is the project-selection source.
+Its Linux development shell generates `javaConfig.json.projects` from that PSF
+while preserving local target and formatter settings. Do not maintain the
+generated project array by hand. After changing the PSF, run `coside-pde-config`
+from the checkout root, then `:lsp restart jdtls` in Neovim. The full exported set
+determines the selection, not just the project containing the current buffer.
+See COSIDE's `releng/README.md` for the generation workflow.
+
+Other projects can provide a local `javaConfig.json` at the checkout root.
+List individual Eclipse projects, including their required source dependencies,
+and a conventional PDE `.target` file. Project and target paths must be relative
+to this file (the pinned PDE importer cannot import an absolute `targetPlatform` path):
 
 ```json
 {
@@ -84,7 +92,7 @@ For a download-free **target**, use a local `pde-pool.target` instead of p2 site
 <?pde?>
 <target name="PDE local bundle pool" sequenceNumber="1">
   <locations>
-    <location path="/absolute/path/to/p2/pool/plugins" type="Directory"/>
+    <location path="${system_property:user.home}/.p2/pool/plugins" type="Directory"/>
   </locations>
   <environment>
     <os>linux</os>
@@ -94,7 +102,9 @@ For a download-free **target**, use a local `pde-pool.target` instead of p2 site
 </target>
 ```
 
-Adjust the path/environment for another machine. Keep `projects` unchanged in
+PDE expands `${system_property:user.home}` to the current user's home directory;
+a bare `~` is not expanded. Adjust the path/environment if the pool is elsewhere or
+you use another platform. Keep `projects` unchanged in
 `javaConfig.json` and set `"targetPlatform": "./pde-pool.target"`. Keep both files
 out of shared commits using the checkout's `.git/info/exclude`. No toolchain
 rebuild is needed for this target-only change: run `:PdeReloadTarget` in an already
@@ -297,7 +307,7 @@ Use `PdeDebug` when debugger-controlled process termination is required.
   restart loop, but opening another Java file can retry a stopped/failed server
   while its configuration is enabled. `:lsp disable jdtls` keeps Java off for
   the rest of this Neovim session unless you enable it again.
-- Add projects manually and restart in batches. Closing a buffer does not unload
+- Update selection at its source and restart in batches. Closing a buffer does not unload
   its project. References and refactorings cover imported projects, not the whole
   repository; use Eclipse for repository-wide or cross-language refactoring.
 - The maximum heap is 6 GB, with 512 MB initially allocated. Total process memory
