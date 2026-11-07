@@ -40,7 +40,7 @@ def prepare(config):
     name = container.rsplit("/", 1)[-1] if container else None
     runtimes = [runtime for runtime in config["runtimes"] if runtime.get("name") == name] if name else [runtime for runtime in config["runtimes"] if runtime.get("default") is True]
     if len(runtimes) != 1:
-        raise ValueError("Unknown or ambiguous launch JRE " + (name or "default") + "; configure vim.g.pde_java_runtimes or activate Home Manager")
+        raise ValueError("Unknown or ambiguous launch JRE " + (name or "default") + "; configure vim.g.pde_java_runtimes or the project's Nix tools")
     java = Path(runtimes[0]["path"]) / "bin/java"
     if not java.is_file() or not os.access(java, os.X_OK):
         raise ValueError("Launch JRE executable missing: " + str(java))

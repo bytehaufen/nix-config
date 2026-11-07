@@ -1,6 +1,7 @@
 -- Opt-in integration test: starts real JDT LS in a disposable one-project workspace.
--- Requires the activated nvim-pde/tools.json and installed nvim-jdtls.
+-- Requires PDE_TOOLS_JSON from the project's development shell and installed nvim-jdtls.
 -- PDE_TEST_FORMATTER / PDE_TEST_PROFILE optionally select an existing XML profile.
+assert(vim.env.PDE_TOOLS_JSON and vim.env.PDE_TOOLS_JSON ~= "", "Run from the project dev shell with PDE_TOOLS_JSON")
 local task = assert(vim.uv.fs_mkdtemp("/tmp/pde-formatter.XXXXXX"))
 vim.env.XDG_CACHE_HOME = task .. "/cache"
 vim.env.XDG_STATE_HOME = task .. "/state"
@@ -103,8 +104,7 @@ local ok, failure = xpcall(function()
 	local previous_id = client.id
 	local workspace_state = client.config._pde.state
 	-- Simulate a Nix bundle-package upgrade: same JARs at different locations.
-	local tools_path = (vim.env.XDG_CONFIG_HOME or (vim.env.HOME .. "/.config")) .. "/nvim-pde/tools.json"
-	local tools = vim.json.decode(table.concat(vim.fn.readfile(tools_path), "\n"))
+	local tools = vim.json.decode(table.concat(vim.fn.readfile(assert(vim.env.PDE_TOOLS_JSON)), "\n"))
 	local _, _, old_runtime = pde.build_config(pde.workspace(repo), tools)
 	local bundles = vim.json.decode(table.concat(vim.fn.readfile(tools.bundles), "\n"))
 	vim.fn.mkdir(task .. "/upgraded-bundles", "p")
@@ -115,8 +115,9 @@ local ok, failure = xpcall(function()
 	end
 	tools.bundles = task .. "/upgraded-bundles/bundles.json"
 	write(tools.bundles, vim.json.encode(bundles))
-	vim.env.XDG_CONFIG_HOME = task .. "/config"
-	write(task .. "/config/nvim-pde/tools.json", vim.json.encode(tools))
+	local upgraded_manifest = task .. "/upgraded-bundles/tools.json"
+	write(upgraded_manifest, vim.json.encode(tools))
+	vim.env.PDE_TOOLS_JSON = upgraded_manifest
 	local _, _, new_runtime = pde.build_config(pde.workspace(repo), tools)
 	assert(new_runtime ~= old_runtime)
 	vim.cmd("lsp restart jdtls")
