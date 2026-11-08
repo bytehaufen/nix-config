@@ -56,8 +56,7 @@ json(task .. "/bundles.json", { task .. "/fake.jar" })
 local tools = {
 	jdtls = vim.fn.exepath("true"),
 	flock = vim.fn.exepath("true"),
-	javaHome = java_home,
-	java21Home = java_home,
+	runtimes = { { name = "JavaSE-25", path = java_home, default = true } },
 	bundles = task .. "/bundles.json",
 	python = vim.fn.exepath("python3"),
 }

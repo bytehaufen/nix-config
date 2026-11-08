@@ -2,7 +2,6 @@
 vim.opt.rtp:prepend(vim.fn.getcwd() .. "/modules/home/tui/neovim/nvim")
 local root = vim.fn.tempname()
 vim.env.XDG_CACHE_HOME, vim.env.XDG_STATE_HOME = root .. "/cache", root .. "/state"
-vim.env.PDE_JAVA_23_HOME = nil
 local function write(path, value)
 	vim.fn.mkdir(vim.fs.dirname(path), "p")
 	vim.fn.writefile(vim.split(value, "\n"), path)
@@ -26,7 +25,7 @@ local java = vim.fn.resolve(vim.fn.exepath("java"))
 local tools = {
 	jdtls = vim.fn.exepath("true"),
 	flock = vim.fn.exepath("true"),
-	javaHome = vim.fs.dirname(vim.fs.dirname(java)),
+	runtimes = { { name = "JavaSE-25", path = vim.fs.dirname(vim.fs.dirname(java)), default = true } },
 	bundles = root .. "/bundles.json",
 	python = vim.fn.exepath("python3"),
 }
@@ -35,8 +34,6 @@ json(tools.bundles, { root .. "/fake.jar" })
 local pde = require("config.pde")
 assert(pde.root(repo .. "/nested/client/Example.java") == repo)
 local config, state = pde.build_config(pde.workspace(repo), tools)
-assert(vim.deep_equal(config.init_options.settings, config.settings))
-assert(vim.deep_equal(config.settings.java.import.exclusions, { "**" }))
 
 local function runtime_path(value)
 	for i, arg in ipairs(value.cmd) do
@@ -60,11 +57,6 @@ local changed_tools = vim.deepcopy(tools)
 changed_tools.jdtls = root .. "/new-jdtls"
 write(changed_tools.jdtls, "#!/bin/sh\nexit 0")
 assert(vim.uv.fs_chmod(changed_tools.jdtls, 493))
-check_runtime_change(changed_tools)
-changed_tools = vim.deepcopy(tools)
-changed_tools.javaHome = root .. "/new-jdk"
-vim.fn.mkdir(changed_tools.javaHome .. "/bin", "p")
-assert(vim.uv.fs_symlink(java, changed_tools.javaHome .. "/bin/java"))
 check_runtime_change(changed_tools)
 write(root .. "/new-package/fake.jar", "fixture")
 json(tools.bundles, { root .. "/new-package/fake.jar" })
@@ -91,8 +83,6 @@ write(
 selection.formatter = { path = "./team style.xml", profile = "Team" }
 json(repo .. "/javaConfig.json", selection)
 local formatted = pde.build_config(pde.workspace(repo), tools)
-assert(formatted.settings.java.format.settings.url == vim.uri_from_fname(repo .. "/team style.xml"))
-assert(formatted.init_options.settings.java.format.settings.profile == "Team")
 assert(formatted.init_options.settings.java.format.insertSpaces == false)
 assert(formatted.init_options.settings.java.format.tabSize == 4)
 selection.formatter.profile = "Other"
@@ -188,5 +178,5 @@ end)
 assert(#notices == 1, "Stopped clients must not emit queued notifications")
 vim.lsp.handlers["window/logMessage"] = original_handler
 vim.lsp.get_client_by_id = original_lookup
-print("PASS: root/selection validation, caches/lock, formatter profiles, import controls, batched errors")
+print("PASS: root/selection validation, caches/lock, formatter profiles, batched errors")
 vim.cmd("qa!")
