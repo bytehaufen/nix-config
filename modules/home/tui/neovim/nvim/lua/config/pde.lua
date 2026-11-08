@@ -153,7 +153,11 @@ end
 function M.build_config(workspace, tools)
   assert(vim.fn.executable(tools.jdtls or "") == 1, "Missing project JDT LS; re-enter the Nix development shell")
   assert(vim.fn.executable(tools.flock or "") == 1, "Missing flock executable")
-  assert(vim.fn.isdirectory(tools.javaHome or "") == 1, "Missing server JDK")
+  local runtimes = tools.runtimes
+  assert(
+    type(runtimes) == "table" and vim.islist(runtimes) and #runtimes > 0,
+    "Missing Java runtimes in PDE_TOOLS_JSON; re-enter the Nix development shell"
+  )
   local bundles = read_json(tools.bundles)
   assert(vim.islist(bundles) and #bundles > 0, "PDE bundle manifest is empty")
   for _, bundle in ipairs(bundles) do
@@ -167,27 +171,8 @@ function M.build_config(workspace, tools)
   -- but must keep the selected projects' workspace and indexes.
   local bundle_paths = vim.deepcopy(bundles)
   table.sort(bundle_paths)
-  local runtime_key = vim.fn
-    .sha256(vim.json.encode({
-      canonical(tools.jdtls),
-      canonical(tools.javaHome),
-      bundle_paths,
-    }))
-    :sub(1, 16)
+  local runtime_key = vim.fn.sha256(vim.json.encode({ canonical(tools.jdtls), bundle_paths })):sub(1, 16)
   local runtime = state .. "/config-" .. runtime_key
-  local runtimes = { { name = "JavaSE-25", path = tools.javaHome, default = true } }
-  if tools.java21Home then
-    runtimes[#runtimes + 1] = { name = "JavaSE-21", path = tools.java21Home }
-  end
-  if vim.env.PDE_JAVA_23_HOME and vim.env.PDE_JAVA_23_HOME ~= "" then
-    runtimes[#runtimes + 1] = { name = "JavaSE-23", path = vim.env.PDE_JAVA_23_HOME }
-  end
-  for _, runtime in ipairs(vim.g.pde_java_runtimes or {}) do
-    runtimes = vim.tbl_filter(function(existing)
-      return existing.name ~= runtime.name
-    end, runtimes)
-    runtimes[#runtimes + 1] = runtime
-  end
   for _, runtime in ipairs(runtimes) do
     assert(vim.fn.executable(runtime.path .. "/bin/java") == 1, "Invalid Java runtime: " .. runtime.path)
   end

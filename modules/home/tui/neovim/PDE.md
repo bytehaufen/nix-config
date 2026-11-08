@@ -1,6 +1,6 @@
 # Java / Eclipse PDE
 
-This configuration uses `nvim-jdtls`, project-provided JDT LS on JDK 25, the
+This configuration uses `nvim-jdtls`, project-provided JDT LS,
 Java bundles from [vscode-pde](https://github.com/testforstephen/vscode-pde),
 and Microsoft Java Debug. It does not require VS Code or a Mason Java adapter.
 Lazy installs `nvim-jdtls` with the existing `nvim-dap` debugger UI.
@@ -22,14 +22,13 @@ tries to start; opening unrelated files does not require the toolchain.
 
 The manifest is a JSON object with these fields:
 
-| Field        | Value                                                              |
-| ------------ | ------------------------------------------------------------------ |
-| `jdtls`      | JDT LS launcher executable, including its Nix native-library setup |
-| `javaHome`   | JDK 25 home used for the default JavaSE-25 runtime                 |
-| `java21Home` | Optional JDK 21 home for launches explicitly requesting JavaSE-21  |
-| `flock`      | Locking executable                                                 |
-| `bundles`    | Path to a JSON array of PDE and Java Debug bundle paths            |
-| `python`     | Python executable with the standard XML parser                     |
+| Field      | Value                                                                 |
+| ---------- | --------------------------------------------------------------------- |
+| `jdtls`    | JDT LS launcher executable, including its Nix native-library setup    |
+| `runtimes` | JDT LS runtime array: `name`, JDK/JRE home `path`, optional `default` |
+| `flock`    | Locking executable                                                    |
+| `bundles`  | Path to a JSON array of PDE and Java Debug bundle paths               |
+| `python`   | Python executable with the standard XML parser                        |
 
 The project flake owns tool versions, source hashes, and the compatible native
 libraries. Keep that packaging outside this editor configuration. COSIDE's
@@ -71,8 +70,8 @@ Keep this file untracked by adding `/javaConfig.json` to your repository's local
 exclude file (`git rev-parse --git-path info/exclude`). Preserve existing entries;
 the Neovim integration does not edit Git settings or create project configuration.
 
-Oomph `Targlet` locations are not supported in this first version. Use a regular
-PDE target with p2 or directory locations. A different target can resolve different
+Oomph `Targlet` locations are not supported. Use a regular PDE target with p2 or
+directory locations. A different target can resolve different
 dependencies from Eclipse: check the resulting diagnostics before expanding the
 selection. Private p2 repositories must be accessible to the server; Maven's
 `settings.xml` does not automatically supply p2 credentials.
@@ -124,24 +123,25 @@ is needed. The repository's shared target and Eclipse's active target are unchan
 
 ### Project Java runtime
 
-The tools manifest supplies JavaSE-25 as the default runtime and can supply
-JavaSE-21 for launches that explicitly request it. JDT LS itself runs on JDK 25.
-Project language, bytecode, and API compatibility settings remain separate:
-running tooling on JDK 25 does not retarget a Java 23 project.
+The project declares its execution environments in the tools manifest's
+`runtimes` array, using JDT LS's native format. Each entry has a `name` such as
+`JavaSE-21`, a JDK/JRE home `path` containing `bin/java`, and an optional
+`default: true` flag. The editor uses this list directly, without version-specific
+defaults or local override layers.
 
-When an actual Java 23 runtime is required, set `PDE_JAVA_23_HOME` to its installed
-JDK/JRE home (the directory containing `bin/java`) before starting Neovim.
-For other execution environments, use local Lua configuration:
+COSIDE declares JavaSE-25 as the default and JavaSE-21 for launches that request it.
+To add an actual Java 23 runtime or change the default, update the project flake's
+runtime list, re-enter its development shell, and reopen Neovim.
 
-```lua
-vim.g.pde_java_runtimes = {
-  { name = "JavaSE-23", path = "/path/to/java-23" },
-}
-```
+JDT LS itself uses the JDK selected by the project launcher. Project language,
+bytecode, and API compatibility settings remain separate: running tooling on a
+newer JDK does not retarget the project or supply an older runtime.
 
-Project compiler settings remain authoritative. Custom JavaFX containers, classpath
-variables, or other Eclipse-specific extensions may need additional configuration;
-this integration does not import Eclipse's installed-runtime preferences.
+Project compiler settings remain authoritative. COSIDE's toolchain supplies
+JavaFX libraries and SDK source attachments through a headless PDE contributor.
+Other custom classpath containers, variables, or Eclipse-specific extensions need
+project toolchain support; this integration does not import Eclipse's
+installed-runtime preferences.
 
 ### Checkout formatter
 
@@ -322,9 +322,10 @@ Use `PdeDebug` when debugger-controlled process termination is required.
   Unchanged selections reuse indexes. Changed selections use a separate workspace
   so removed projects cannot remain imported. Older caches are retained.
   Within that directory, `workspace/` holds project indexes; `config-<runtime-hash>/`
-  holds the Eclipse runtime cache. Changes to the JDT LS or JDK package paths, or
-  PDE bundle paths, select a fresh runtime cache without clearing the workspace
-  or downloaded targets. The old unversioned `config/` is no longer used and is
+  holds the Eclipse runtime cache. Changes to the project launcher (including its
+  JDT LS/JDK closure) or PDE bundle paths select a fresh runtime cache without
+  clearing the workspace or downloaded targets. Changing only project execution
+  environments does not invalidate the server cache. The old unversioned `config/` is no longer used and is
   retained, not deleted. Restart Neovim after updating this Lua configuration.
 - A checkout-wide `flock` prevents concurrent Neovim processes from opening the
   same PDE workspace. A crashed process releases the lock automatically. A server
@@ -375,6 +376,15 @@ bundles without losing workspace indexes:
 
 ```sh
 NVIM_LOG_FILE=/tmp/pde-formatter-integration.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde-formatter.lua
+```
+
+With a JavaFX-enabled project toolchain, the optional source-navigation regression
+opens real controls/FXML source buffers, relocates the SDK, and verifies that native
+restart replaces cached library/source paths without rewriting Eclipse metadata.
+It uses a disposable empty target and does not read your p2 pool:
+
+```sh
+NVIM_LOG_FILE=/tmp/pde-javafx-integration.log nvim --headless -u NONE -l modules/home/tui/neovim/tests/pde-javafx.lua
 ```
 
 These checks do not establish full-monorepo memory stability, complete target
