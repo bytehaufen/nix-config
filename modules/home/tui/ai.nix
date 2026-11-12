@@ -51,8 +51,18 @@ in {
       chatgpt = {
         name = "ChatGPT";
         exec = "brave --app=https://chatgpt.com";
+        icon = "chatgpt";
         terminal = false;
         categories = ["Network"];
+      };
+
+      chatgptDesktop = {
+        name = "ChatGPT Desktop";
+        exec = "${lib.getExe llma-pkgs.chatgpt} %U";
+        icon = "chatgpt";
+        terminal = false;
+        categories = ["Network"];
+        mimeType = ["x-scheme-handler/codex"];
       };
     };
 
