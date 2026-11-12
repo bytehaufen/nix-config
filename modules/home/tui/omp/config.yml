@@ -16,7 +16,7 @@ composer:
 theme:
   dark: dark-catppuccin
   light: dark-catppuccin
-setupVersion: 2
+setupVersion: 3
 tui:
   vimMode: true
   textSizing: true
