@@ -80,7 +80,6 @@
       omp.enable = true;
 
       discord.enable = false;
-      nchat.enable = true;
       obs.enable = false;
       teams.enable = true;
       translator.enable = true;

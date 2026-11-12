@@ -9,7 +9,6 @@
     ./git.nix
     ./gpg.nix
     ./mail.nix
-    ./nchat.nix
     ./neovim
     ./shell.nix
     ./skim.nix
@@ -20,7 +19,6 @@
     ./workaholick
     ./xdg.nix
     ./yazi
-    ./zellij
     ./zoxide.nix
   ];
 }

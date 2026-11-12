@@ -31,7 +31,6 @@ in {
     programs = {
       discord = mkEnableOption "Enable Discord Vesktop Client";
       luanti = mkEnableOption "Enable luanti, an open source voxel game engine";
-      nchat = mkEnableOption "Enable nchat - Terminal-based chat client with support for Telegram and WhatsApp";
       obs = mkEnableOption "Enable OBS Studio configuration.";
       teams = mkEnableOption "Enable Microsoft Teams Client for Linux";
       translator = mkEnableOption " Enable translateLocally - Fast and secure translation on your local machine, powered by marian and Bergamot.";
