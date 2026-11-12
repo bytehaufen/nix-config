@@ -74,7 +74,7 @@ in {
         ollama-256k = "OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_CONTEXT_LENGTH=262144 ollama serve";
       }
       // lib.optionalAttrs ompEnabled {
-        omps = "omp -p --model '@smol'";
+        omps = "omp -p --no-session --model '@smol' 2>/dev/null";
       };
   };
 }
