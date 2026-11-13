@@ -129,6 +129,11 @@
             ];
             parseEmoji = true;
           };
+          keybinding.commits = {
+            moveDownCommit = "<a-j>";
+            moveUpCommit = "<a-k>";
+            openLogMenu = "<a-l>";
+          };
         };
       };
     };
