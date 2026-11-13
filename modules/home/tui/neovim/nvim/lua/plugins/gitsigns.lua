@@ -6,7 +6,10 @@ return {
 
     -- Let mini.diff handle visualization
     opts = function(_, opts)
-      opts.current_line_blame = true
+      opts.signcolumn = false
+      opts.numhl = false
+      opts.linehl = false
+      opts.current_line_blame = false
 
       local original_on_attach = opts.on_attach
 

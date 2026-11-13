@@ -18,6 +18,7 @@ return {
     "catgoose/nvim-colorizer.lua",
     event = "BufReadPre",
     opts = {
+      filetypes = { "css", "scss", "sass", "html", "vue", "svelte", "javascriptreact", "typescriptreact", "lua", "nix" },
       user_default_options = {
         RGB = true, -- #RGB hex codes
         RRGGBB = true, -- #RRGGBB hex codes

@@ -28,7 +28,7 @@
       clock24 = true;
       customPaneNavigationAndResize = false; # That is the default
 
-      escapeTime = 50;
+      escapeTime = 0;
 
       historyLimit = 10000;
       keyMode = "vi";
@@ -51,7 +51,17 @@
             set -g @continuum-save-interval '5' # minutes
           '';
         }
-        vim-tmux-navigator
+        {
+          plugin = vim-tmux-navigator;
+          extraConfig = ''
+            # Avoid scanning all processes for ordinary editor and shell panes.
+            # Retain the process lookup for wrappers and other foreground jobs.
+            set -g @vim_navigator_check "\
+              echo '#{pane_current_command}' | grep -iqE '^@vim_navigator_pattern$' && exit 0; \
+              case '#{pane_current_command}' in bash|zsh|fish) exit 1 ;; esac; \
+              ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +@vim_navigator_pattern$'"
+          '';
+        }
       ];
 
       shortcut = "a";
@@ -167,9 +177,13 @@
         set -g status-left "#[fg=#{@thm_bg},bg=#{@thm_blue},bold] #S #[fg=#{@thm_blue},bg=#{@thm_bg},nobold,nounderscore,noitalics]#{S:#{?session_bell_flag,#[fg=#{@thm_red}]#[bg=#{@thm_bg}]#[fg=#{@thm_bg}]#[bg=#{@thm_red}]#[bold] ! #{session_name} #[fg=#{@thm_red}]#[bg=#{@thm_bg}]#[nobold],},}"
 
         set -g status-right "#[fg=#{@thm_bg},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[fg=#{@thm_blue},bg=#{@thm_bg}] #{prefix_highlight} #[fg=#{@thm_surface_0},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[fg=#{@thm_fg},bg=#{@thm_surface_0}] %Y-%m-%d  %I:%M %p #[fg=#{@thm_blue},bg=#{@thm_surface_0},nobold,nounderscore,noitalics]#[fg=#{@thm_bg},bg=#{@thm_blue},bold] #h "
-        if-shell '[ "$(tmux show-option -gqv "clock-mode-style")" == "24" ]' {
+        if -F '#{==:#{clock-mode-style},24}' {
           set -g status-right "#[fg=#{@thm_bg},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[fg=#{@thm_blue},bg=#{@thm_bg}] #{prefix_highlight} #[fg=#{@thm_surface_0},bg=#{@thm_bg},nobold,nounderscore,noitalics]#[fg=#{@thm_fg},bg=#{@thm_surface_0}] %Y-%m-%d  %H:%M #[fg=#{@thm_blue},bg=#{@thm_surface_0},nobold,nounderscore,noitalics]#[fg=#{@thm_bg},bg=#{@thm_blue},bold] #h "
         }
+
+        # Custom status-right replaces the hook installed by Continuum above.
+        # Reattach it after both clock layouts, including on config reload.
+        set -ag status-right '#(${pkgs.tmuxPlugins.continuum}/share/tmux-plugins/continuum/scripts/continuum_save.sh)'
 
         setw -g window-status-activity-style "underscore,fg=#{@thm_subtext_1},bg=#{@thm_bg}"
         setw -g window-status-bell-style "bold,fg=#{@thm_bg},bg=#{@thm_red}"

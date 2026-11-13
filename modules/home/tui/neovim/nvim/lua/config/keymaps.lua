@@ -5,9 +5,6 @@ if vim.fn.executable("btop") == 1 then
   end, { desc = "btop" })
 end
 
--- Exit insert mode with jk
-vim.keymap.set("i", "jk", "<Esc>", { noremap = true, silent = true, desc = "<Esc>" })
-
 -- Activate Tmux seamless navigating
 vim.keymap.del("n", "<C-h>")
 vim.keymap.del("n", "<C-j>")
