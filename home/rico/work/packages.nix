@@ -7,6 +7,7 @@
   workspace = "${sdkHome}/ws";
   reviewWorkspace = "${sdkHome}/host-review-ws";
   cosideRepoRoot = "$HOME/Projects/coside-eclipse";
+  sdkArgs = "-data ${workspace} --launcher.appendVmargs -vmargs -Xmx3g";
 in {
   xdg.configFile."coside/copilot-local.conf".text = ''
     ECLIPSE_HOME=${eclipseHome}
@@ -74,7 +75,7 @@ in {
       (pkgs.writeShellScriptBin "coside-sdk" ''
         COSIDE_INSTALL_PATH="${cosideInstallPath}"
         SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
-        EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${eclipseHome}/eclipse -data ${workspace}"
+        EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${eclipseHome}/eclipse ${sdkArgs}"
         GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
       '')
 
@@ -82,7 +83,7 @@ in {
       (pkgs.writeShellScriptBin "coside-sdk-no-nix" ''
         COSIDE_INSTALL_PATH="${cosideInstallPath}"
         SOURCE_COMMAND="source $COSIDE_INSTALL_PATH/coside --setenv"
-        EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${eclipseHome}/eclipse -data ${workspace}"
+        EXEC_CMD="cd $COSIDE_INSTALL_PATH && $SOURCE_COMMAND && setenv GDK_BACKEND wayland && setenv WEBKIT_DISABLE_COMPOSITING_MODE 1 && ${eclipseHome}/eclipse ${sdkArgs}"
         exec bash-no-nix env GTK_THEME=Adwaita tcsh -c "$EXEC_CMD"
       '')
 
