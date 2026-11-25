@@ -11,6 +11,7 @@
       nautilus # File manager
       overskride # Bluetooth / Obex client
       gparted # Partition editor
+      tigervnc # VNC client
 
       # Screenshot
       grim # Screenshot utility
